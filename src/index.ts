@@ -37,7 +37,7 @@ async function main(mainActivity: Java.Wrapper) {
   const Resources = CoreModule.class("UnityEngine.Resources");
 	const CharacterDataMonitor = TheMultiplayerGuys.image.class('FG.Common.Character.CharacterDataMonitor');
 	const CharacterControllerData = TheMultiplayerGuys.image.class('FG.Common.CharacterControllerData');
-  await sleep(1000); // try to fix random crashes while image.class('FG.Common.COMMON_ObjectiveReachEndZone');
+  await sleep(1000); // try to fix random crashes while image.class('FG.Common.COMMON_ObjectiveReachEndZone'); // not working ig
   const ObjectiveReachEndZone = TheMultiplayerGuys.image.class('FG.Common.COMMON_ObjectiveReachEndZone');
 
 	// Creating state variables
@@ -52,8 +52,7 @@ async function main(mainActivity: Java.Wrapper) {
 
   const config = Config.$new();
 
-  config.MENU_TITLE.value = 'FAIL GUS HAKTOL';
-  config.MENU_SUBTITLE.value = 'Created by FGM Team!';
+  config.MENU_SUBTITLE.value = 'Created By @repinek';
 
   const menu = Menu.$new(mainActivity, config);
 
@@ -63,7 +62,7 @@ async function main(mainActivity: Java.Wrapper) {
 	menu.Switch('360 Dives', is360Dives);
 	menu.SeekBar('Normal Max Speed', normalMaxSpeedvalue, 1, 1000);
 	menu.SeekBar('Max Gravity Velocity', maxGravityVelocityvalue, -100, 200);
-  menu.Switch('qual', tpToEndZonevalue);
+  menu.Switch('Teleport To Finish', tpToEndZonevalue);
 
 	// Main functions, hooks
 
@@ -77,6 +76,7 @@ async function main(mainActivity: Java.Wrapper) {
 	CharacterDataMonitor.method("CheckCharacterControllerData", 1).implementation = function (character) {
     console.log("Перехвачена функция CheckCharacterControllerData");
     if (isBypassCCH.get()) {
+        console.log("52")
         // Set variables from menu
         //@ts-ignore for character.method
         let storedCharacterControllerData = character.method("get_Data").invoke();
@@ -88,7 +88,18 @@ async function main(mainActivity: Java.Wrapper) {
 				}
         if (tpToEndZonevalue.get()) {
           let instance = findObjectsOfTypeAll(ObjectiveReachEndZone).get(0)
-          console.log(instance.monitor)
+          const EndZoneVector3Pos = instance
+          .method<Il2Cpp.Object>("get_transform").invoke()
+          .method<Il2Cpp.Object>("get_position").invoke();
+
+          console.log(EndZoneVector3Pos)
+          //@ts-ignore
+          console.log(character.monitor)
+
+          character.
+          //@ts-ignore
+          method<Il2Cpp.Object>("get_transform").invoke().
+          method<Il2Cpp.Object>("set_position").invoke(EndZoneVector3Pos);
         }
           // flag2 = isValid; return flag2; 
           return true;
@@ -98,7 +109,7 @@ async function main(mainActivity: Java.Wrapper) {
 };
 
 Java.scheduleOnMainThread(() => {
-  // sleep(2000) // idk gonna try to fix crashes
+  sleep(2000) // idk gonna try to fix crashes // not working ig
   menu.attach();
 });
 }

@@ -29,7 +29,7 @@ export async function ensureModuleInitialized(...modules: string[]) {
 }
 
 export function JavaIl2cppPerform(fn: () => void) {
-  // sleep(2000)
+  sleep(2000) // not working ig
   Java.perform(() => {
     Il2Cpp.perform(fn);
   });
