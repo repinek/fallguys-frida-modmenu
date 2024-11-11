@@ -1,0 +1,21 @@
+{
+  "name": "lglmenu",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "spawn": "frida -U Gadget -l dist/agent.js",
+    "build": "frida-compile src/index.ts -o dist/agent.js -c",
+    "watch": "frida-compile src/index.ts -o dist/agent.js -w"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/frida-gum": "^18.7.1",
+    "@types/node": "^22.9.0",
+    "frida-compile": "^16.4.1",
+    "frida-il2cpp-bridge": "^0.9.1",
+    "typescript": "^5.6.3"
+  }
+}
