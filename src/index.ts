@@ -10,8 +10,9 @@ const modules = ['libil2cpp.so', 'libunity.so', 'libmain.so'];
 JavaIl2cppPerform(async () => {
   await sleep(1000);
   await ensureModuleInitialized(...modules);
-
+  
   const mainActivity = await getActivity(APP_MAIN_ACTIVITY);
+
   if (!mainActivity) throw new Error('Failed to get main activity');
 
   main(mainActivity).catch((error) => console.error(error));
@@ -29,9 +30,11 @@ async function main(mainActivity: Java.Wrapper) {
 	// Getting unity classes
 
 	const TheMultiplayerGuys = Il2Cpp.domain.assembly('TheMultiplayerGuys.FGCommon');
-  const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
+  const MTFGClient = Il2Cpp.domain.assembly('MT.FGClient');
+  const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule");
 
-  const Resources = CoreModule.class("UnityEngine.Resources");
+  const Resources = CoreModule.image.class("UnityEngine.Resources");
+  const GraphicsSettings = MTFGClient.image.class('FGClient.GraphicsSettings');
 	const CharacterDataMonitor = TheMultiplayerGuys.image.class('FG.Common.Character.CharacterDataMonitor');
 	const CharacterControllerData = TheMultiplayerGuys.image.class('FG.Common.CharacterControllerData');
   await sleep(1000); // try to fix random crashes while image.class('FG.Common.COMMON_ObjectiveReachEndZone'); // not working ig
@@ -72,10 +75,17 @@ async function main(mainActivity: Java.Wrapper) {
 
 	// Main functions, hooks
 
+    // bad fps bypass (set to 144)
+    GraphicsSettings.method("set_TargetFrameRate", 1).implementation = function (value) {
+
+        return this.method("set_TargetFrameRate", 1).invoke(144); 
+      }
+
+
   function findObjectsOfTypeAll(klass: Il2Cpp.Class) {
     return Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1,).invoke(klass.type.object);
   }
-
+  
 	let storedCharacterControllerData = null;
 	
   // FallGuysCharacterController character
@@ -110,16 +120,14 @@ async function main(mainActivity: Java.Wrapper) {
               useCustomMGV.set(false);
               console.log("Conflict: useCustomMGV выключен, потому что NoVelocity включен");
           }
-      } else if (!NoVelocity.get() && useCustomMGV.get()) {
-          // Если NoVelocity выключен и useCustomMGV включен
-          storedCharacterControllerData.field("maxGravityVelocity").value = maxGravityVelocityvalue.get();
-      } else {
-          // Если оба выключены
-          storedCharacterControllerData.field("maxGravityVelocity").value = 40;
-      }
+          } else if (!NoVelocity.get() && useCustomMGV.get()) {
+              // Если NoVelocity выключен и useCustomMGV включен
+              storedCharacterControllerData.field("maxGravityVelocity").value = maxGravityVelocityvalue.get();
+          } else {
+              // Если оба выключены
+              storedCharacterControllerData.field("maxGravityVelocity").value = 40;
+          }
       
-
-
 
 				if (is360Dives.get()){
 					storedCharacterControllerData.field("divePlayerSensitivity").value = 14888; // Set divePlayerSensivity to 14888 (for 360 dives)
