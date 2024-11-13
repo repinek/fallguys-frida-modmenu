@@ -28,8 +28,8 @@ export async function ensureModuleInitialized(...modules: string[]) {
   }
 }
 
-export function JavaIl2cppPerform(fn: () => void) {
-  Java.perform(() => {
-    Il2Cpp.perform(fn);
-  });
-}
+  export function JavaIl2cppPerform(fn: () => void) {
+    Java.perform(() => {
+      Il2Cpp.perform(fn);
+    });
+  }

@@ -18,5 +18,8 @@
     "frida-compile": "^16.4.1",
     "frida-il2cpp-bridge": "^0.9.1",
     "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "frida-java-menu": "github:commonuserlol/frida-java-menu"
   }
 }
