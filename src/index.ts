@@ -1,169 +1,211 @@
 import 'frida-il2cpp-bridge';
-import { getActivity, sleep, ensureModuleInitialized, JavaIl2cppPerform } from './util.js';
+import 'frida-java-menu';
+import { obsidianConfig } from './menuConfig.js';
 
-type Il2CppThis = Il2Cpp.Class | Il2Cpp.Object;
+// ultra shitcode at least it works
+let AssemblyCSharp: Il2Cpp.Image | undefined;
+let TheMultiplayerGuys: Il2Cpp.Image | undefined;
+let CoreModule: Il2Cpp.Image | undefined;
 
-const APP_MAIN_ACTIVITY = "com.unity3d.player.UnityPlayerActivity"
+let Resources: Il2Cpp.Class | undefined; 
 
-const modules = ['libil2cpp.so', 'libunity.so', 'libmain.so'];
+function getAssemblyCSharp() {
+  console.log(2)
+  if (AssemblyCSharp) return AssemblyCSharp;
+  AssemblyCSharp = Il2Cpp.domain.assembly("Assembly-CSharp").image;
+  return AssemblyCSharp;
+}
 
-JavaIl2cppPerform(async () => {
-  await sleep(1000);
-  await ensureModuleInitialized(...modules);
-  
-  const mainActivity = await getActivity(APP_MAIN_ACTIVITY);
-
-  if (!mainActivity) throw new Error('Failed to get main activity');
-
-  main(mainActivity).catch((error) => console.error(error));
-});
-
-async function main(mainActivity: Java.Wrapper) {
-
-  // Getting Java classes
-
-  const Menu = Java.use('com.maars.fmenu.Menu');
-  const Config = Java.use('com.maars.fmenu.Config');
-  const Bool = Java.use('com.maars.fmenu.PBoolean');
-  const Int = Java.use('com.maars.fmenu.PInteger');
-
-	// Getting unity classes
-
-	const TheMultiplayerGuys = Il2Cpp.domain.assembly('TheMultiplayerGuys.FGCommon');
-  const MTFGClient = Il2Cpp.domain.assembly('MT.FGClient');
-  const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule");
-
-  const Resources = CoreModule.image.class("UnityEngine.Resources");
-  const GraphicsSettings = MTFGClient.image.class('FGClient.GraphicsSettings');
-	const CharacterDataMonitor = TheMultiplayerGuys.image.class('FG.Common.Character.CharacterDataMonitor');
-	const CharacterControllerData = TheMultiplayerGuys.image.class('FG.Common.CharacterControllerData');
-  await sleep(1000); // try to fix random crashes while image.class('FG.Common.COMMON_ObjectiveReachEndZone'); // not working ig
-  const ObjectiveReachEndZone = TheMultiplayerGuys.image.class('FG.Common.COMMON_ObjectiveReachEndZone');
-
-	// Creating state variables
-
-  const isBypassCCH = Bool.of(false);
-  //const showFPS = Bool.of(false);
-	const is360Dives = Bool.of(false);
-  const useCustomNMS = Bool.of(false);
-	const normalMaxSpeedvalue = Int.of(9);
-  let NoVelocity = Bool.of(false);
-  const useCustomMGV = Bool.of(false);
-	const maxGravityVelocityvalue = Int.of(40);
-  const tpToEndZonevalue = Bool.of(false);
-
-  // Creating a custom config
-
-  const config = Config.$new();
-  
-  config.MENU_TITLE.value = "Fall Guys Hak Tol";
-  config.MENU_SUBTITLE.value = 'Created By @repinek';
-
-  const menu = Menu.$new(mainActivity, config);
-
-  // Building menu
-
-  menu.Switch('Bypass CharacterControllerData Checks', isBypassCCH);
-  //menu.Switch('Show FPS', showFPS);
-	menu.Switch('360 Dives', is360Dives);
-  menu.Switch('Use Custom Normal Max Speed?', useCustomNMS);
-	menu.SeekBar('Normal Max Speed', normalMaxSpeedvalue, 1, 1000);
-  menu.Switch('No Velocity', NoVelocity);
-  menu.Switch('Use Custom Max Gravity Velocity?', useCustomMGV);
-	menu.SeekBar('Max Gravity Velocity', maxGravityVelocityvalue, -100, 200)
-  menu.Switch('Teleport To Finish (Only Races)', tpToEndZonevalue);
-
-	// Main functions, hooks
-
-    // bad fps bypass (set to 144)
-    GraphicsSettings.method("set_TargetFrameRate", 1).implementation = function (value) {
-
-        return this.method("set_TargetFrameRate", 1).invoke(144); 
-      }
-
-
-  function findObjectsOfTypeAll(klass: Il2Cpp.Class) {
-    return Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1,).invoke(klass.type.object);
+function getCoreModule() {
+    if (CoreModule) return CoreModule;
+    CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
+    Resources = CoreModule.class("UnityEngine.Resources")
+    return CoreModule;
   }
-  
-	let storedCharacterControllerData = null;
-	
-  // FallGuysCharacterController character
-	CharacterDataMonitor.method("CheckCharacterControllerData", 1).implementation = function (character) {
-    console.log(`CheckCharacterControllerData function was intercepted!
-      DEBUG:
-      CharacterControllerData Checks: ${isBypassCCH.get()}
-      360 Dives: ${is360Dives.get()}
-      normalMaxSpeed: ${useCustomNMS.get()}, ${normalMaxSpeedvalue.get()}
-      No Velocity: ${NoVelocity.get()}
-      maxGravityVelocity: ${useCustomMGV.get()}, ${maxGravityVelocityvalue.get()}
-      Insta-Qual: ${tpToEndZonevalue.get()}`);
 
-    if (isBypassCCH.get()) {
-        // Set variables from menu
 
-        //@ts-ignore for character.method
-        let storedCharacterControllerData = character.method("get_Data").invoke(); // CharacterControllerData instance
+let storedFallGuysCharacterController = Il2Cpp.Class;
 
-        if (useCustomNMS.get()){
-          storedCharacterControllerData.field("normalMaxSpeed").value = normalMaxSpeedvalue.get(); 
-        } else {
-          storedCharacterControllerData.field("normalMaxSpeed").value = 9.5;
+let isCharacterControllerDataCheckEnabled = false;
+let originalCheckCharacterControllerData: Il2Cpp.Method | null = null; 
+let CharacterDataMonitor: Il2Cpp.Class | undefined; 
+let storedCharacterControllerData: Il2Cpp.Class | undefined;
+
+// from menu 
+let is360Dives = false;
+let timetospawn = 10000;
+let normalMaxSpeed = 9.5;
+let maxGravityVelocity = 40; 
+let noVelocity = false;
+
+const CheckCharacterControllerDataBypass = {
+    enable() {
+        try {
+            console.log("[Disable] CheckCharacterControllerDataBypass");
+
+            Java.scheduleOnMainThread(() => {
+                console.log("[Disable] Preparing to hook CheckCharacterControllerData...");
+
+                setTimeout(() => {
+                    console.log("[Disable] Delayed execution before implementation");
+                    const method = CharacterDataMonitor!.method("CheckCharacterControllerData", 1);
+
+                    if (originalCheckCharacterControllerData === null) {
+                        originalCheckCharacterControllerData = method;
+                    }
+                    
+                    // FallGuysCharacterController character
+                    method.implementation = function (character: any) {
+                        console.log("[Disable] Method CheckCharacterControllerData called");
+                        storedFallGuysCharacterController = character;
+
+                        storedCharacterControllerData = character.method("get_Data").invoke();
+
+                        if (is360Dives === true) {
+                            storedCharacterControllerData!.field("divePlayerSensitivity").value = 14888;
+                        }
+                        else if (is360Dives === false) {
+                            storedCharacterControllerData!.field("divePlayerSensitivity").value = 70;
+                        }
+                        
+                        storedCharacterControllerData!.field("normalMaxSpeed").value = normalMaxSpeed;
+                        
+                        if (noVelocity === false) {
+                          storedCharacterControllerData!.field("maxGravityVelocity").value = maxGravityVelocity;
+                        }
+                        else if (noVelocity === true) {
+                          storedCharacterControllerData!.field("maxGravityVelocity").value = 0;
+                        }
+                        return isCharacterControllerDataCheckEnabled ? true : originalCheckCharacterControllerData!.invoke(character);
+                    };
+                    timetospawn = 0;
+                    console.log("[Disable] Hook successfully applied to CheckCharacterControllerData!");
+                }, timetospawn); // эти краши чертовски пиздец.
+            });
+
+        } catch (error: any) {
+            console.log(error);
         }
-        
+    },
 
-        // Velocity:
-        if (NoVelocity.get()) {
-          // Если NoVelocity включен, устанавливаем 0, независимо от useCustomMGV
-          storedCharacterControllerData.field("maxGravityVelocity").value = 0;
-          if (useCustomMGV.get()) {
-              useCustomMGV.set(false);
-              console.log("Conflict: useCustomMGV выключен, потому что NoVelocity включен");
-          }
-          } else if (!NoVelocity.get() && useCustomMGV.get()) {
-              // Если NoVelocity выключен и useCustomMGV включен
-              storedCharacterControllerData.field("maxGravityVelocity").value = maxGravityVelocityvalue.get();
-          } else {
-              // Если оба выключены
-              storedCharacterControllerData.field("maxGravityVelocity").value = 40;
-          }
-      
+    disable() {
+        console.log("[Disable] CheckCharacterControllerDataBypass 525252");
 
-				if (is360Dives.get()){
-					storedCharacterControllerData.field("divePlayerSensitivity").value = 14888; // Set divePlayerSensivity to 14888 (for 360 dives)
-				}
-
-        if (tpToEndZonevalue.get()) {
-          let instance: Il2Cpp.Object | null = null;
-          try {
-            instance = findObjectsOfTypeAll(ObjectiveReachEndZone).get(0);
-          } catch (error) {
-            console.error("EndZone instance not found. Probably round is not Race. Error:", error);
-            tpToEndZonevalue.set(false)
-          }
-
-          if (instance) {
-            const EndZoneVector3Pos = instance
-            .method<Il2Cpp.Object>("get_transform").invoke()
-            .method<Il2Cpp.Object>("get_position").invoke();
-
-            character.
-            //@ts-ignore
-            method<Il2Cpp.Object>("get_transform").invoke().
-            method<Il2Cpp.Object>("set_position").invoke(EndZoneVector3Pos);
-          }
+        if (originalCheckCharacterControllerData) {
+            originalCheckCharacterControllerData.revert();
+            originalCheckCharacterControllerData = null; 
         }
-
-          // flag2 = isValid; return flag2; 
-          return true;
-
-    } else {
-        return this.method("CheckCharacterControllerData", 1).invoke(character); // dont change method if not enabled 
     }
 };
 
 
-Java.scheduleOnMainThread(() => {
-  menu.attach();
-});
+function toggleCheckCharacterControllerDataBypass(enabled: boolean) {
+    isCharacterControllerDataCheckEnabled = enabled;
+
+    Java.scheduleOnMainThread(() => {
+        console.log("Scheduling execution in 10 seconds...");
+
+        setTimeout(() => {
+            if (TheMultiplayerGuys) {
+                console.log("TheMultiplayerGuys.FGCommon already loaded.");
+                CharacterDataMonitor = TheMultiplayerGuys!.class("FG.Common.Character.CharacterDataMonitor");
+                Il2Cpp.perform(() => {
+                    enabled ? CheckCharacterControllerDataBypass.enable() : CheckCharacterControllerDataBypass.disable();
+                });
+                return;
+            }
+
+            console.log("Waiting for TheMultiplayerGuys.FGCommon to load...");
+
+            // Пока ассембля не загрузится
+            while (!TheMultiplayerGuys) {
+                TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
+                if (!TheMultiplayerGuys) {
+                    console.log("Still waiting for TheMultiplayerGuys.FGCommon...");
+                }
+            }
+
+            console.log("Successfully loaded TheMultiplayerGuys.FGCommon.");
+            CharacterDataMonitor = TheMultiplayerGuys!.class("FG.Common.Character.CharacterDataMonitor");
+            Il2Cpp.perform(() => {
+                enabled ? CheckCharacterControllerDataBypass.enable() : CheckCharacterControllerDataBypass.disable();
+            });
+        }, timetospawn); 
+    });
 }
+
+function findObjectsOfTypeAll(klass: Il2Cpp.Class) {
+    return Resources!.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1,).invoke(klass.type.object);
+  }
+
+function TeleportToEndZone() {
+    let instance: Il2Cpp.Object | null = null;
+    try {
+      const ObjectiveReachEndZone = TheMultiplayerGuys!.class('FG.Common.COMMON_ObjectiveReachEndZone');
+      instance = findObjectsOfTypeAll(ObjectiveReachEndZone).get(0);
+      console.log(instance);
+      if (instance) {
+        const EndZoneVector3Pos = instance
+        .method<Il2Cpp.Object>("get_transform").invoke()
+        .method<Il2Cpp.Object>("get_position").invoke();
+
+        storedFallGuysCharacterController!.
+        //@ts-ignore
+        method<Il2Cpp.Object>("get_transform").invoke().
+        method<Il2Cpp.Object>("set_position").invoke(EndZoneVector3Pos);
+      }
+
+    } catch (error) {
+      console.error("EndZone instance not found. Probably round is not Race. Error:", error);
+    }
+}
+
+function init() {
+    try {
+        Il2Cpp.perform(getAssemblyCSharp);
+        Il2Cpp.perform(getCoreModule);
+        
+        const layout = new Menu.ObsidianLayout(obsidianConfig);
+        const composer = new Menu.Composer("FGStool Mobile", "Created by @repinek", layout);
+        composer.icon("https://cdn.floyzi.ru/shared-images/fgstool2.png", "Web");
+
+        const general = layout.textView("<b>--- Physics ---</b>");
+        general.gravity = Menu.Api.CENTER;
+
+        Menu.add(general);
+
+        Menu.add(layout.toggle("Bypass Character Controller Data checks", (enabled) => {
+            toggleCheckCharacterControllerDataBypass(enabled);
+        }));
+
+        Menu.add(layout.toggle("360 Dives", (enabled) => {
+            enabled ? is360Dives = true : is360Dives = false;
+        }));
+        
+        Menu.add(
+          layout.seekbar("Normal Max Speed: {0} / 1000", 100, 1, (value: number) => { 
+              normalMaxSpeed = value;
+              console.log(`Normal Max Speed updated: ${normalMaxSpeed}`);
+            }));
+        
+        Menu.add(layout.toggle("No Velocuty", (enabled) => {
+              enabled ? noVelocity = true : noVelocity = false;
+          }));
+
+        Menu.add(
+          layout.seekbar("Max Gravity Velocity: {0} / 100", 100, -100, (value: number) => {  // -100 dont work
+              maxGravityVelocity = value;
+              console.log(`Max Gravity Velocity updated: ${maxGravityVelocity}`);
+            }));
+            
+        Menu.add(layout.button("Teleport to Finish (Only Races)", () => TeleportToEndZone()));
+        
+        Menu.toast("Created by repinek", 1);
+        
+        composer.show();
+    } catch (error: any) {
+        console.log(error.stack);
+    }
+}
+
+Menu.waitForInit(init);
