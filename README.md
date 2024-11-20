@@ -3,7 +3,7 @@
 > The author is not responsible for any bans from the use of this tool.  
 > Use it at your own risk.
 
-# Fall Guys Frida Mod Menu
+# Fall Guys Mod Menu
 Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge)
 
 ## Message To MediaTonic 
