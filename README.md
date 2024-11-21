@@ -12,8 +12,8 @@ Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridg
 - Change velocity / No velocity / Negative velocity 
 - 360 Dives 
 - Teleport To Finish (Only Races)
-- FPS Bypass 
-- FPS Show
+- Remove FPS Limit 
+- Display FGDebug (Minimum, maximum, average and current FPS, Time, Ping, Dropped packets)
 
 ## Troubleshooting 
 **HyperOS**, **ColorOS**, **HarmonyOS** and other **OEM ROMs** may not work properly <br>
