@@ -10,7 +10,7 @@ Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridg
 Please, Fix the game. You've had over a year to fix the many bugs and the bad optimization on consoles (Switch, Xbox, PS) makes it unplayable. It's time to focus on the state of the game.
 
 ## Features  
-- Bypass character physics checks
+- Bypass character physics checks 
 - Change speed 
 - Change velocity / No velocity / Negative velocity 
 - 360 Dives 

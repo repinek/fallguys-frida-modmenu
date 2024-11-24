@@ -2,36 +2,36 @@ import 'frida-il2cpp-bridge';
 import 'frida-java-menu';
 import { obsidianConfig } from './menuConfig.js';
 
-// ultra shitcode at least it works
+// assemblies
 let AssemblyCSharp: Il2Cpp.Image | undefined;
 let TheMultiplayerGuys: Il2Cpp.Image | undefined;
 let CoreModule: Il2Cpp.Image | undefined;
 let MTFGClient: Il2Cpp.Image | undefined;
 
+// classes
 let Resources: Il2Cpp.Class | undefined; 
 let GraphicsSettings: Il2Cpp.Class | undefined;
+let CharacterDataMonitor: Il2Cpp.Class | undefined; 
 
-function getAssemblyCSharp() {
-  console.log(2)
-  if (AssemblyCSharp) return AssemblyCSharp;
-  AssemblyCSharp = Il2Cpp.domain.assembly("Assembly-CSharp").image;
-  return AssemblyCSharp;
-}
-
-function getCoreModule() {
-  if (CoreModule) return CoreModule;
-  CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
-  Resources = CoreModule.class("UnityEngine.Resources");
-  return CoreModule;
+function prepareModules() {
+  if (!CoreModule) {
+    CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
+    Resources = CoreModule.class("UnityEngine.Resources");
   }
 
-function getMTFGClient() {
-  if (MTFGClient) return MTFGClient;
-  MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image;
-  GraphicsSettings = MTFGClient.class("FGClient.GraphicsSettings")
-  return MTFGClient;
-}
+  if (!MTFGClient) {
+    MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image;
+    GraphicsSettings = MTFGClient.class("FGClient.GraphicsSettings");
+  }
 
+  if (!AssemblyCSharp) {
+    AssemblyCSharp = Il2Cpp.domain.assembly("Assembly-CSharp").image;
+  }
+
+  console.log("Loaded Assembly-CSharp, UnityEngine.CoreModule and MT.FGClient")
+  // return {AssemblyCSharp,CoreModule, MTFGClient};
+  return
+}
 
 // Helper functions
 function OpenURL(link: string) {
@@ -55,118 +55,57 @@ function findObjectsOfTypeAll(klass: Il2Cpp.Class) {
   return Resources!.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1,).invoke(klass.type.object);
 }
 
-
 let storedFallGuysCharacterController = Il2Cpp.Class;
-
-let isCharacterControllerDataCheckEnabled = false;
-let originalCheckCharacterControllerData: Il2Cpp.Method | null = null; 
-let CharacterDataMonitor: Il2Cpp.Class | undefined; 
 let storedCharacterControllerData: Il2Cpp.Class | undefined;
 
 // from menu 
 let is360Dives = false;
-let timetospawn = 10000;
 let normalMaxSpeed = 9.5;
 let maxGravityVelocity = 40; 
 let noVelocity = false;
 let removeFPSLimit = false;
 
-const CheckCharacterControllerDataBypass = {
-    enable() {
-        try {
-            console.log("[Disable] CheckCharacterControllerDataBypass");
-
-            Java.scheduleOnMainThread(() => {
-                console.log("[Disable] Preparing to hook CheckCharacterControllerData...");
-
-                setTimeout(() => {
-                    console.log("[Disable] Delayed execution before implementation");
-                    const method = CharacterDataMonitor!.method("CheckCharacterControllerData", 1);
-
-                    if (originalCheckCharacterControllerData === null) {
-                        originalCheckCharacterControllerData = method;
-                    }
-                    
-                    // FallGuysCharacterController character
-                    method.implementation = function (character: any) {
-                        console.log("[Disable] Method CheckCharacterControllerData called");
-                        storedFallGuysCharacterController = character;
-
-                        storedCharacterControllerData = character.method("get_Data").invoke();
-
-                        if (is360Dives === true) {
-                            storedCharacterControllerData!.field("divePlayerSensitivity").value = 14888;
-                        }
-                        else if (is360Dives === false) {
-                            storedCharacterControllerData!.field("divePlayerSensitivity").value = 70;
-                        }
-                        
-                        storedCharacterControllerData!.field("normalMaxSpeed").value = normalMaxSpeed;
-                        
-                        if (noVelocity === false) {
-                          storedCharacterControllerData!.field("maxGravityVelocity").value = maxGravityVelocity;
-                        }
-                        else if (noVelocity === true) {
-                          storedCharacterControllerData!.field("maxGravityVelocity").value = 0;
-                        }
-                        return isCharacterControllerDataCheckEnabled ? true : originalCheckCharacterControllerData!.invoke(character);
-                    };
-                    timetospawn = 0;
-                    console.log("[Disable] Hook successfully applied to CheckCharacterControllerData!");
-                }, timetospawn); // эти краши чертовски пиздец.
-            });
-
-        } catch (error: any) {
-            console.log(error);
-        }
-    },
-
-    disable() {
-        console.log("[Disable] CheckCharacterControllerDataBypass 525252");
-
-        if (originalCheckCharacterControllerData) {
-            originalCheckCharacterControllerData.revert();
-            originalCheckCharacterControllerData = null; 
-        }
-    }
-};
-
-
-function toggleCheckCharacterControllerDataBypass(enabled: boolean) {
-    isCharacterControllerDataCheckEnabled = enabled;
-
-    Java.scheduleOnMainThread(() => {
-        console.log("Scheduling execution in 10 seconds...");
-
-        setTimeout(() => {
-            if (TheMultiplayerGuys) {
-                console.log("TheMultiplayerGuys.FGCommon already loaded.");
-                CharacterDataMonitor = TheMultiplayerGuys!.class("FG.Common.Character.CharacterDataMonitor");
-                Il2Cpp.perform(() => {
-                    enabled ? CheckCharacterControllerDataBypass.enable() : CheckCharacterControllerDataBypass.disable();
-                });
-                return;
-            }
-
-            console.log("Waiting for TheMultiplayerGuys.FGCommon to load...");
-
-            // Пока ассембля не загрузится
-            while (!TheMultiplayerGuys) {
-                TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
-                if (!TheMultiplayerGuys) {
-                    console.log("Still waiting for TheMultiplayerGuys.FGCommon...");
-                }
-            }
-
-            console.log("Successfully loaded TheMultiplayerGuys.FGCommon.");
-            CharacterDataMonitor = TheMultiplayerGuys!.class("FG.Common.Character.CharacterDataMonitor");
-            Il2Cpp.perform(() => {
-                enabled ? CheckCharacterControllerDataBypass.enable() : CheckCharacterControllerDataBypass.disable();
-            });
-        }, timetospawn); 
-    });
+// bypass
+// better to hook where this function called, and apply hook from there (because while you hook function before game startup it will cause game freeze on blue screen, thats why i used 7s sleep)
+function prepareBypass() {
+  Java.scheduleOnMainThread(() => {
+    setTimeout(() => {
+        TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
+        console.log("Loaded TheMultiplayerGuys")
+        CharacterDataMonitor = TheMultiplayerGuys!.class("FG.Common.Character.CharacterDataMonitor");
+        Il2Cpp.perform(CheckCharacterControllerDataBypass)
+    }, 8000)})
 }
 
+function CheckCharacterControllerDataBypass() {
+  try {
+    const method = CharacterDataMonitor!.method("CheckCharacterControllerData", 1);
+    method.implementation = function (character: any) {
+      storedFallGuysCharacterController = character;
+      storedCharacterControllerData = character.method("get_Data").invoke();
+
+      if (is360Dives === true) {
+          storedCharacterControllerData!.field("divePlayerSensitivity").value = 14888;
+      }
+      else if (is360Dives === false) {
+          storedCharacterControllerData!.field("divePlayerSensitivity").value = 70;
+      }
+      
+      storedCharacterControllerData!.field("normalMaxSpeed").value = normalMaxSpeed;
+      
+      if (noVelocity === false) {
+        storedCharacterControllerData!.field("maxGravityVelocity").value = maxGravityVelocity;
+      }
+      else if (noVelocity === true) {
+        storedCharacterControllerData!.field("maxGravityVelocity").value = 0;
+      }
+
+      return true;
+  };
+  } catch (error: any) {
+    console.error(error.stack)
+  }
+}
 
 function TeleportToEndZone() {
     let instance: Il2Cpp.Object | null = null;
@@ -193,7 +132,7 @@ function TeleportToEndZone() {
 }
 
 // Other 
-function FGDebugShow(enabled: boolean) {
+function FGDebugShow() {
   let instance: Il2Cpp.Object | null = null;
 
   try {
@@ -201,11 +140,25 @@ function FGDebugShow(enabled: boolean) {
     instance = findObjectsOfTypeAll(DebugClass).get(0); 
 
     if (instance) {
-      console.log(`Debug instance has been found ${instance}`);
+      console.log(`Debug object has been found: ${instance}`);
+
+      const Vector3class = CoreModule!.class("UnityEngine.Vector3");
+
+      const localScale = Vector3class.alloc();
+      localScale.method(".ctor", 3).invoke(0.4, 0.4, 0.4);
+      const localScaleUnboxed = localScale.unbox();
+
+      instance
+      .method<Il2Cpp.Object>("get_transform").invoke()
+      .method<Il2Cpp.Object>("set_localScale").invoke(localScaleUnboxed);
+
       const gameObject = instance.method<Il2Cpp.Object>("get_gameObject").invoke(); 
       gameObject.method("SetActive").invoke(true)
+
+
     } else {
-      console.log("Debug instance not found");
+      console.log("Debug object not found");
+      Menu.toast("Debug object not found", 0)
     }
   } catch (error: any) {
     Menu.toast(error.stack, 1);
@@ -215,6 +168,8 @@ function FGDebugShow(enabled: boolean) {
 
 function RemoveFPSLimit() {
     // it would be good to do a check if the fps already changed
+    // maybe rewrite with alloc. upd: idk how, trace FGClient.GraphicsSettings and FGClient.TargetFPSOptionViewModel with trace(true) for more
+    
     const text = "To remove FPS Limit change the FPS preset in settings to any other and save. You need to do this only once!"
 
     if (removeFPSLimit === true) {
@@ -223,30 +178,20 @@ function RemoveFPSLimit() {
     }
 
     removeFPSLimit = true;
-    const method = GraphicsSettings!.method("set_TargetFrameRate", 1);
-    method.implementation = function () {
+    const methodset = GraphicsSettings!.method("set_TargetFrameRate", 1);
+    methodset.implementation = function () {
       Menu.toast(text, 1)
-      return this.method("set_TargetFrameRate", 1).invoke(1488); // 
+      return this.method("set_TargetFrameRate", 1).invoke(1488); // https://www.youtube.com/watch?v=VRnyWwNC328
     }
-  }
+}
 
-// const FPSBypassnahoi = {
-//   enable() {
-//     const method = GraphicsSettings!.method("set_TargetFrameRate", 1);
-//     method.implementation = function (value) {
-//       return this.method("set_TargetFrameRate", 1).invoke(1488);
-//     }
-//   },
-//   disable() {
-//     console.warn("пидорас да хуй сосал да")
-//   }
-// }
 
 function init() {
     try {
-        Il2Cpp.perform(getAssemblyCSharp);
-        Il2Cpp.perform(getCoreModule);
-        Il2Cpp.perform(getMTFGClient)
+        // Il2Cpp.perform(getAssemblyCSharp);
+        Il2Cpp.perform(prepareModules);
+        Il2Cpp.perform(prepareBypass);
+
         const layout = new Menu.ObsidianLayout(obsidianConfig);
         const composer = new Menu.Composer("Fall Guys Mod Menu", "Created by @repinek", layout);
         composer.icon("https://cdn.floyzi.ru/shared-images/fgstool2.png", "Web");
@@ -256,12 +201,9 @@ function init() {
         general.gravity = Menu.Api.CENTER;
         Menu.add(general);
 
-        Menu.add(layout.toggle("Bypass Character Controller Data checks", (enabled) => {
-            toggleCheckCharacterControllerDataBypass(enabled);
-        }));
 
-        Menu.add(layout.toggle("360 Dives", (enabled) => {
-            enabled ? is360Dives = true : is360Dives = false;
+        Menu.add(layout.toggle("360 Dives", (state: boolean) => {
+            state ? is360Dives = true : is360Dives = false;
             console.log(`Is 360 Dives updated: ${is360Dives}`);
         }));
         
@@ -271,10 +213,11 @@ function init() {
               console.log(`Normal Max Speed updated: ${normalMaxSpeed}`);
         }));
         
-        Menu.add(layout.toggle("No Velocity", (enabled) => {
-              enabled ? noVelocity = true : noVelocity = false;
+        Menu.add(layout.toggle("No Velocity", (state: boolean) => {
+              state ? noVelocity = true : noVelocity = false;
               console.log(`No Velocity updated: ${noVelocity}`)
         }));
+
 
         Menu.add(
           layout.seekbar("Max Gravity Velocity: {0} / 100", 100, -100, (value: number) => {
@@ -289,8 +232,8 @@ function init() {
         other.gravity = Menu.Api.CENTER;
         Menu.add(other);
 
-        Menu.add(layout.toggle("Display FGDebug", (enabled) => {
-          FGDebugShow(enabled);
+        Menu.add(layout.toggle("Display FGDebug", () => {
+          FGDebugShow();
           console.log(`Display FGDebug turned on`)
         }));
 
@@ -303,11 +246,13 @@ function init() {
 
         Menu.add(layout.button("Github Repository", () => OpenURL("https://github.com/repinek/FallGuysFridaModMenu")));
 
+        Menu.add(layout.button("Creator Twitter", () => OpenURL("https://x.com/repinek840")))
 
-        Menu.toast("Created by repinek", 1);
+        Menu.toast("Made with Love by repinek", 1);
         composer.show();
     } catch (error: any) {
         Menu.toast(error.stack, 1);
+        console.error(error.stack)
     }
 }
 
