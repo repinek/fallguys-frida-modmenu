@@ -4,9 +4,7 @@
   "main": "index.js",
   "scripts": {
     "spawn": "frida -U Gadget -l dist/agent.js",
-    "build": "frida-compile src/index.ts -o dist/agent.js -c",
-    "test": "frida-compile src/test.ts -o dist/agent.js -c",
-    "anrtest": "frida-compile src/anothertest.ts -o dist/agent.js -c"
+    "build": "frida-compile src/index.ts -o dist/agent.js -c"
   },
   "keywords": [],
   "author": "",
