@@ -6,8 +6,10 @@
 # Fall Guys Mod Menu
 Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge)
 
+## Screenshots
+
 ## Message To MediaTonic 
-Please, Fix the game. You've had over a year to fix the many bugs and the bad optimization on consoles (Switch, Xbox, PS) makes it unplayable. It's time to focus on the state of the game.
+Please, Fix the game. You've had over a year to fix the many bugs and the bad optimization on consoles (Switch, Xbox, PS) makes it unplayable. It's time to focus on the state of the game. 
 
 ## Features  
 - Bypass character physics checks 
@@ -17,6 +19,8 @@ Please, Fix the game. You've had over a year to fix the many bugs and the bad op
 - Teleport To Finish (Only Races)
 - Remove FPS Limit 
 - Display FGDebug (Minimum, maximum, average and current FPS, Time, Ping, Dropped packets)
+
+## Build 
 
 ## Troubleshooting 
 **HyperOS**, **ColorOS**, **HarmonyOS** and other **OEM ROMs** may not work properly <br>
