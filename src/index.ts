@@ -296,7 +296,7 @@ function init() {
 
         Menu.add(layout.button("Github Repository", () => OpenURL("https://github.com/repinek/FallGuysFridaModMenu")));
 
-        Menu.add(layout.button("Creator Twitter", () => OpenURL("https://x.com/repinek840")))
+        Menu.add(layout.button("Creator's Twitter", () => OpenURL("https://x.com/repinek840")))
 
         Menu.toast("Made with Love by repinek", 1);
         composer.show();
