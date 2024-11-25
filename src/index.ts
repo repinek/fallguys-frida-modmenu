@@ -57,26 +57,41 @@ function findObjectsOfTypeAll(klass: Il2Cpp.Class) {
 
 let storedFallGuysCharacterController = Il2Cpp.Class;
 let storedCharacterControllerData: Il2Cpp.Class | undefined;
+let isMultiplayerGuysLoaded = false;
 
 // from menu 
 let is360Dives = false;
+let useCustomSpeed = false;
 let normalMaxSpeed = 9.5;
-let maxGravityVelocity = 40; 
+let useCustomVelocity = false;
+let useNegativeVelocity = false;
+let maxGravityVelocity = 40;
 let noVelocity = false;
 let removeFPSLimit = false;
 
 // bypass
-// better to hook where this function called, and apply hook from there (because while you hook function before game startup it will cause game freeze on blue screen, thats why i used 7s sleep)
+
+/*
+better to hook where this function called 
+(FGClient.ClientGameManager::Update, or you can hook FG.Common.Character.CharacterDataMonitor::UpdateCheck(FallGuysCharacterController)), 
+and apply hook from there, 
+because while you hook function before game startup it will cause game freeze on blue screen, thats why i used 7s sleep
+
+I will rewrite it i guess 
+*/
+
 function prepareBypass() {
   Java.scheduleOnMainThread(() => {
     setTimeout(() => {
         TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
-        console.log("Loaded TheMultiplayerGuys")
+        console.log("Loaded TheMultiplayerGuys");
+        isMultiplayerGuysLoaded = true;
         CharacterDataMonitor = TheMultiplayerGuys!.class("FG.Common.Character.CharacterDataMonitor");
-        Il2Cpp.perform(CheckCharacterControllerDataBypass)
+        Il2Cpp.perform(CheckCharacterControllerDataBypass);
     }, 8000)})
 }
 
+// using it like update function
 function CheckCharacterControllerDataBypass() {
   try {
     const method = CharacterDataMonitor!.method("CheckCharacterControllerData", 1);
@@ -84,22 +99,29 @@ function CheckCharacterControllerDataBypass() {
       storedFallGuysCharacterController = character;
       storedCharacterControllerData = character.method("get_Data").invoke();
 
-      if (is360Dives === true) {
-          storedCharacterControllerData!.field("divePlayerSensitivity").value = 14888;
-      }
-      else if (is360Dives === false) {
-          storedCharacterControllerData!.field("divePlayerSensitivity").value = 70;
-      }
-      
-      storedCharacterControllerData!.field("normalMaxSpeed").value = normalMaxSpeed;
-      
-      if (noVelocity === false) {
-        storedCharacterControllerData!.field("maxGravityVelocity").value = maxGravityVelocity;
-      }
-      else if (noVelocity === true) {
-        storedCharacterControllerData!.field("maxGravityVelocity").value = 0;
+      if (is360Dives) {
+        storedCharacterControllerData!.field("divePlayerSensitivity").value = 14888;
+      } else {
+        storedCharacterControllerData!.field("divePlayerSensitivity").value = 70;
       }
 
+      if (useCustomSpeed) {
+        storedCharacterControllerData!.field("normalMaxSpeed").value = normalMaxSpeed;
+      } else {
+        storedCharacterControllerData!.field("normalMaxSpeed").value = 9.5;
+      }
+
+      if (useCustomVelocity) {
+        if (noVelocity) {
+          storedCharacterControllerData!.field("maxGravityVelocity").value = 0;
+        } else if (useNegativeVelocity) {
+          storedCharacterControllerData!.field("maxGravityVelocity").value = -maxGravityVelocity;
+        } else {
+          storedCharacterControllerData!.field("maxGravityVelocity").value = maxGravityVelocity;
+        }
+      } else {
+        storedCharacterControllerData!.field("maxGravityVelocity").value = 40;
+      }
       return true;
   };
   } catch (error: any) {
@@ -108,6 +130,7 @@ function CheckCharacterControllerDataBypass() {
 }
 
 function TeleportToEndZone() {
+    console.log("Trying to teleport to the EndZone")
     let instance: Il2Cpp.Object | null = null;
 
     try {
@@ -123,6 +146,7 @@ function TeleportToEndZone() {
         //@ts-ignore
         method<Il2Cpp.Object>("get_transform").invoke().
         method<Il2Cpp.Object>("set_position").invoke(EndZoneVector3Pos);
+        console.log("Teleported to EndZone")
       }
 
     } catch (error: any) {
@@ -131,56 +155,71 @@ function TeleportToEndZone() {
     }
 }
 
+let FGDebugInstance: Il2Cpp.Object | null = null;
+
 // Other 
-function FGDebugShow() {
-  let instance: Il2Cpp.Object | null = null;
-
-  try {
-    const DebugClass = TheMultiplayerGuys!.class('GvrFPS');
-    instance = findObjectsOfTypeAll(DebugClass).get(0); 
-
-    if (instance) {
-      console.log(`Debug object has been found: ${instance}`);
-
-      const Vector3class = CoreModule!.class("UnityEngine.Vector3");
-
-      const localScale = Vector3class.alloc();
-      localScale.method(".ctor", 3).invoke(0.4, 0.4, 0.4);
-      const localScaleUnboxed = localScale.unbox();
-
-      instance
-      .method<Il2Cpp.Object>("get_transform").invoke()
-      .method<Il2Cpp.Object>("set_localScale").invoke(localScaleUnboxed);
-
-      const gameObject = instance.method<Il2Cpp.Object>("get_gameObject").invoke(); 
-      gameObject.method("SetActive").invoke(true)
-
-
-    } else {
-      console.log("Debug object not found");
-      Menu.toast("Debug object not found", 0)
+const FGDebug = {
+  enable() {
+    console.log("Attempting to enable FGDebug")
+    if (isMultiplayerGuysLoaded === false) {
+      Menu.toast("Wait until TheMultiplayerGuys load and re-enable FGDebug", 0); // the same thing as prepareBypass
+      return
     }
-  } catch (error: any) {
-    Menu.toast(error.stack, 1);
-    console.error(error.stack);
+    try {
+      const DebugClass = TheMultiplayerGuys!.class('GvrFPS');
+      FGDebugInstance = findObjectsOfTypeAll(DebugClass).get(0); 
+
+      if (FGDebugInstance) {
+        const Vector3class = CoreModule!.class("UnityEngine.Vector3");
+
+        const localScale = Vector3class.alloc();
+        localScale.method(".ctor", 3).invoke(0.4, 0.4, 0.4);
+
+        const localScaleUnboxed = localScale.unbox();
+
+        FGDebugInstance
+        .method<Il2Cpp.Object>("get_transform").invoke()
+        .method<Il2Cpp.Object>("set_localScale").invoke(localScaleUnboxed); 
+
+        const gameObject = FGDebugInstance.method<Il2Cpp.Object>("get_gameObject").invoke(); 
+        gameObject.method("SetActive").invoke(true);
+        console.log("Enabled FGDebug")
+
+
+      } else {
+        console.log("Debug object not found");
+        Menu.toast("Debug object not found", 0);
+      }
+    } catch (error: any) {
+      Menu.toast(error.stack, 1);
+      console.error(error.stack);
+    }
+  },
+  disable() {
+    console.log("Attempting to disable FGDebug")
+    if (FGDebugInstance) {
+      const gameObject = FGDebugInstance.method<Il2Cpp.Object>("get_gameObject").invoke(); 
+      gameObject.method("SetActive").invoke(false);
+      console.log("Disabled FGDebug")
+    }
   }
 }
 
 function RemoveFPSLimit() {
     // it would be good to do a check if the fps already changed
     // maybe rewrite with alloc. upd: idk how, trace FGClient.GraphicsSettings and FGClient.TargetFPSOptionViewModel with trace(true) for more
-    
+
     const text = "To remove FPS Limit change the FPS preset in settings to any other and save. You need to do this only once!"
 
     if (removeFPSLimit === true) {
       Menu.toast(text, 1)
       return
     }
-
     removeFPSLimit = true;
     const methodset = GraphicsSettings!.method("set_TargetFrameRate", 1);
+    Menu.toast(text, 1)
     methodset.implementation = function () {
-      Menu.toast(text, 1)
+      Menu.toast("Removing FPS Limit", 0)
       return this.method("set_TargetFrameRate", 1).invoke(1488); // https://www.youtube.com/watch?v=VRnyWwNC328
     }
 }
@@ -201,28 +240,40 @@ function init() {
         general.gravity = Menu.Api.CENTER;
         Menu.add(general);
 
-
         Menu.add(layout.toggle("360 Dives", (state: boolean) => {
             state ? is360Dives = true : is360Dives = false;
             console.log(`Is 360 Dives updated: ${is360Dives}`);
         }));
         
+        Menu.add(layout.toggle("Use Custom Speed", (state: boolean) => {
+          state ? useCustomSpeed = true : useCustomSpeed = false;
+        }))
+
         Menu.add(
           layout.seekbar("Normal Max Speed: {0} / 100", 100, 1, (value: number) => { 
               normalMaxSpeed = value;
               console.log(`Normal Max Speed updated: ${normalMaxSpeed}`);
         }));
         
-        Menu.add(layout.toggle("No Velocity", (state: boolean) => {
-              state ? noVelocity = true : noVelocity = false;
-              console.log(`No Velocity updated: ${noVelocity}`)
+        Menu.add(layout.toggle("Use Custom Velocity", (state: boolean) => {
+              state ? useCustomVelocity = true : useCustomVelocity = false;
+              console.log(`Use Custom Velocity updated: ${useCustomVelocity}`)
         }));
-
-
+    
         Menu.add(
           layout.seekbar("Max Gravity Velocity: {0} / 100", 100, -100, (value: number) => {
               maxGravityVelocity = value;
               console.log(`Max Gravity Velocity updated: ${maxGravityVelocity}`);
+        }));
+        
+        Menu.add(layout.toggle("Negative Velocity", (state: boolean) => {
+          state ? useNegativeVelocity = true : useNegativeVelocity = false;
+          console.log(`Negative Velocity updated: ${useNegativeVelocity}`)
+        }));
+        
+        Menu.add(layout.toggle("No Velocity", (state: boolean) => {
+          state ? noVelocity = true : noVelocity = false;
+          console.log(`No Velocity updated: ${noVelocity}`)
         }));
             
         Menu.add(layout.button("Teleport to Finish (Only Races)", () => TeleportToEndZone()));
@@ -232,9 +283,8 @@ function init() {
         other.gravity = Menu.Api.CENTER;
         Menu.add(other);
 
-        Menu.add(layout.toggle("Display FGDebug", () => {
-          FGDebugShow();
-          console.log(`Display FGDebug turned on`)
+        Menu.add(layout.toggle("Display FGDebug", (state: boolean) => {
+          state ? FGDebug.enable() : FGDebug.disable();
         }));
 
         Menu.add(layout.button("Remove FPS Limit", () => RemoveFPSLimit()))
