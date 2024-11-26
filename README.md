@@ -55,6 +55,7 @@ Apk will be saved at the path ./yourfallguys.patched.apk
 ## Troubleshooting 
 On startup it will ask for permission to display over other apps, if it doesn't ask for it - grant it yourself <br>
 **HyperOS**, **ColorOS**, **OneUI**, **HarmonyOS** and other **OEM ROMs** may not work properly or not at all <br>
+**Please, prefer roms with non/slightly modified ART code (AOSP forks mainly)**
 
 ## Special Thanks
 [FloyzI](https://github.com/FloyzI) - for how the game works <br>
