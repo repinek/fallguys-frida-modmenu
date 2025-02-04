@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "spawn": "frida -U Gadget -l dist/agent.js",
+    "spawn": "frida -U gadget -l dist/agent.js",
     "build": "frida-compile src/index.ts -o dist/agent.js -c"
   },
   "keywords": [],

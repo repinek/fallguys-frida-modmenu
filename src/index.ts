@@ -67,6 +67,8 @@ let useCustomVelocity = false;
 let useNegativeVelocity = false;
 let maxGravityVelocity = 40;
 let noVelocity = false;
+let useCustomJump = false;
+let JumpForceUltimateParty = 17.5;
 let removeFPSLimit = false;
 
 // bypass
@@ -77,18 +79,26 @@ better to hook where this function called
 and apply hook from there, 
 because while you hook function before game startup it will cause game freeze on blue screen, thats why i used 7s sleep
 
-I will rewrite it i guess 
+I will rewrite it i guess
+
+upd: hell nah
 */
 
 function prepareBypass() {
-  Java.scheduleOnMainThread(() => {
-    setTimeout(() => {
-        TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
-        console.log("Loaded TheMultiplayerGuys");
-        isMultiplayerGuysLoaded = true;
-        CharacterDataMonitor = TheMultiplayerGuys!.class("FG.Common.Character.CharacterDataMonitor");
-        Il2Cpp.perform(CheckCharacterControllerDataBypass);
-    }, 8000)})
+  try {
+    Java.scheduleOnMainThread(() => {
+      setTimeout(() => {
+          TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
+          console.log("Loaded TheMultiplayerGuys");
+          isMultiplayerGuysLoaded = true;
+          CharacterDataMonitor = TheMultiplayerGuys!.class("FG.Common.Character.CharacterDataMonitor");
+          Il2Cpp.perform(CheckCharacterControllerDataBypass);
+          console.log("Bypassed")
+      }, 8000)}) 
+  } catch (error: any) {
+    console.log(error)
+  }
+
 }
 
 // using it like update function
@@ -98,7 +108,8 @@ function CheckCharacterControllerDataBypass() {
     method.implementation = function (character: any) {
       storedFallGuysCharacterController = character;
       storedCharacterControllerData = character.method("get_Data").invoke();
-
+      const jumpForce = storedCharacterControllerData!.field<Il2Cpp.Object>("jumpForceUltimateParty").value;
+      
       if (is360Dives) {
         storedCharacterControllerData!.field("divePlayerSensitivity").value = 14888;
       } else {
@@ -121,6 +132,12 @@ function CheckCharacterControllerDataBypass() {
         }
       } else {
         storedCharacterControllerData!.field("maxGravityVelocity").value = 40;
+      }
+
+      if (useCustomJump) {
+        jumpForce.field("y").value = JumpForceUltimateParty;
+      } else {
+        jumpForce.field("y").value = 17.5;
       }
       return true;
   };
@@ -233,7 +250,7 @@ function init() {
 
         const layout = new Menu.ObsidianLayout(obsidianConfig);
         const composer = new Menu.Composer("Fall Guys Mod Menu", "Created by @repinek", layout);
-        composer.icon("https://cdn.floyzi.ru/shared-images/fgstool2.png", "Web");
+        composer.icon("https://floyzi.github.io/images/sigma.png", "Web");
 
         // Physics 
         const general = layout.textView("<b>--- Physics ---</b>");
@@ -275,6 +292,17 @@ function init() {
           state ? noVelocity = true : noVelocity = false;
           console.log(`No Velocity updated: ${noVelocity}`)
         }));
+
+        Menu.add(layout.toggle("Use Custom Jump Force (Applied in Next Round)", (state: boolean) => {
+          state ? useCustomJump = true : useCustomJump = false;
+        }))
+
+        Menu.add(
+          layout.seekbar("Jump Force: {0} / 100", 100, 1, (value: number) => { 
+              JumpForceUltimateParty = value;
+              console.log(`Jump Force updated: ${JumpForceUltimateParty}`);
+        }));
+        
             
         Menu.add(layout.button("Teleport to Finish (Only Races)", () => TeleportToEndZone()));
         
