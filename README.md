@@ -2,6 +2,7 @@
 > This project is for educational purposes only.  
 > The author is not responsible for any bans from the use of this tool.  
 > Use it at your own risk.
+> Works on my machine.
 
 # Fall Guys Mod Menu
 Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge)
