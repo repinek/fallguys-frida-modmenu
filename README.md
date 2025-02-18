@@ -13,9 +13,6 @@ Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridg
 <img src="https://github.com/user-attachments/assets/59ddff53-6dc1-49cc-8396-4243bb3c096a" width="500" height="224"/>
 <img src="https://github.com/user-attachments/assets/f2164534-1700-4ba6-b681-576dca29583d" width="500" height="224"/>
 
-## Message To MediaTonic 
-Please, Fix the game. You've had over a year to fix the many bugs and the bad optimization on consoles (Switch, Xbox, PS) makes it unplayable. It's time to focus on the state of the game. 
-
 ## Features  
 - Bypass character physics checks 
 - Change speed 
