@@ -3,38 +3,123 @@ import 'frida-java-menu';
 import { obsidianConfig } from './menuConfig.js';
 
 // assemblies
-let AssemblyCSharp: Il2Cpp.Image | undefined;
 let TheMultiplayerGuys: Il2Cpp.Image | undefined;
 let CoreModule: Il2Cpp.Image | undefined;
 let MTFGClient: Il2Cpp.Image | undefined;
 
 // classes
 let Resources: Il2Cpp.Class | undefined; 
+let Vector3class: Il2Cpp.Class | undefined; 
 let GraphicsSettings: Il2Cpp.Class | undefined;
+let LobbyService: Il2Cpp.Class | undefined;
 let CharacterDataMonitor: Il2Cpp.Class | undefined; 
+let DebugClass: Il2Cpp.Class | undefined;
+let ObjectiveReachEndZone: Il2Cpp.Class | undefined;
+
+// storage
+let reachedMainMenu = false;
+let FallGuysCharacterController_stored: Il2Cpp.Class | undefined;
+let CharacterControllerData_stored: Il2Cpp.Class | undefined;
+let FGDebugInstance: Il2Cpp.Object | null = null;
 
 function prepareModules() {
-  if (!CoreModule) {
-    CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
-    Resources = CoreModule.class("UnityEngine.Resources");
-  }
+  /*
+  sooo, if you load all these assemblies before the menu appears, the game will freeze when entering the main menu. 
+  probably, the shitcode from the menu is affecting this, idk.
 
-  if (!MTFGClient) {
-    MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image;
-    GraphicsSettings = MTFGClient.class("FGClient.GraphicsSettings");
-  }
+  you can load the menu here, in this function, and it will wait another 2 seconds in the initMenu function before showing it (bad, but working SOMETIMES), 
+  or you can load the menu when entering the main menu in the OnMainMenuDisplayed_method hook.
+  */
 
-  if (!AssemblyCSharp) {
-    AssemblyCSharp = Il2Cpp.domain.assembly("Assembly-CSharp").image;
-  }
+  //Menu.waitForInit(initMenu);
+  Menu.toast("Menu will appear once you enter the main menu.", 1);
 
-  console.log("Loaded Assembly-CSharp, UnityEngine.CoreModule and MT.FGClient")
-  // return {AssemblyCSharp,CoreModule, MTFGClient};
+  CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
+  Resources = CoreModule.class("UnityEngine.Resources");
+  Vector3class = CoreModule.class("UnityEngine.Vector3");
+
+  MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image;
+  GraphicsSettings = MTFGClient.class("FGClient.GraphicsSettings");
+  LobbyService = MTFGClient.class("FGClient.CatapultServices.LobbyService");
+
+  TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
+  CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
+  DebugClass = TheMultiplayerGuys.class('GvrFPS');
+  ObjectiveReachEndZone = TheMultiplayerGuys.class('FG.Common.COMMON_ObjectiveReachEndZone');
+
+
+  console.log("Loaded assemblies and classes");
+  Il2Cpp.perform(functionHooks);
   return
 }
 
-// Helper functions
-function OpenURL(link: string) {
+function functionHooks() {
+  const OnMainMenuDisplayed_method = LobbyService!.method("OnMainMenuDisplayed", 1); 
+  const CheckCharacterControllerData_method = CharacterDataMonitor!.method("CheckCharacterControllerData", 1);
+  const get_TargetFrameRate_method = GraphicsSettings!.method("get_TargetFrameRate", 0); 
+  const set_TargetFrameRate_method = GraphicsSettings!.method("set_TargetFrameRate", 1);
+
+  get_TargetFrameRate_method.implementation = function() {
+    console.log("get_TargetFrameRate Called!");
+    return 1488 // fps
+  }
+
+  set_TargetFrameRate_method.implementation = function (fps) {
+    console.log("set_TargetFrameRate Called!");
+    return this.method<void>("set_TargetFrameRate", 1).invoke(1488); 
+  }
+
+  OnMainMenuDisplayed_method.implementation = function(event) {
+      console.log("OnMainMenuDisplayed Called!");
+
+      if (!reachedMainMenu) {
+        Menu.toast("Showing menu", 0);
+        Menu.waitForInit(initMenu);
+        reachedMainMenu = true;
+        if (enableFGDebug) {
+          FGDebug.enable();
+        }
+      }
+
+      return this.method<void>("OnMainMenuDisplayed", 1).invoke(event);
+  } 
+
+  // update function
+  CheckCharacterControllerData_method.implementation = function(character: any) {
+      console.log("CheckCharacterControllerData Called!");
+      FallGuysCharacterController_stored = character;
+      CharacterControllerData_stored = character.method("get_Data").invoke(); // get Data instance
+
+      CharacterControllerData_stored!.field("divePlayerSensitivity").value = enable360Dives ? 14888 : 70;
+      CharacterControllerData_stored!.field("normalMaxSpeed").value = enableCustomSpeed ? customNormalMaxSpeed : 9.5;
+
+      CharacterControllerData_stored!.field("maxGravityVelocity").value = enableCustomVelocity
+      ? (enableNoVelocity ? 0 : (enableNegativeVelocity ? -customMaxGravityVelocity : customMaxGravityVelocity))
+      : 40;
+
+      /*  
+      about JumpForce  
+      value that needs to be changed is located in JumpMotorFunction within FallGuysCharacterController_stored
+      (don't forget to use get, since it's a getter method)  
+
+      const jumpforce = JumpMotorFunction_stored!.method<Il2Cpp.Object>("get_JumpForce").invoke() as any;  
+      console.log(jumpforce.field("y").value);  
+
+      however, i couldn't change it.  
+      jumpforce.field("y").value = 100;  
+      didn't work
+      tried set, but nothing too  
+      */
+
+      const jumpForce = CharacterControllerData_stored!.field<Il2Cpp.Object>("jumpForceUltimateParty").value;
+      jumpForce.field("y").value = enableCustomJump ? customJumpForceUltimateParty : 17.5;
+
+      return true;
+  }
+}
+
+// helper functions
+function openURL(link: string) {
   Java.perform(() => {
       try {
           console.log(`Opening URL: ${link}`);
@@ -55,115 +140,36 @@ function findObjectsOfTypeAll(klass: Il2Cpp.Class) {
   return Resources!.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1,).invoke(klass.type.object);
 }
 
-let storedFallGuysCharacterController = Il2Cpp.Class;
-let storedCharacterControllerData: Il2Cpp.Class | undefined;
-let isMultiplayerGuysLoaded = false;
+// enablers
+let enable360Dives: boolean;
+let enableCustomSpeed: boolean;
+let enableCustomVelocity: boolean;
+let enableNegativeVelocity: boolean;
+let enableNoVelocity: boolean;
+let enableCustomJump: boolean;
+let enableFGDebug: boolean;
 
-// from menu 
-let is360Dives = false;
-let useCustomSpeed = false;
-let normalMaxSpeed = 9.5;
-let useCustomVelocity = false;
-let useNegativeVelocity = false;
-let maxGravityVelocity = 40;
-let noVelocity = false;
-let useCustomJump = false;
-let JumpForceUltimateParty = 17.5;
-let removeFPSLimit = false;
+// player
+let customNormalMaxSpeed = 9.5;
+let customMaxGravityVelocity = 40;
+let customJumpForceUltimateParty = 17.5;
 
-// bypass
-
-/*
-better to hook where this function called 
-(FGClient.ClientGameManager::Update, or you can hook FG.Common.Character.CharacterDataMonitor::UpdateCheck(FallGuysCharacterController)), 
-and apply hook from there, 
-because while you hook function before game startup it will cause game freeze on blue screen, thats why i used 7s sleep
-
-I will rewrite it i guess
-
-upd: hell nah
-*/
-
-function prepareBypass() {
-  try {
-    Java.scheduleOnMainThread(() => {
-      setTimeout(() => {
-          TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
-          console.log("Loaded TheMultiplayerGuys");
-          isMultiplayerGuysLoaded = true;
-          CharacterDataMonitor = TheMultiplayerGuys!.class("FG.Common.Character.CharacterDataMonitor");
-          Il2Cpp.perform(CheckCharacterControllerDataBypass);
-          console.log("Bypassed")
-      }, 8000)}) 
-  } catch (error: any) {
-    console.log(error)
-  }
-
-}
-
-// using it like update function
-function CheckCharacterControllerDataBypass() {
-  try {
-    const method = CharacterDataMonitor!.method("CheckCharacterControllerData", 1);
-    method.implementation = function (character: any) {
-      storedFallGuysCharacterController = character;
-      storedCharacterControllerData = character.method("get_Data").invoke();
-      const jumpForce = storedCharacterControllerData!.field<Il2Cpp.Object>("jumpForceUltimateParty").value;
-      
-      if (is360Dives) {
-        storedCharacterControllerData!.field("divePlayerSensitivity").value = 14888;
-      } else {
-        storedCharacterControllerData!.field("divePlayerSensitivity").value = 70;
-      }
-
-      if (useCustomSpeed) {
-        storedCharacterControllerData!.field("normalMaxSpeed").value = normalMaxSpeed;
-      } else {
-        storedCharacterControllerData!.field("normalMaxSpeed").value = 9.5;
-      }
-
-      if (useCustomVelocity) {
-        if (noVelocity) {
-          storedCharacterControllerData!.field("maxGravityVelocity").value = 0;
-        } else if (useNegativeVelocity) {
-          storedCharacterControllerData!.field("maxGravityVelocity").value = -maxGravityVelocity;
-        } else {
-          storedCharacterControllerData!.field("maxGravityVelocity").value = maxGravityVelocity;
-        }
-      } else {
-        storedCharacterControllerData!.field("maxGravityVelocity").value = 40;
-      }
-
-      if (useCustomJump) {
-        jumpForce.field("y").value = JumpForceUltimateParty;
-      } else {
-        jumpForce.field("y").value = 17.5;
-      }
-      return true;
-  };
-  } catch (error: any) {
-    console.error(error.stack)
-  }
-}
-
+// other
 function TeleportToEndZone() {
-    console.log("Trying to teleport to the EndZone")
-    let instance: Il2Cpp.Object | null = null;
+    let endZoneInstance: Il2Cpp.Object | null = null;
 
     try {
-      const ObjectiveReachEndZone = TheMultiplayerGuys!.class('FG.Common.COMMON_ObjectiveReachEndZone');
-      instance = findObjectsOfTypeAll(ObjectiveReachEndZone).get(0);
-      if (instance) {
-        console.log(`EndZone instance has been found ${instance}`);
-        const EndZoneVector3Pos = instance 
-        .method<Il2Cpp.Object>("get_transform").invoke()
-        .method<Il2Cpp.Object>("get_position").invoke();
+      endZoneInstance = findObjectsOfTypeAll(ObjectiveReachEndZone!).get(0); // find finish
 
-        storedFallGuysCharacterController!.
+      if (endZoneInstance) {
+        const EndZoneVector3Pos = endZoneInstance 
+        .method<Il2Cpp.Object>("get_transform").invoke()
+        .method<Il2Cpp.Object>("get_position").invoke(); 
+
+        FallGuysCharacterController_stored!.
         //@ts-ignore
         method<Il2Cpp.Object>("get_transform").invoke().
         method<Il2Cpp.Object>("set_position").invoke(EndZoneVector3Pos);
-        console.log("Teleported to EndZone")
       }
 
     } catch (error: any) {
@@ -172,82 +178,45 @@ function TeleportToEndZone() {
     }
 }
 
-let FGDebugInstance: Il2Cpp.Object | null = null;
-
-// Other 
 const FGDebug = {
   enable() {
-    console.log("Attempting to enable FGDebug")
-    if (isMultiplayerGuysLoaded === false) {
-      Menu.toast("Wait until TheMultiplayerGuys load and re-enable FGDebug", 0); // the same thing as prepareBypass
-      return
-    }
+    enableFGDebug = true;
+
+    if (!reachedMainMenu) {
+      return // it will enable after hook
+    } 
+
     try {
-      const DebugClass = TheMultiplayerGuys!.class('GvrFPS');
-      FGDebugInstance = findObjectsOfTypeAll(DebugClass).get(0); 
+      FGDebugInstance = findObjectsOfTypeAll(DebugClass!).get(0); // find object with debug class
+      
+      const localScale = Vector3class!.alloc().unbox();
+      localScale.method(".ctor", 3).invoke(0.4, 0.4, 0.4); // new scale
 
-      if (FGDebugInstance) {
-        const Vector3class = CoreModule!.class("UnityEngine.Vector3");
+      FGDebugInstance
+      .method<Il2Cpp.Object>("get_transform").invoke()
+      .method<Il2Cpp.Object>("set_localScale").invoke(localScale); 
 
-        const localScale = Vector3class.alloc();
-        localScale.method(".ctor", 3).invoke(0.4, 0.4, 0.4);
+      const gameObject = FGDebugInstance.method<Il2Cpp.Object>("get_gameObject").invoke(); 
+      gameObject.method("SetActive").invoke(true); // enabling
 
-        const localScaleUnboxed = localScale.unbox();
-
-        FGDebugInstance
-        .method<Il2Cpp.Object>("get_transform").invoke()
-        .method<Il2Cpp.Object>("set_localScale").invoke(localScaleUnboxed); 
-
-        const gameObject = FGDebugInstance.method<Il2Cpp.Object>("get_gameObject").invoke(); 
-        gameObject.method("SetActive").invoke(true);
-        console.log("Enabled FGDebug")
-
-
-      } else {
-        console.log("Debug object not found");
-        Menu.toast("Debug object not found", 0);
-      }
     } catch (error: any) {
       Menu.toast(error.stack, 1);
-      console.error(error.stack);
+      console.error(error.stack)
     }
+
   },
   disable() {
-    console.log("Attempting to disable FGDebug")
+    enableFGDebug = false;
+    FGDebugInstance = findObjectsOfTypeAll(DebugClass!).get(0);
     if (FGDebugInstance) {
       const gameObject = FGDebugInstance.method<Il2Cpp.Object>("get_gameObject").invoke(); 
       gameObject.method("SetActive").invoke(false);
-      console.log("Disabled FGDebug")
     }
   }
-}
+} 
 
-function RemoveFPSLimit() {
-    // it would be good to do a check if the fps already changed
-    // maybe rewrite with alloc. upd: idk how, trace FGClient.GraphicsSettings and FGClient.TargetFPSOptionViewModel with trace(true) for more
-
-    const text = "To remove FPS Limit change the FPS preset in settings to any other and save. You need to do this only once!"
-
-    if (removeFPSLimit === true) {
-      Menu.toast(text, 1)
-      return
-    }
-    removeFPSLimit = true;
-    const methodset = GraphicsSettings!.method("set_TargetFrameRate", 1);
-    Menu.toast(text, 1)
-    methodset.implementation = function () {
-      Menu.toast("Removing FPS Limit", 0)
-      return this.method("set_TargetFrameRate", 1).invoke(1488); // https://www.youtube.com/watch?v=VRnyWwNC328
-    }
-}
-
-
-function init() {
+function initMenu() {
     try {
-        // Il2Cpp.perform(getAssemblyCSharp);
-        Il2Cpp.perform(prepareModules);
-        Il2Cpp.perform(prepareBypass);
-
         const layout = new Menu.ObsidianLayout(obsidianConfig);
         const composer = new Menu.Composer("Fall Guys Mod Menu", "Created by @repinek", layout);
         composer.icon("https://floyzi.github.io/images/sigma.png", "Web");
@@ -258,52 +227,53 @@ function init() {
         Menu.add(general);
 
         Menu.add(layout.toggle("360 Dives", (state: boolean) => {
-            state ? is360Dives = true : is360Dives = false;
-            console.log(`Is 360 Dives updated: ${is360Dives}`);
+          enable360Dives = state;
+          console.log(`enable360Dives: ${enable360Dives}`);
         }));
-        
+      
         Menu.add(layout.toggle("Use Custom Speed", (state: boolean) => {
-          state ? useCustomSpeed = true : useCustomSpeed = false;
+          enableCustomSpeed = state;
+          console.log(`enableCustomSpeed: ${enableCustomSpeed}`);
         }))
 
         Menu.add(
           layout.seekbar("Normal Max Speed: {0} / 100", 100, 1, (value: number) => { 
-              normalMaxSpeed = value;
-              console.log(`Normal Max Speed updated: ${normalMaxSpeed}`);
+            customNormalMaxSpeed = value;
+            console.log(`customNormalMaxSpeed: ${customNormalMaxSpeed}`);
         }));
         
         Menu.add(layout.toggle("Use Custom Velocity", (state: boolean) => {
-              state ? useCustomVelocity = true : useCustomVelocity = false;
-              console.log(`Use Custom Velocity updated: ${useCustomVelocity}`)
+          enableCustomVelocity = state;
+          console.log(`enableCustomVelocity: ${enableCustomVelocity}`)
         }));
     
         Menu.add(
           layout.seekbar("Max Gravity Velocity: {0} / 100", 100, -100, (value: number) => {
-              maxGravityVelocity = value;
-              console.log(`Max Gravity Velocity updated: ${maxGravityVelocity}`);
+            customMaxGravityVelocity = value;
+            console.log(`customMaxGravityVelocity: ${customMaxGravityVelocity}`);
         }));
         
         Menu.add(layout.toggle("Negative Velocity", (state: boolean) => {
-          state ? useNegativeVelocity = true : useNegativeVelocity = false;
-          console.log(`Negative Velocity updated: ${useNegativeVelocity}`)
+          enableNegativeVelocity = state;
+          console.log(`enableNegativeVelocity: ${enableNegativeVelocity}`)
         }));
         
         Menu.add(layout.toggle("No Velocity", (state: boolean) => {
-          state ? noVelocity = true : noVelocity = false;
-          console.log(`No Velocity updated: ${noVelocity}`)
+          enableNoVelocity = state;
+          console.log(`enableNoVelocity: ${enableNoVelocity}`)
         }));
 
         Menu.add(layout.toggle("Use Custom Jump Force (Applied in Next Round)", (state: boolean) => {
-          state ? useCustomJump = true : useCustomJump = false;
+          enableCustomJump = state;
+          console.log(`enableCustomJump: ${enableCustomJump}`)
         }))
 
         Menu.add(
           layout.seekbar("Jump Force: {0} / 100", 100, 1, (value: number) => { 
-              JumpForceUltimateParty = value;
-              console.log(`Jump Force updated: ${JumpForceUltimateParty}`);
+            customJumpForceUltimateParty = value;
+            console.log(`customJumpForceUltimateParty: ${customJumpForceUltimateParty}`);
         }));
         
-            
         Menu.add(layout.button("Teleport to Finish (Only Races)", () => TeleportToEndZone()));
         
         // other
@@ -315,23 +285,24 @@ function init() {
           state ? FGDebug.enable() : FGDebug.disable();
         }));
 
-        Menu.add(layout.button("Remove FPS Limit", () => RemoveFPSLimit()))
-
         // links
         const links = layout.textView("<b>--- Links ---</b>");
         links.gravity = Menu.Api.CENTER;
         Menu.add(links);
 
-        Menu.add(layout.button("Github Repository", () => OpenURL("https://github.com/repinek/FallGuysFridaModMenu")));
+        Menu.add(layout.button("Github Repository (Leave a star!)", () => openURL("https://github.com/repinek/FallGuysFridaModMenu")));
+        Menu.add(layout.button("Creator's Twitter", () => openURL("https://x.com/repinek840")))
 
-        Menu.add(layout.button("Creator's Twitter", () => OpenURL("https://x.com/repinek840")))
+        Java.scheduleOnMainThread(() => {
+          setTimeout(() => {
+              composer.show();
+          }, 2000) // refer to the comment in the prepareModules function
+        }) 
 
-        Menu.toast("Made with Love by repinek", 1);
-        composer.show();
     } catch (error: any) {
         Menu.toast(error.stack, 1);
         console.error(error.stack)
     }
 }
 
-Menu.waitForInit(init);
+Il2Cpp.perform(prepareModules);
