@@ -1,15 +1,20 @@
 {
-  "name": "lglmenu",
+  "name": "fallguys-frida-modmenu",
   "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/repinek/fallguys-frida-modmenu"
+  },
   "main": "index.js",
   "scripts": {
     "spawn": "frida -U gadget -l dist/agent.js",
-    "build": "frida-compile src/index.ts -o dist/agent.js -c"
+    "build": "frida-compile src/index.ts -o dist/agent.js -c",
+    "test": "frida-compile src/test.ts -o dist/agent.js -c"
   },
   "keywords": [],
-  "author": "",
+  "author": "repinek",
   "license": "ISC",
-  "description": "",
+  "description": "Android Fall Guys cheat using FRIDA and frida-il2cpp-bridge",
   "devDependencies": {
     "@types/frida-gum": "^18.7.1",
     "@types/node": "^22.9.0",
@@ -19,5 +24,8 @@
   },
   "dependencies": {
     "frida-java-menu": "github:commonuserlol/frida-java-menu"
+  },
+  "prettier": {
+    "printWidth": 160
   }
 }

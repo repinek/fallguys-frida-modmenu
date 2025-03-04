@@ -17,12 +17,13 @@ Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridg
 - Change Speed
 - Change Velocity / No Velocity / Negative Velocity
 - 360 Dives
-- Teleport To Finish
+- Teleport To Finish or Crown
 - Display FGDebug (Minimum, maximum, average and current FPS, Time, Ping, Dropped packets)
 
 ### Features that always work (cannot be disabled)
 - Bypass Character Physics Checks
 - Remove FPS Limit
+- Anti-AFK
   
 ## Build 
 **— Build script**
