@@ -29,8 +29,8 @@ Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridg
 **— Build script**
 1. Clone the repository:
 ```
-git clone https://github.com/repinek/FallGuysFridaModMenu
-cd FallGuysFridaModMenu
+git clone https://github.com/repinek/fallguys-frida-modmenu
+cd fallguys-frida-modmenu
 ```
 2. Install dependencies:
 ``` 
