@@ -25,6 +25,12 @@ Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridg
 - Remove FPS Limit
 - Anti-AFK
   
+## Note
+> If you don't want to wait for game resources to download, copy the .obb file from: <br>
+> Android/obb/com.Mediatonic.FallGuys_client/ to <br>
+> Android/obb/com.Mediatonic.FallGuys_client.modmenu/, then rename it by adding .modmenu before .obb <br>
+> Final file name example: main.XXXX.com.mediatonic.FallGuys_client.modmenu.obb <br>
+
 ## Build 
 **— Build script**
 1. Clone the repository:
@@ -59,7 +65,6 @@ Apk will be saved at the path ./yourfallguys.patched.apk
 On startup it will ask for permission to display over other apps, If it doesn’t ask for it, grant it manually. <br><br>
 **HyperOS, ColorOS, OneUI, HarmonyOS**, and other OEM ROMs may not work properly or at all. <br>
 **It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).** <br>
-
 
 ## Special Thanks
 [FloyzI](https://github.com/FloyzI) - for how the game works <br>

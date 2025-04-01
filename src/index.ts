@@ -54,9 +54,9 @@ function main() {
 
     const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
     const CheckCharacterControllerData_method = CharacterDataMonitor.method("CheckCharacterControllerData", 1);
-    const get_TargetFrameRate_method = GraphicsSettings.method("get_TargetFrameRate", 0);
+    const get_TargetFrameRate_method = GraphicsSettings.method("get_TargetFrameRate");
     const set_TargetFrameRate_method = GraphicsSettings.method("set_TargetFrameRate", 1);
-    const StartAFKManager_method = AFKManager.method("Start", 0);
+    const StartAFKManager_method = AFKManager.method("Start");
 
     let FallGuysCharacterController_stored: Il2Cpp.Object;
     let CharacterControllerData_stored: Il2Cpp.Object;
