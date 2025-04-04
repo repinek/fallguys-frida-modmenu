@@ -31,11 +31,12 @@ let enableCustomDiveForce: boolean;
 let enableFGDebug: boolean;
 let enableHideStuff: boolean;
 
-// player
+// numbers
 let customNormalMaxSpeed = 9.5;
 let customMaxGravityVelocity = 40;
 let customJumpForceUltimateParty = 17.5;
 let customDiveForce = 16.5;
+let customResolutionScale = 1;
 
 function main() {
     const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
@@ -63,15 +64,12 @@ function main() {
     const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
     const CheckCharacterControllerData_method = CharacterDataMonitor.method("CheckCharacterControllerData", 1); 
     const get_TargetFrameRate_method = GraphicsSettings.method("get_TargetFrameRate");
-    const StartAFKManager_method = AFKManager.method("Start");
+    const set_TargetFrameRate_method = GraphicsSettings.method("set_TargetFrameRate", 1);
+    const get_ResolutionScale_method = GraphicsSettings.method("get_ResolutionScale");
     const set_ResolutionScale_method = GraphicsSettings.method("set_ResolutionScale", 1);
+    const StartAFKManager_method = AFKManager.method("Start");
     // const get_IsGameLevelLoaded_method = ClientGameManager.method("get_IsGameLevelLoaded"); // idk it probably not called, i cant hook it 
     const get_IsGameCountingDown_method = ClientGameStateView.method("get_IsGameCountingDown");
-    /*
-    TODO implement this stuff, also i found ResolutionScaling class with some functions, 
-    like System.Void ResolutionScaling::UpdateResolutionScaleStatus() and System.Void ResolutionScaling::DisableCameraRenderTexture()
-    */
-    const set_TargetFrameRate_method = GraphicsSettings.method("set_TargetFrameRate", 1);
 
     let FallGuysCharacterController_stored: Il2Cpp.Object;
     let CharacterControllerData_stored: Il2Cpp.Object;
@@ -82,6 +80,7 @@ function main() {
     
     // storage
     let reachedMainMenu = false;
+    let GraphicsSettingsInstance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // this
 
     Menu.toast("Menu will appear once you enter the main menu.", 1);
 
@@ -94,6 +93,19 @@ function main() {
         console.log("set_TargetFrameRate Called!");
         return this.method<void>("set_TargetFrameRate", 1).invoke(1488);
     };
+
+    get_ResolutionScale_method.implementation = function () {
+        console.log("get_ResolutionScale Called!");
+        GraphicsSettingsInstance = this;
+        console.log("getter with args", customResolutionScale)
+        return customResolutionScale;
+    }
+
+    set_ResolutionScale_method.implementation = function (scale) {
+        console.log("set_ResolutionScale called!")
+        console.log("setter with args", customResolutionScale)
+        return this.method("set_ResolutionScale", 1).invoke(customResolutionScale);
+    }
 
     StartAFKManager_method.implementation = function () { 
         console.log("AFKManager Start Called!");
@@ -122,6 +134,7 @@ function main() {
     };
 
     // doors tested, others - no, give feedback
+    // this method is called during the countdown at the start of the round. idk of any other method that should be hooked
     get_IsGameCountingDown_method.implementation = function () { 
         console.log("get_IsGameCountingDown Called!");
         
@@ -203,6 +216,7 @@ function main() {
         return true;
     };
 
+    // functions 
     const FGDebug = {
         enable() {
             enableFGDebug = true;
@@ -334,6 +348,16 @@ function main() {
         };
     };
 
+    const changeResolutionScale = () => {
+        try {
+            console.log("trying change resolution scale to", customResolutionScale);
+            GraphicsSettingsInstance.method("set_ResolutionScale", 1).invoke(customResolutionScale); // HOOK ResolutionScaling::UpdateResolutionScaleStatus to update it, i was right! tomorrow.
+        } catch (error: any) {
+            Menu.toast(error.stack, 1); 
+            console.error(error.stack);
+        }
+
+    }
 
 
     const initMenu = () => {
@@ -455,6 +479,14 @@ function main() {
             Menu.add(
                 layout.toggle("Display FGDebug", (state: boolean) => {
                     state ? FGDebug.enable() : FGDebug.disable();
+                }),
+            );
+
+            Menu.add(
+                layout.seekbar("Custom Resolution %: {0} / 100", 100, 1, (value: number) => {
+                    customResolutionScale = value / 100;
+                    changeResolutionScale(); 
+                    console.log(`customResolutionScale: ${customResolutionScale}`);
                 }),
             );
 
