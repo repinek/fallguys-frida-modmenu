@@ -13,12 +13,26 @@ Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridg
 <img src="https://github.com/user-attachments/assets/59ddff53-6dc1-49cc-8396-4243bb3c096a" width="500" height="224"/>
 <img src="https://github.com/user-attachments/assets/f2164534-1700-4ba6-b681-576dca29583d" width="500" height="224"/>
 
-## Features  
+## Features 
+
+### Movement
 - Change Speed
 - Change Velocity / No Velocity / Negative Velocity
 - 360 Dives
-- Teleport To Finish or Crown
-- Display FGDebug (Minimum, maximum, average and current FPS, Time, Ping, Dropped packets)
+- Change Jump and Dive Power
+
+### Rounds helper
+- Hide Real Doors (Door Dash and Lost Temple)
+- Hide Fake Platforms (Tip Toe)
+
+### Teleports
+- Teleport to Finish or Crown
+- Teleport to Random Player
+- Teleport to Bubble or Active Button
+
+### Other
+- Display FGDebug  
+  Shows FPS (min/max/avg/current), Time, Ping, Dropped Packets
 
 ### Features that always work (cannot be disabled)
 - Bypass Character Physics Checks
@@ -67,5 +81,6 @@ On startup it will ask for permission to display over other apps, If it doesn’
 **It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).** <br>
 
 ## Special Thanks
+Obed Guys Team - Some features powered by Obed Guys Team <br>
 [FloyzI](https://github.com/FloyzI) - for how the game works <br>
 [commonuserlol](https://github.com/commonuserlol) - for help with code and [menu](https://github.com/commonuserlol/frida-java-menu)
