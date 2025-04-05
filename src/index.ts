@@ -82,8 +82,8 @@ function main() {
     let FGDebugInstance: Il2Cpp.Object;
 
     console.log("Loaded all stuff")
-    
-    // storage
+
+    // storage cache
     let reachedMainMenu = false;
     let GraphicsSettingsInstance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in get_ResolutionScale
 
@@ -399,7 +399,7 @@ function main() {
             );
 
             Menu.add(
-                layout.seekbar("Normal Max Speed: {0} / 100", 100, 1, (value: number) => {
+                layout.seekbar("Custom Speed: {0} / 100", 100, 1, (value: number) => {
                     customNormalMaxSpeed = value;
                     console.log(`customNormalMaxSpeed: ${customNormalMaxSpeed}`);
                 }),
@@ -413,7 +413,7 @@ function main() {
             );
 
             Menu.add(
-                layout.seekbar("Max Gravity Velocity: {0} / 100", 100, 0, (value: number) => {
+                layout.seekbar("Vertical Gravity Velocity: {0} / 100", 100, 0, (value: number) => {
                     customMaxGravityVelocity = value;
                     console.log(`customMaxGravityVelocity: ${customMaxGravityVelocity}`);
                 }),
@@ -434,28 +434,28 @@ function main() {
             );
 
             Menu.add(
-                layout.toggle("Use Custom Jump Force", (state: boolean) => {
+                layout.toggle("Use Custom Jump Strenght", (state: boolean) => {
                     enableCustomJump = state;
                     console.log(`enableCustomJump: ${enableCustomJump}`);
                 }),
             );
 
             Menu.add(
-                layout.seekbar("Jump Force: {0} / 100", 100, 1, (value: number) => {
+                layout.seekbar("Jump Strenght: {0} / 100", 100, 1, (value: number) => {
                     customJumpForceUltimateParty = value;
                     console.log(`customJumpForceUltimateParty: ${customJumpForceUltimateParty}`);
                 }),
             );
 
             Menu.add(
-                layout.toggle("Use Custom Dive Force", (state: boolean) => {
+                layout.toggle("Use Custom Dive Strenght", (state: boolean) => {
                     enableCustomDiveForce = state;
                     console.log(`enableDiveForce: ${enableCustomDiveForce}`);
                 }),
             );
 
             Menu.add(
-                layout.seekbar("Dive Force: {0} / 100", 100, 1, (value: number) => {
+                layout.seekbar("Dive Strenght: {0} / 100", 100, 1, (value: number) => {
                     customDiveForce = value;
                     console.log(`customDiveForce: ${customDiveForce}`);
                 }),
@@ -467,7 +467,7 @@ function main() {
             Menu.add(round);
 
             Menu.add(
-                layout.toggle("Hide fake doors, tiptoe", (state: boolean) => {
+                layout.toggle("Hide Fake Doors, Tiptoe Platforms", (state: boolean) => {
                     enableHideStuff = state;
                     console.log(`enableHideStuff: ${enableHideStuff}`);
                 }),
@@ -478,11 +478,11 @@ function main() {
             teleports.gravity = Menu.Api.CENTER;
             Menu.add(teleports);
             
-            Menu.add(layout.button("Teleport to Finish or Crown", teleportToFinish));
+            Menu.add(layout.button("Teleport To Finish or Crown", teleportToFinish));
 
-            Menu.add(layout.button("Teleport to Random Player", TeleportToRandomPlayer));
+            Menu.add(layout.button("Teleport To Random Player", TeleportToRandomPlayer));
 
-            Menu.add(layout.button("Teleport to Bubble or Active Button", TeleportToScorePoint));
+            Menu.add(layout.button("Teleport To Bubble or Active Button", TeleportToScorePoint));
 
             // other
             const other = layout.textView("<b>--- Other ---</b>");
@@ -496,7 +496,7 @@ function main() {
             );
 
             Menu.add(
-                layout.seekbar("Custom Resolution %: {0} / 100", 100, 1, (value: number) => {
+                layout.seekbar("Custom Resolution (Applied in Next Round): {0}% / 100%", 100, 1, (value: number) => {
                     customResolutionScale = value / 100;
                     changeResolutionScale(); 
                     console.log(`customResolutionScale: ${customResolutionScale}`);
@@ -509,7 +509,7 @@ function main() {
             Menu.add(links);
 
             Menu.add(layout.button("Github Repository (Leave a star!)", () => openURL("https://github.com/repinek/fallguys-frida-modmenu")));
-            Menu.add(layout.button("Cheating discord server", () => openURL("https://discord.gg/cNFJ73P6p3")));
+            Menu.add(layout.button("Cheating Discord Server", () => openURL("https://discord.gg/cNFJ73P6p3")));
             Menu.add(layout.button("Creator's Twitter", () => openURL("https://x.com/repinek840")));
 
             Java.scheduleOnMainThread(() => {

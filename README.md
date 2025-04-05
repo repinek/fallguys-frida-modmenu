@@ -5,7 +5,9 @@
 > Works on my machine.
 
 # Fall Guys Mod Menu
-Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge)
+Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge) <br>
+
+[Cheating Discord Server](https://discord.gg/cNFJ73P6p3)
 
 ## Screenshots
 ![Demo](https://github.com/user-attachments/assets/57b9a4cd-3a62-47b7-8a3e-17dc801ea0b3)
@@ -16,19 +18,19 @@ Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridg
 ## Features 
 
 ### Movement
-- Change Speed
-- Change Velocity / No Velocity / Negative Velocity
 - 360 Dives
-- Change Jump and Dive Power
+- Change Speed
+- Change Vertical Velocity / No Velocity / Negative Velocity
+- Change Jump and Dive Strenght
 
 ### Rounds helper
 - Hide Real Doors (Door Dash and Lost Temple)
 - Hide Fake Platforms (Tip Toe)
 
 ### Teleports
-- Teleport to Finish or Crown
-- Teleport to Random Player
-- Teleport to Bubble or Active Button
+- Teleport To Finish or Crown
+- Teleport To Random Player
+- Teleport To Bubble or Active Button
 
 ### Other
 - Display FGDebug  
