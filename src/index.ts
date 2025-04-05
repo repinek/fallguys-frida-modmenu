@@ -46,21 +46,27 @@ function main() {
     // classes
     const Resources = CoreModule.class("UnityEngine.Resources");
     const Vector3class = CoreModule.class("UnityEngine.Vector3");
+
     const GraphicsSettings = MTFGClient.class("FGClient.GraphicsSettings");
     const LobbyService = MTFGClient.class("FGClient.CatapultServices.LobbyService");
+    const ClientGameStateView = MTFGClient.class("FGClient.ClientGameStateView");
+    const ClientGameManager = MTFGClient.class("FGClient.ClientGameManager");
+
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const FallGuysCharacterController = TheMultiplayerGuys.class("FallGuysCharacterController");
+
     const DebugClass = TheMultiplayerGuys.class("GvrFPS"); // debug info
+    const AFKManager = MTFGClient.class("FGClient.AFKManager");
+
     const ObjectiveReachEndZone = TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone"); // finish
     const GrabToQualify = TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crowns
     const SpawnableCollectable = TheMultiplayerGuys.class("Levels.ScoreZone.SpawnableCollectable"); // bubbles
     const ScoredButton = TheMultiplayerGuys.class("ScoredButton");
-    const AFKManager = MTFGClient.class("FGClient.AFKManager");
-    const ClientGameStateView = MTFGClient.class("FGClient.ClientGameStateView");
     const TipToe_Platform = TheMultiplayerGuys.class("Levels.TipToe.TipToe_Platform");
     const FakeDoorController = TheMultiplayerGuys.class("Levels.DoorDash.FakeDoorController");
     const CrownMazeDoor = TheMultiplayerGuys.class("Levels.CrownMaze.CrownMazeDoor");
 
+    // methods
     const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
     const CheckCharacterControllerData_method = CharacterDataMonitor.method("CheckCharacterControllerData", 1); 
     const get_TargetFrameRate_method = GraphicsSettings.method("get_TargetFrameRate");
@@ -68,19 +74,18 @@ function main() {
     const get_ResolutionScale_method = GraphicsSettings.method("get_ResolutionScale");
     const set_ResolutionScale_method = GraphicsSettings.method("set_ResolutionScale", 1);
     const StartAFKManager_method = AFKManager.method("Start");
-    // const get_IsGameLevelLoaded_method = ClientGameManager.method("get_IsGameLevelLoaded"); // idk it probably not called, i cant hook it 
-    const get_IsGameCountingDown_method = ClientGameStateView.method("get_IsGameCountingDown");
+    const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1); // LMAO i was sooo stupid
 
     let FallGuysCharacterController_stored: Il2Cpp.Object;
     let CharacterControllerData_stored: Il2Cpp.Object;
     let JumpMotorFunction_stored: Il2Cpp.Object;
     let FGDebugInstance: Il2Cpp.Object;
 
-    console.log("Loaded classes")
+    console.log("Loaded all stuff")
     
     // storage
     let reachedMainMenu = false;
-    let GraphicsSettingsInstance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // this
+    let GraphicsSettingsInstance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in get_ResolutionScale
 
     Menu.toast("Menu will appear once you enter the main menu.", 1);
 
@@ -96,14 +101,12 @@ function main() {
 
     get_ResolutionScale_method.implementation = function () {
         console.log("get_ResolutionScale Called!");
-        GraphicsSettingsInstance = this;
-        console.log("getter with args", customResolutionScale)
+        GraphicsSettingsInstance = this; // often gc.choose causes crashes
         return customResolutionScale;
     }
 
     set_ResolutionScale_method.implementation = function (scale) {
         console.log("set_ResolutionScale called!")
-        console.log("setter with args", customResolutionScale)
         return this.method("set_ResolutionScale", 1).invoke(customResolutionScale);
     }
 
@@ -133,62 +136,67 @@ function main() {
         return this.method<void>("OnMainMenuDisplayed", 1).invoke(event);
     };
 
-    // doors tested, others - no, give feedback
-    // this method is called during the countdown at the start of the round. idk of any other method that should be hooked
-    get_IsGameCountingDown_method.implementation = function () { 
-        console.log("get_IsGameCountingDown Called!");
-        
-        if (enableHideStuff) {
-            try {
-                const currentGameLevelName = this.field<Il2Cpp.String>("CurrentGameLevelName").value?.content;
-        
-                const disableFakeObjects = (
-                    type: Il2Cpp.Class, // class of object
-                    field: string, // getter method name like get_IsFakeDoor 
-                    expected: boolean
-                ) => {
-                    const objectsArray = findObjectsOfTypeAll(type);
-        
-                    for (const obj of objectsArray) {
-                        // const value = obj.field<boolean>(field).value;
-                        const value = obj.method<boolean>(field).invoke();
-                        if (value === expected) {
-                            const gameObject = obj.method<Il2Cpp.Object>("get_gameObject").invoke();
-                            gameObject.method("SetActive").invoke(false);
-                        }
-                    }
-                };
-        
-                if (!currentGameLevelName)
-                    return this.method<boolean>("get_IsGameCountingDown").invoke(); 
-                
-                // why includes? just search round_door_dash or any other in cms, that's why not the ===
-                if (currentGameLevelName.includes("round_door_dash")) {
-                    disableFakeObjects(FakeDoorController, "get_IsFakeDoor", false);
-                }
-        
-                else if (currentGameLevelName.includes("round_crown_maze")) {
-                    disableFakeObjects(CrownMazeDoor, "get_IsBreakable", true);
-                }
-        
-                else if (
-                    currentGameLevelName.includes("round_tip_toe") || // round_tip_toe_...
-                    currentGameLevelName.includes("round_tiptoe") // round_tiptoefinale_...
-                ) {
-                    disableFakeObjects(TipToe_Platform, "get_IsFakePlatform", true);
-                }
-        
-                else if (currentGameLevelName.includes("ugc")) { // creative
-                    disableFakeObjects(FakeDoorController, "get_IsFakeDoor", false);
-                }
+    GameLevelLoaded_method.implementation = function (ugcLevelHash) {
+        console.log("GameLevelLoaded called!");
 
-            } catch (error: any) {
-                Menu.toast(error.stack, 1); 
-                console.error(error.stack);
+        // TODO: rewrite with ROUND instance
+        Il2Cpp.gc.choose(ClientGameStateView).forEach((instance: Il2Cpp.Object) => { // find ClientGameStateView instance
+            const currentGameLevelName = instance.field<Il2Cpp.String>("CurrentGameLevelName").value?.content; 
+
+            if (enableHideStuff) {
+                try {
+                    const disableFakeObjects = (
+                        type: Il2Cpp.Class, // class of object
+                        field: string, // getter method name like get_IsFakeDoor 
+                        expected: boolean
+                    ) => {
+                        const objectsArray = findObjectsOfTypeAll(type);
+            
+                        for (const obj of objectsArray) {
+                            // const value = obj.field<boolean>(field).value;
+                            const value = obj.method<boolean>(field).invoke();
+                            if (value === expected) {
+                                const gameObject = obj.method<Il2Cpp.Object>("get_gameObject").invoke();
+                                gameObject.method("SetActive").invoke(false);
+                            }
+                        }
+                    };
+            
+                    if (!currentGameLevelName) {
+                        Menu.toast("Something went wrong in determining the round ID", 0);
+                        return; // i think it exits the current forEach callback iteration, NOT the whole GameLevelLoaded method hook
+
+                    }
+
+                    // why includes? just search round_door_dash or any other in cms, that's why not the ===
+                    if (currentGameLevelName.includes("round_door_dash")) {
+                        disableFakeObjects(FakeDoorController, "get_IsFakeDoor", false);
+                    }
+            
+                    else if (currentGameLevelName.includes("round_crown_maze")) {
+                        disableFakeObjects(CrownMazeDoor, "get_IsBreakable", true);
+                    }
+            
+                    else if (
+                        currentGameLevelName.includes("round_tip_toe") || // round_tip_toe_...
+                        currentGameLevelName.includes("round_tiptoe") // round_tiptoefinale_...
+                    ) {
+                        disableFakeObjects(TipToe_Platform, "get_IsFakePlatform", true);
+                    }
+            
+                    else if (currentGameLevelName.includes("ugc")) { // creative
+                        disableFakeObjects(FakeDoorController, "get_IsFakeDoor", false);
+                    }
+    
+                } catch (error: any) {
+                    Menu.toast(error.stack, 1); 
+                    console.error(error.stack);
+                }
             }
-        }
-        return this.method<boolean>("get_IsGameCountingDown").invoke();
-    };
+        });
+        
+        return this.method("GameLevelLoaded", 1).invoke(ugcLevelHash);
+    }
     
     CheckCharacterControllerData_method.implementation = function (character: any) {
     
@@ -287,7 +295,7 @@ function main() {
         }
     };
 
-    // not tested, give feedback
+    // buttons tested, bubbles no, give feedback
     const TeleportToScorePoint = () => {
         const BubblesArray = findObjectsOfTypeAll(SpawnableCollectable); // bubbles 
         const ScoredButtonArray = findObjectsOfTypeAll(ScoredButton);
@@ -351,7 +359,12 @@ function main() {
     const changeResolutionScale = () => {
         try {
             console.log("trying change resolution scale to", customResolutionScale);
-            GraphicsSettingsInstance.method("set_ResolutionScale", 1).invoke(customResolutionScale); // HOOK ResolutionScaling::UpdateResolutionScaleStatus to update it, i was right! tomorrow.
+            GraphicsSettingsInstance.method("set_ResolutionScale", 1).invoke(customResolutionScale);
+            /*
+            i wanted to make this value changeable in the game, but unfortunately 
+            calling ResolutionScaling::UpdateResolutionScaleStatus() doesn't do anything,
+            maybe i should call something else, but idk exactly (will check later with IDA)
+            */
         } catch (error: any) {
             Menu.toast(error.stack, 1); 
             console.error(error.stack);
