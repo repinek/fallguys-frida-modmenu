@@ -20,6 +20,8 @@ function openURL(link: string) {
     });
 }
 
+let version = "1.01"
+
 // enablers
 let enable360Dives: boolean;
 let enableCustomSpeed: boolean;
@@ -81,17 +83,16 @@ function main() {
     const StartAFKManager_method = AFKManager.method("Start");
     const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
 
-    let FallGuysCharacterController_stored: Il2Cpp.Object;
-    let CharacterControllerData_stored: Il2Cpp.Object;
-    let JumpMotorFunction_stored: Il2Cpp.Object;
-    let FGDebugInstance: Il2Cpp.Object;
-
     console.log("Loaded all stuff")
 
     // storage cache
+    let FallGuysCharacterController_Instance: Il2Cpp.Object; 
+    let CharacterControllerData_Instance: Il2Cpp.Object;
+    let JumpMotorFunction_Instance: Il2Cpp.Object;
+    let FGDebug_Instance: Il2Cpp.Object;
     let reachedMainMenu = false;
-    let GraphicsSettingsInstance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in get_ResolutionScale
-
+    let GraphicsSettings_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in get_ResolutionScale
+    
     Menu.toast("Menu will appear once you enter the main menu.", 1);
 
     get_TargetFrameRate_method.implementation = function () {
@@ -106,7 +107,7 @@ function main() {
 
     get_ResolutionScale_method.implementation = function () {
         console.log("get_ResolutionScale Called!");
-        GraphicsSettingsInstance = this; // often gc.choose causes crashes
+        GraphicsSettings_Instance = this; // often gc.choose causes crashes
         return customResolutionScale;
     }
 
@@ -144,7 +145,7 @@ function main() {
     GameLevelLoaded_method.implementation = function (ugcLevelHash) {
         console.log("GameLevelLoaded called!");
 
-        // TODO: rewrite with ROUND instance
+        // TODO: rewrite with ROUND instance. UPD: probably i have no reason to do this, this method is not bad too
         Il2Cpp.gc.choose(ClientGameStateView).forEach((instance: Il2Cpp.Object) => { // find ClientGameStateView instance
             const currentGameLevelName = instance.field<Il2Cpp.String>("CurrentGameLevelName").value?.content; 
 
@@ -205,14 +206,14 @@ function main() {
     
     CheckCharacterControllerData_method.implementation = function (character: any) {
     
-        FallGuysCharacterController_stored = character;
-        CharacterControllerData_stored = character.method("get_Data").invoke(); // get Data instance
-        JumpMotorFunction_stored = character.method("get_JumpMotorFunction").invoke(); // get JumpMotorFunction 
+        FallGuysCharacterController_Instance = character;
+        CharacterControllerData_Instance = character.method("get_Data").invoke(); // get Data instance
+        JumpMotorFunction_Instance = character.method("get_JumpMotorFunction").invoke(); // get JumpMotorFunction 
     
-        CharacterControllerData_stored.field("divePlayerSensitivity").value = enable360Dives ? 14888 : 70;
-        CharacterControllerData_stored.field("normalMaxSpeed").value = enableCustomSpeed ? customNormalMaxSpeed : 9.5;
+        CharacterControllerData_Instance.field("divePlayerSensitivity").value = enable360Dives ? 14888 : 70;
+        CharacterControllerData_Instance.field("normalMaxSpeed").value = enableCustomSpeed ? customNormalMaxSpeed : 9.5;
     
-        CharacterControllerData_stored.field("maxGravityVelocity").value = enableCustomVelocity
+        CharacterControllerData_Instance.field("maxGravityVelocity").value = enableCustomVelocity
             ? enableNoVelocity
                 ? 0
                 : enableNegativeVelocity
@@ -220,10 +221,10 @@ function main() {
                   : customMaxGravityVelocity
             : 40;
 
-        CharacterControllerData_stored.field("diveForce").value = enableCustomDiveForce ? customDiveForce : 17.5;
-        CharacterControllerData_stored.field("airDiveForce").value = enableCustomDiveForce ? customDiveForce : 7;
+        CharacterControllerData_Instance.field("diveForce").value = enableCustomDiveForce ? customDiveForce : 17.5;
+        CharacterControllerData_Instance.field("airDiveForce").value = enableCustomDiveForce ? customDiveForce : 7;
 
-        const jumpForce = JumpMotorFunction_stored.field<Il2Cpp.Object>("_jumpForce").value;
+        const jumpForce = JumpMotorFunction_Instance.field<Il2Cpp.Object>("_jumpForce").value;
         jumpForce.field("y").value = enableCustomJump ? customJumpForceUltimateParty : 17.5;
     
         return true;
@@ -239,14 +240,14 @@ function main() {
             }
 
             try {
-                FGDebugInstance = findObjectsOfTypeAll(DebugClass).get(0); // find object with debug class
+                FGDebug_Instance = findObjectsOfTypeAll(DebugClass).get(0); // find object with debug class
 
                 const localScale = Vector3class.alloc().unbox();
                 localScale.method(".ctor", 3).invoke(0.4, 0.4, 0.4); // new scale
 
-                FGDebugInstance.method<Il2Cpp.Object>("get_transform").invoke().method<Il2Cpp.Object>("set_localScale").invoke(localScale);
+                FGDebug_Instance.method<Il2Cpp.Object>("get_transform").invoke().method<Il2Cpp.Object>("set_localScale").invoke(localScale);
 
-                const gameObject = FGDebugInstance.method<Il2Cpp.Object>("get_gameObject").invoke();
+                const gameObject = FGDebug_Instance.method<Il2Cpp.Object>("get_gameObject").invoke();
                 gameObject.method("SetActive").invoke(true); // enabling
             } catch (error: any) {
                 Menu.toast(error.stack, 1);
@@ -255,9 +256,9 @@ function main() {
         },
         disable() {
             enableFGDebug = false;
-            FGDebugInstance = findObjectsOfTypeAll(DebugClass).get(0);
-            if (FGDebugInstance) {
-                const gameObject = FGDebugInstance.method<Il2Cpp.Object>("get_gameObject").invoke();
+            FGDebug_Instance = findObjectsOfTypeAll(DebugClass).get(0);
+            if (FGDebug_Instance) {
+                const gameObject = FGDebug_Instance.method<Il2Cpp.Object>("get_gameObject").invoke();
                 gameObject.method("SetActive").invoke(false);
             }
         },
@@ -289,7 +290,7 @@ function main() {
                 .method<Il2Cpp.Object>("get_position")
                 .invoke();
     
-            FallGuysCharacterController_stored
+            FallGuysCharacterController_Instance
                 //@ts-ignore
                 .method<Il2Cpp.Object>("get_transform")
                 .invoke()
@@ -315,7 +316,7 @@ function main() {
                     .method<Il2Cpp.Object>("get_position")
                     .invoke();
         
-                FallGuysCharacterController_stored
+                FallGuysCharacterController_Instance
                     .method<Il2Cpp.Object>("get_transform")
                     .invoke()
                     .method<Il2Cpp.Object>("set_position")
@@ -380,7 +381,7 @@ function main() {
                 .method<Il2Cpp.Object>("get_position")
                 .invoke();
         
-            FallGuysCharacterController_stored
+            FallGuysCharacterController_Instance
                 .method<Il2Cpp.Object>("get_transform")
                 .invoke()
                 .method<Il2Cpp.Object>("set_position")
@@ -393,7 +394,7 @@ function main() {
     const changeResolutionScale = () => {
         try {
             console.log("trying change resolution scale to", customResolutionScale);
-            GraphicsSettingsInstance.method("set_ResolutionScale", 1).invoke(customResolutionScale);
+            GraphicsSettings_Instance.method("set_ResolutionScale", 1).invoke(customResolutionScale);
             /*
             i wanted to make this value changeable in the game, but unfortunately 
             calling ResolutionScaling::UpdateResolutionScaleStatus() doesn't do anything,
@@ -545,6 +546,9 @@ function main() {
             Menu.add(layout.button("Github Repository (Leave a star!)", () => openURL("https://github.com/repinek/fallguys-frida-modmenu")));
             Menu.add(layout.button("Cheating Discord Server", () => openURL("https://discord.gg/cNFJ73P6p3")));
             Menu.add(layout.button("Creator's Twitter", () => openURL("https://x.com/repinek840")));
+
+            Menu.add(layout.textView(`Version Mod Menu: ${version}`));
+            Menu.add(layout.textView(`Created by repinek`));
 
             Java.scheduleOnMainThread(() => {
                 setTimeout(() => {
