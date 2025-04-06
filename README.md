@@ -30,7 +30,7 @@ Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridg
 ### Teleports
 - Teleport To Finish or Crown
 - Teleport To Random Player
-- Teleport To Bubble or Active Button
+- Teleport To Bubble, Active Button or Score Zone
 
 ### Other
 - Display FGDebug  
@@ -85,4 +85,5 @@ On startup it will ask for permission to display over other apps, If it doesn’
 ## Special Thanks
 Obed Guys Team - Some features powered by Obed Guys Team <br>
 [FloyzI](https://github.com/FloyzI) - for how the game works <br>
-[commonuserlol](https://github.com/commonuserlol) - for help with code and [menu](https://github.com/commonuserlol/frida-java-menu)
+[commonuserlol](https://github.com/commonuserlol) - for help with code and [menu](https://github.com/commonuserlol/frida-java-menu) <br>
+[Dynasty-Dev](https://github.com/Dynasty-Dev) - for testing

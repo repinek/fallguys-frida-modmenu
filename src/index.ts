@@ -42,6 +42,7 @@ function main() {
     const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
     const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
     const MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image;
+    const WushuLevelEditorRuntime = Il2Cpp.domain.assembly("Wushu.LevelEditor.Runtime").image; // creative logic
 
     // classes
     const Resources = CoreModule.class("UnityEngine.Resources");
@@ -59,12 +60,16 @@ function main() {
     const AFKManager = MTFGClient.class("FGClient.AFKManager");
 
     const ObjectiveReachEndZone = TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone"); // finish
-    const GrabToQualify = TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crowns
-    const SpawnableCollectable = TheMultiplayerGuys.class("Levels.ScoreZone.SpawnableCollectable"); // bubbles
+    const GrabToQualify = TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crown
+    const SpawnableCollectable = TheMultiplayerGuys.class("Levels.ScoreZone.SpawnableCollectable"); // unity level bubble
+    const COMMON_ScoringBubble = TheMultiplayerGuys.class("Levels.Progression.COMMON_ScoringBubble") // creative bubble
     const ScoredButton = TheMultiplayerGuys.class("ScoredButton");
     const TipToe_Platform = TheMultiplayerGuys.class("Levels.TipToe.TipToe_Platform");
     const FakeDoorController = TheMultiplayerGuys.class("Levels.DoorDash.FakeDoorController");
     const CrownMazeDoor = TheMultiplayerGuys.class("Levels.CrownMaze.CrownMazeDoor");
+    const VolumeZone = TheMultiplayerGuys.class("Levels.ScoreZone.VolumeZone"); // airtime
+    const FollowTheLeaderZone = TheMultiplayerGuys.class("Levels.ScoreZone.FollowTheLeader.FollowTheLeaderZone"); // leading light
+    const LevelEditorTriggerZoneActiveBase = WushuLevelEditorRuntime.class("LevelEditorTriggerZoneActiveBase");
 
     // methods
     const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
@@ -74,7 +79,7 @@ function main() {
     const get_ResolutionScale_method = GraphicsSettings.method("get_ResolutionScale");
     const set_ResolutionScale_method = GraphicsSettings.method("set_ResolutionScale", 1);
     const StartAFKManager_method = AFKManager.method("Start");
-    const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1); // LMAO i was sooo stupid
+    const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
 
     let FallGuysCharacterController_stored: Il2Cpp.Object;
     let CharacterControllerData_stored: Il2Cpp.Object;
@@ -168,18 +173,18 @@ function main() {
 
                     }
 
-                    // why includes? just search round_door_dash or any other in cms, that's why not the ===
-                    if (currentGameLevelName.includes("round_door_dash")) {
+                    // why includes? just search door_dash or any other in cms, that's why not the ===
+                    if (currentGameLevelName.includes("door_dash")) { // lmao i forgot about knockout_door_dash
                         disableFakeObjects(FakeDoorController, "get_IsFakeDoor", false);
                     }
             
-                    else if (currentGameLevelName.includes("round_crown_maze")) {
+                    else if (currentGameLevelName.includes("crown_maze")) {
                         disableFakeObjects(CrownMazeDoor, "get_IsBreakable", true);
                     }
             
                     else if (
-                        currentGameLevelName.includes("round_tip_toe") || // round_tip_toe_...
-                        currentGameLevelName.includes("round_tiptoe") // round_tiptoefinale_...
+                        currentGameLevelName.includes("tip_toe") || // round_tip_toe_...
+                        currentGameLevelName.includes("tiptoe") // round_tiptoefinale_...
                     ) {
                         disableFakeObjects(TipToe_Platform, "get_IsFakePlatform", true);
                     }
@@ -295,40 +300,70 @@ function main() {
         }
     };
 
-    // buttons tested, bubbles no, give feedback
     const TeleportToScorePoint = () => {
-        const BubblesArray = findObjectsOfTypeAll(SpawnableCollectable); // bubbles 
-        const ScoredButtonArray = findObjectsOfTypeAll(ScoredButton);
+        try {
+            const UnityBubblesArray = findObjectsOfTypeAll(SpawnableCollectable); // unity bubbles
+            const CreativeBubblesArray = findObjectsOfTypeAll(COMMON_ScoringBubble); // creative bubbles
+            const ScoredButtonArray = findObjectsOfTypeAll(ScoredButton);
+            const creativeScoreZonesArray = findObjectsOfTypeAll(LevelEditorTriggerZoneActiveBase); // creative scorezones
+            const FollowTheLeaderZonesArray = findObjectsOfTypeAll(FollowTheLeaderZone) // leading light 
 
-        const teleportTo = (target: Il2Cpp.Object) => {
-            const pos = target
-                .method<Il2Cpp.Object>("get_transform")
-                .invoke()
-                .method<Il2Cpp.Object>("get_position")
-                .invoke();
-    
-            FallGuysCharacterController_stored
-                //@ts-ignore
-                .method<Il2Cpp.Object>("get_transform")
-                .invoke()
-                .method<Il2Cpp.Object>("set_position")
-                .invoke(pos);
-        };
+            const teleportTo = (target: Il2Cpp.Object) => {
+                const pos = target
+                    .method<Il2Cpp.Object>("get_transform")
+                    .invoke()
+                    .method<Il2Cpp.Object>("get_position")
+                    .invoke();
+        
+                FallGuysCharacterController_stored
+                    .method<Il2Cpp.Object>("get_transform")
+                    .invoke()
+                    .method<Il2Cpp.Object>("set_position")
+                    .invoke(pos);
+            };
 
-        for (const bubble of BubblesArray) {
-            if (bubble.method<boolean>("get_Spawned").invoke()) {
-                teleportTo(bubble);
+            for (const bubble of UnityBubblesArray) {
+                if (bubble.method<boolean>("get_Spawned").invoke()) {
+                    teleportTo(bubble);
+                    return;
+                }
+            }
+
+            for (const bubble of CreativeBubblesArray) {
+                if (bubble.field<number>("_pointsAwarded").value > 0) {
+                    let bubbleHandle = bubble.field<Il2Cpp.Object>("_bubbleHandle").value;
+                    if (bubbleHandle.field<boolean>("_spawned").value) {
+                        teleportTo(bubble);
+                        return;
+                    }
+                }
+            }
+
+            for (const button of ScoredButtonArray) {
+                if (button.field<boolean>("_isAnActiveTarget").value) {
+                    teleportTo(button);
+                    return;
+                }
+            }
+
+            for (const scoreZone of creativeScoreZonesArray) {
+                if (scoreZone.field<boolean>("_useForPointScoring").value) {
+                    if (scoreZone.field<number>("_pointsScored").value > 0) {
+                        teleportTo(scoreZone);
+                        return;
+                    }
+                }
+            }
+
+            for (const scoreZone of FollowTheLeaderZonesArray) {
+                teleportTo(scoreZone);
                 return;
             }
-        }
 
-        for (const button of ScoredButtonArray) {
-            if (button.field<boolean>("_isAnActiveTarget").value) {
-                teleportTo(button);
-                return;
-            }
+        } catch (error: any) {
+            console.error(error.stack);
+            Menu.toast(error.stack, 0);
         }
-
         Menu.toast("No bubbles or Buttons was found. If round has any, it's bug, open issue", 0);
     };
 
@@ -346,7 +381,6 @@ function main() {
                 .invoke();
         
             FallGuysCharacterController_stored
-                //@ts-ignore
                 .method<Il2Cpp.Object>("get_transform")
                 .invoke()
                 .method<Il2Cpp.Object>("set_position")
@@ -482,7 +516,7 @@ function main() {
 
             Menu.add(layout.button("Teleport To Random Player", TeleportToRandomPlayer));
 
-            Menu.add(layout.button("Teleport To Bubble or Active Button", TeleportToScorePoint));
+            Menu.add(layout.button("Teleport To Bubble, Active Button or Score Zone", TeleportToScorePoint));
 
             // other
             const other = layout.textView("<b>--- Other ---</b>");
