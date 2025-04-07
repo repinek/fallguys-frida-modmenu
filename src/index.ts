@@ -20,7 +20,7 @@ function openURL(link: string) {
     });
 }
 
-let version = "1.01"
+let version = "1.01.1"
 
 // enablers
 let enable360Dives: boolean;
@@ -46,6 +46,9 @@ function main() {
     const MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image;
     const WushuLevelEditorRuntime = Il2Cpp.domain.assembly("Wushu.LevelEditor.Runtime").image; // creative logic
 
+    let lastTeleportTime = 0;
+    const TELEPORT_COOLDOWN = 1000;
+    
     // classes
     const Resources = CoreModule.class("UnityEngine.Resources");
     const Vector3class = CoreModule.class("UnityEngine.Vector3");
@@ -269,6 +272,14 @@ function main() {
     };
 
     const teleportToFinish = () => {
+        // Check if enough time has passed since thelast teleport
+        const currentTime = Date.now();
+        if (currentTime - lastTeleportTime < TELEPORT_COOLDOWN) {
+            Menu.toast(`Please wait ${((TELEPORT_COOLDOWN - (currentTime - lastTeleportTime)) / 1000).toFixed(1)} seconds before teleporting again!`, 0);
+            return;
+        }
+        lastTeleportTime = currentTime;
+        
         let EndZoneObject: Il2Cpp.Object | null;
         let CrownObject: Il2Cpp.Object | null;
     
@@ -297,18 +308,26 @@ function main() {
                 .method<Il2Cpp.Object>("set_position")
                 .invoke(FinishVector3Pos);
         } else {
-            Menu.toast(`No Finish or Crown was found. Round probably does not have a finish or a crown.`, 0);
+            Menu.toast(`No Finish or Crown was found. The round probably does not have a finish or a crown.`, 0);
         }
     };
-
+    
     const TeleportToScorePoint = () => {
+        // Check if enough time has passed since last teleport
+        const currentTime = Date.now();
+        if (currentTime - lastTeleportTime < TELEPORT_COOLDOWN) {
+            Menu.toast(`Please wait ${((TELEPORT_COOLDOWN - (currentTime - lastTeleportTime)) / 1000).toFixed(1)} seconds before teleporting again!`, 0);
+            return;
+        }
+        lastTeleportTime = currentTime;
+        
         try {
             const UnityBubblesArray = findObjectsOfTypeAll(SpawnableCollectable); // unity bubbles
             const CreativeBubblesArray = findObjectsOfTypeAll(COMMON_ScoringBubble); // creative bubbles
             const ScoredButtonArray = findObjectsOfTypeAll(ScoredButton);
             const creativeScoreZonesArray = findObjectsOfTypeAll(LevelEditorTriggerZoneActiveBase); // creative scorezones
             const FollowTheLeaderZonesArray = findObjectsOfTypeAll(FollowTheLeaderZone) // leading light 
-
+    
             const teleportTo = (target: Il2Cpp.Object) => {
                 const pos = target
                     .method<Il2Cpp.Object>("get_transform")
@@ -322,14 +341,15 @@ function main() {
                     .method<Il2Cpp.Object>("set_position")
                     .invoke(pos);
             };
-
+    
+            // Rest of the function remains the same...
             for (const bubble of UnityBubblesArray) {
                 if (bubble.method<boolean>("get_Spawned").invoke()) {
                     teleportTo(bubble);
                     return;
                 }
             }
-
+    
             for (const bubble of CreativeBubblesArray) {
                 if (bubble.field<number>("_pointsAwarded").value > 0) {
                     let bubbleHandle = bubble.field<Il2Cpp.Object>("_bubbleHandle").value;
@@ -339,14 +359,14 @@ function main() {
                     }
                 }
             }
-
+    
             for (const button of ScoredButtonArray) {
                 if (button.field<boolean>("_isAnActiveTarget").value) {
                     teleportTo(button);
                     return;
                 }
             }
-
+    
             for (const scoreZone of creativeScoreZonesArray) {
                 if (scoreZone.field<boolean>("_useForPointScoring").value) {
                     if (scoreZone.field<number>("_pointsScored").value > 0) {
@@ -355,26 +375,34 @@ function main() {
                     }
                 }
             }
-
+    
             for (const scoreZone of FollowTheLeaderZonesArray) {
                 teleportTo(scoreZone);
                 return;
             }
-
+    
         } catch (error: any) {
             console.error(error.stack);
             Menu.toast(error.stack, 0);
         }
-        Menu.toast("No bubbles or Buttons was found. If round has any, it's bug, open issue", 0);
+        Menu.toast("No bubbles or buttons were found. Please open an issue if it does not work.", 0);
     };
-
+    
     const TeleportToRandomPlayer = () => {
+        // Check if enough time has passed since the last teleport
+        const currentTime = Date.now();
+        if (currentTime - lastTeleportTime < TELEPORT_COOLDOWN) {
+            Menu.toast(`Please wait ${((TELEPORT_COOLDOWN - (currentTime - lastTeleportTime)) / 1000).toFixed(1)} seconds before teleporting again!`, 0);
+            return;
+        }
+        lastTeleportTime = currentTime;
+        
         const FallGuysCharacterControllerArray = findObjectsOfTypeAll(FallGuysCharacterController); 
-
+    
         if (FallGuysCharacterControllerArray.length > 0) {
             const randomIndex = Math.floor(Math.random() * FallGuysCharacterControllerArray.length); // random
             const randomPlayer = FallGuysCharacterControllerArray.get(randomIndex);
-
+    
             const randomPlayerVector3Pos = randomPlayer
                 .method<Il2Cpp.Object>("get_transform")
                 .invoke()
@@ -387,7 +415,7 @@ function main() {
                 .method<Il2Cpp.Object>("set_position")
                 .invoke(randomPlayerVector3Pos);
         } else {
-            Menu.toast(`No Players found!`, 0);
+            Menu.toast(`No Players were found!`, 0);
         };
     };
 
@@ -411,7 +439,7 @@ function main() {
     const initMenu = () => {
         try {
             const layout = new Menu.ObsidianLayout(obsidianConfig);
-            const composer = new Menu.Composer("Fall Guys Mod Menu", "IF YOU BOUGHT IT YOU ARE SCAMMED", layout);
+            const composer = new Menu.Composer("Fall Guys Mod Menu", "IF YOU BOUGHT IT YOU WERE SCAMMED", layout);
             composer.icon("https://floyzi.github.io/images/obed-guys-present.png", "Web");
 
             // movement
@@ -469,28 +497,28 @@ function main() {
             );
 
             Menu.add(
-                layout.toggle("Use Custom Jump Strenght", (state: boolean) => {
+                layout.toggle("Use Custom Jump Strength", (state: boolean) => {
                     enableCustomJump = state;
                     console.log(`enableCustomJump: ${enableCustomJump}`);
                 }),
             );
 
             Menu.add(
-                layout.seekbar("Jump Strenght: {0} / 100", 100, 1, (value: number) => {
+                layout.seekbar("Jump Strength: {0} / 100", 100, 1, (value: number) => {
                     customJumpForceUltimateParty = value;
                     console.log(`customJumpForceUltimateParty: ${customJumpForceUltimateParty}`);
                 }),
             );
 
             Menu.add(
-                layout.toggle("Use Custom Dive Strenght", (state: boolean) => {
+                layout.toggle("Use Custom Dive Strength", (state: boolean) => {
                     enableCustomDiveForce = state;
                     console.log(`enableDiveForce: ${enableCustomDiveForce}`);
                 }),
             );
 
             Menu.add(
-                layout.seekbar("Dive Strenght: {0} / 100", 100, 1, (value: number) => {
+                layout.seekbar("Dive Strength: {0} / 100", 100, 1, (value: number) => {
                     customDiveForce = value;
                     console.log(`customDiveForce: ${customDiveForce}`);
                 }),
@@ -502,7 +530,7 @@ function main() {
             Menu.add(round);
 
             Menu.add(
-                layout.toggle("Hide Fake Doors, Tiptoe Platforms", (state: boolean) => {
+                layout.toggle("Hide Fake Doors & Tiptoe Platforms", (state: boolean) => {
                     enableHideStuff = state;
                     console.log(`enableHideStuff: ${enableHideStuff}`);
                 }),
@@ -517,7 +545,7 @@ function main() {
 
             Menu.add(layout.button("Teleport To Random Player", TeleportToRandomPlayer));
 
-            Menu.add(layout.button("Teleport To Bubble, Active Button or Score Zone", TeleportToScorePoint));
+            Menu.add(layout.button("Teleport To Bubble, Active Button, or Score Zone", TeleportToScorePoint));
 
             // other
             const other = layout.textView("<b>--- Other ---</b>");
