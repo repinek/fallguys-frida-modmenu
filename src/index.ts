@@ -308,7 +308,7 @@ function main() {
                 .method<Il2Cpp.Object>("set_position")
                 .invoke(FinishVector3Pos);
         } else {
-            Menu.toast(`No Finish or Crown was found. The Round probably does not have a finish or a crown.`, 0);
+            Menu.toast(`No Finish or Crown was found. The round probably does not have a finish or a crown.`, 0);
         }
     };
     
@@ -316,7 +316,7 @@ function main() {
         // Check if enough time has passed since last teleport
         const currentTime = Date.now();
         if (currentTime - lastTeleportTime < TELEPORT_COOLDOWN) {
-            Menu.toast(`Please wait ${((TELEPORT_COOLDOWN - (currentTime - lastTeleportTime)) / 1000).toFixed(1)} seconds before teleporting again`, 0);
+            Menu.toast(`Please wait ${((TELEPORT_COOLDOWN - (currentTime - lastTeleportTime)) / 1000).toFixed(1)} seconds before teleporting again!`, 0);
             return;
         }
         lastTeleportTime = currentTime;
@@ -385,14 +385,14 @@ function main() {
             console.error(error.stack);
             Menu.toast(error.stack, 0);
         }
-        Menu.toast("No bubbles or Buttons was found. Please open an issue if it does not work.", 0);
+        Menu.toast("No bubbles or buttons were found. Please open an issue if it does not work.", 0);
     };
     
     const TeleportToRandomPlayer = () => {
         // Check if enough time has passed since the last teleport
         const currentTime = Date.now();
         if (currentTime - lastTeleportTime < TELEPORT_COOLDOWN) {
-            Menu.toast(`Please wait ${((TELEPORT_COOLDOWN - (currentTime - lastTeleportTime)) / 1000).toFixed(1)} seconds before teleporting again`, 0);
+            Menu.toast(`Please wait ${((TELEPORT_COOLDOWN - (currentTime - lastTeleportTime)) / 1000).toFixed(1)} seconds before teleporting again!`, 0);
             return;
         }
         lastTeleportTime = currentTime;
@@ -415,7 +415,7 @@ function main() {
                 .method<Il2Cpp.Object>("set_position")
                 .invoke(randomPlayerVector3Pos);
         } else {
-            Menu.toast(`No Players found!`, 0);
+            Menu.toast(`No Players were found!`, 0);
         };
     };
 
@@ -439,7 +439,7 @@ function main() {
     const initMenu = () => {
         try {
             const layout = new Menu.ObsidianLayout(obsidianConfig);
-            const composer = new Menu.Composer("Fall Guys Mod Menu", "IF YOU BOUGHT IT YOU ARE SCAMMED", layout);
+            const composer = new Menu.Composer("Fall Guys Mod Menu", "IF YOU BOUGHT IT YOU WERE SCAMMED", layout);
             composer.icon("https://floyzi.github.io/images/obed-guys-present.png", "Web");
 
             // movement
