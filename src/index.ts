@@ -20,10 +20,11 @@ function openURL(link: string) {
     });
 }
 
-let version = "1.01.1"
+const version = "1.03";
 
 // enablers
 let enable360Dives: boolean;
+let enableAirJump: boolean;
 let enableCustomSpeed: boolean;
 let enableCustomVelocity: boolean;
 let enableNegativeVelocity: boolean;
@@ -41,13 +42,11 @@ let customDiveForce = 16.5;
 let customResolutionScale = 1;
 
 function main() {
+    // assemblies 
     const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
     const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
     const MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image;
     const WushuLevelEditorRuntime = Il2Cpp.domain.assembly("Wushu.LevelEditor.Runtime").image; // creative logic
-
-    let lastTeleportTime = 0;
-    const TELEPORT_COOLDOWN = 1000;
     
     // classes
     const Resources = CoreModule.class("UnityEngine.Resources");
@@ -60,6 +59,7 @@ function main() {
 
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const FallGuysCharacterController = TheMultiplayerGuys.class("FallGuysCharacterController");
+    const MotorFunctionJump = TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
 
     const DebugClass = TheMultiplayerGuys.class("GvrFPS"); // debug info
     const AFKManager = MTFGClient.class("FGClient.AFKManager");
@@ -72,13 +72,13 @@ function main() {
     const TipToe_Platform = TheMultiplayerGuys.class("Levels.TipToe.TipToe_Platform");
     const FakeDoorController = TheMultiplayerGuys.class("Levels.DoorDash.FakeDoorController");
     const CrownMazeDoor = TheMultiplayerGuys.class("Levels.CrownMaze.CrownMazeDoor");
-    const VolumeZone = TheMultiplayerGuys.class("Levels.ScoreZone.VolumeZone"); // airtime
     const FollowTheLeaderZone = TheMultiplayerGuys.class("Levels.ScoreZone.FollowTheLeader.FollowTheLeaderZone"); // leading light
     const LevelEditorTriggerZoneActiveBase = WushuLevelEditorRuntime.class("LevelEditorTriggerZoneActiveBase");
 
     // methods
-    const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
     const CheckCharacterControllerData_method = CharacterDataMonitor.method("CheckCharacterControllerData", 1); 
+    const CanJump_method = MotorFunctionJump.method<boolean>("CanJump");
+    const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
     const get_TargetFrameRate_method = GraphicsSettings.method("get_TargetFrameRate");
     const set_TargetFrameRate_method = GraphicsSettings.method("set_TargetFrameRate", 1);
     const get_ResolutionScale_method = GraphicsSettings.method("get_ResolutionScale");
@@ -86,7 +86,7 @@ function main() {
     const StartAFKManager_method = AFKManager.method("Start");
     const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
 
-    console.log("Loaded all stuff")
+    console.log("Loaded il2cpp and classes and method pointers")
 
     // storage cache
     let FallGuysCharacterController_Instance: Il2Cpp.Object; 
@@ -95,9 +95,12 @@ function main() {
     let FGDebug_Instance: Il2Cpp.Object;
     let reachedMainMenu = false;
     let GraphicsSettings_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in get_ResolutionScale
+    let lastTeleportTime = 0;
+    const TELEPORT_COOLDOWN = 1000; // teleport cooldown for Teleports
     
     Menu.toast("Menu will appear once you enter the main menu.", 1);
 
+    // hooks 
     get_TargetFrameRate_method.implementation = function () {
         console.log("get_TargetFrameRate Called!");
         return 1488; // fps limit
@@ -105,7 +108,7 @@ function main() {
 
     set_TargetFrameRate_method.implementation = function (fps) {
         console.log("set_TargetFrameRate Called!");
-        return this.method<void>("set_TargetFrameRate", 1).invoke(1488);
+        return this.method("set_TargetFrameRate", 1).invoke(1488);
     };
 
     get_ResolutionScale_method.implementation = function () {
@@ -142,13 +145,12 @@ function main() {
             }
         }
 
-        return this.method<void>("OnMainMenuDisplayed", 1).invoke(event);
+        return this.method("OnMainMenuDisplayed", 1).invoke(event);
     };
 
     GameLevelLoaded_method.implementation = function (ugcLevelHash) {
         console.log("GameLevelLoaded called!");
 
-        // TODO: rewrite with ROUND instance. UPD: probably i have no reason to do this, this method is not bad too
         Il2Cpp.gc.choose(ClientGameStateView).forEach((instance: Il2Cpp.Object) => { // find ClientGameStateView instance
             const currentGameLevelName = instance.field<Il2Cpp.String>("CurrentGameLevelName").value?.content; 
 
@@ -232,6 +234,13 @@ function main() {
     
         return true;
     };
+
+    CanJump_method.implementation = function () {
+        if (enableAirJump) {
+            return true;
+        }
+        return this.method<boolean>("CanJump").invoke();
+    }
 
     // functions 
     const FGDebug = {
@@ -329,7 +338,7 @@ function main() {
             const FollowTheLeaderZonesArray = findObjectsOfTypeAll(FollowTheLeaderZone) // leading light 
     
             const teleportTo = (target: Il2Cpp.Object) => {
-                const pos = target
+                const ObjectVector3Pos = target
                     .method<Il2Cpp.Object>("get_transform")
                     .invoke()
                     .method<Il2Cpp.Object>("get_position")
@@ -339,7 +348,7 @@ function main() {
                     .method<Il2Cpp.Object>("get_transform")
                     .invoke()
                     .method<Il2Cpp.Object>("set_position")
-                    .invoke(pos);
+                    .invoke(ObjectVector3Pos);
             };
     
             // Rest of the function remains the same...
@@ -400,10 +409,10 @@ function main() {
         const FallGuysCharacterControllerArray = findObjectsOfTypeAll(FallGuysCharacterController); 
     
         if (FallGuysCharacterControllerArray.length > 0) {
-            const randomIndex = Math.floor(Math.random() * FallGuysCharacterControllerArray.length); // random
-            const randomPlayer = FallGuysCharacterControllerArray.get(randomIndex);
+            const RandomIndex = Math.floor(Math.random() * FallGuysCharacterControllerArray.length); // random
+            const RandomPlayer = FallGuysCharacterControllerArray.get(RandomIndex);
     
-            const randomPlayerVector3Pos = randomPlayer
+            const RandomPlayerVector3Pos = RandomPlayer
                 .method<Il2Cpp.Object>("get_transform")
                 .invoke()
                 .method<Il2Cpp.Object>("get_position")
@@ -413,7 +422,7 @@ function main() {
                 .method<Il2Cpp.Object>("get_transform")
                 .invoke()
                 .method<Il2Cpp.Object>("set_position")
-                .invoke(randomPlayerVector3Pos);
+                .invoke(RandomPlayerVector3Pos);
         } else {
             Menu.toast(`No Players were found!`, 0);
         };
@@ -432,7 +441,6 @@ function main() {
             Menu.toast(error.stack, 1); 
             console.error(error.stack);
         }
-
     }
 
 
@@ -451,6 +459,13 @@ function main() {
                 layout.toggle("360 Dives", (state: boolean) => {
                     enable360Dives = state;
                     console.log(`enable360Dives: ${enable360Dives}`);
+                }),
+            );
+
+            Menu.add(
+                layout.toggle("Air Jump", (state: boolean) => {
+                    enableAirJump = state;
+                    console.log(`enableAirJump: ${enableAirJump}`);
                 }),
             );
 
@@ -530,7 +545,7 @@ function main() {
             Menu.add(round);
 
             Menu.add(
-                layout.toggle("Hide Fake Doors & Tiptoe Platforms", (state: boolean) => {
+                layout.toggle("Hide Real Doors & Fake Tiptoe Platforms", (state: boolean) => {
                     enableHideStuff = state;
                     console.log(`enableHideStuff: ${enableHideStuff}`);
                 }),
