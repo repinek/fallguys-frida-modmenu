@@ -19,6 +19,7 @@ Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridg
 
 ### Movement
 - 360 Dives
+- Air Jump
 - Change Speed
 - Change Vertical Velocity / No Velocity / Negative Velocity
 - Change Jump and Dive Strength
