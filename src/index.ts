@@ -20,7 +20,11 @@ function openURL(link: string) {
     });
 }
 
-const version = "1.14";
+// TODO: 
+// get_ResolutionScale saving
+// checkpoints teleports for lap
+// fix follow the leader teleport (add +y)
+const version = "1.40";
 
 // enablers
 let enable360Dives: boolean;
@@ -94,15 +98,17 @@ function main() {
     let CharacterControllerData_Instance: Il2Cpp.Object;
     let JumpMotorFunction_Instance: Il2Cpp.Object;
     let FGDebug_Instance: Il2Cpp.Object;
-    let reachedMainMenu = false;
     let GraphicsSettings_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in get_ResolutionScale
-    let isRoundLap = false;
+    let reachedMainMenu = false;
+    let current_SceneName;
     let lastTeleportTime = 0;
     const TELEPORT_COOLDOWN = 1000; // teleport cooldown for Teleports
     
     Menu.toast("Menu will appear once you enter the main menu", 1);
 
     // hooks
+
+    // graphics
     get_TargetFrameRate_method.implementation = function () {
         console.log("get_TargetFrameRate Called!");
         return 1488; // fps limit
@@ -117,13 +123,14 @@ function main() {
         console.log("get_ResolutionScale Called!");
         GraphicsSettings_Instance = this; // often gc.choose causes crashes
         return customResolutionScale;
-    }
+    };
 
     set_ResolutionScale_method.implementation = function (scale) {
         console.log("set_ResolutionScale called!")
         return this.method("set_ResolutionScale", 1).invoke(customResolutionScale);
-    }
+    };
 
+    // other stuff
     StartAFKManager_method.implementation = function () { 
         console.log("AFKManager Start Called!");
         return; // anti-afk implementation
@@ -153,58 +160,46 @@ function main() {
     GameLevelLoaded_method.implementation = function (ugcLevelHash) {
         console.log("GameLevelLoaded called!");
 
-        try { 
-            const disableFakeObjects = (
+        const Scene_Instance = SceneManager.method<Il2Cpp.Object>("GetActiveScene").invoke();
+        current_SceneName = Scene_Instance.method<Il2Cpp.String>("get_name").invoke().content; // it's better to check by SceneName, instead round id (and easier lol)
+        console.log(current_SceneName);
+
+        if (enableHideStuff) {
+            const manipulateObjects = (
                 type: Il2Cpp.Class, // class of object
                 field: string, // getter method name like get_IsFakeDoor 
-                expected: boolean
+                expectedValue: boolean,
             ) => {
                 const objectsArray = findObjectsOfTypeAll(type);
-    
+        
                 for (const obj of objectsArray) {
                     const value = obj.method<boolean>(field).invoke();
-                    if (value === expected) {
+                    if (value === expectedValue) {
                         const gameObject = obj.method<Il2Cpp.Object>("get_gameObject").invoke();
                         gameObject.method("SetActive").invoke(false);
                     }
                 }
-            };
-
-            const Scene_Instance = SceneManager.method<Il2Cpp.Object>("GetActiveScene").invoke();
-            const SceneName = Scene_Instance.method<Il2Cpp.String>("get_name").invoke().content; // it's better to check by SceneName, instead round id (and easier lol)
-            console.log(SceneName);
-
-            isRoundLap = false;
+            };  
 
             switch (true) {
-                case SceneName?.includes("FallGuy_DoorDash"):
-                    disableFakeObjects(FakeDoorController, "get_IsFakeDoor", false);
-                    break;
-            
-                case SceneName?.includes("FallGuy_Crown_Maze_Topdown"):
-                    disableFakeObjects(CrownMazeDoor, "get_IsBreakable", true);
-                    break;
-            
-                case SceneName?.includes("FallGuy_Tip"): // FallGuy_TipToe and FallGuy_Tip_Toe_Finale
-                    disableFakeObjects(TipToe_Platform, "get_IsFakePlatform", true);
-                    break;
-            
-                case SceneName?.includes("Fraggle"): // creative codename
-                    disableFakeObjects(FakeDoorController, "get_IsFakeDoor", false);
-                    break;
-            
-                case SceneName?.includes("Circuit"): // FallGuy_ShortCircuit and FallGuy_ShortCircuit2 (which is speed circuit)
-                    isRoundLap = true;
-                    break;
+            case current_SceneName?.includes("FallGuy_DoorDash"):
+                manipulateObjects(FakeDoorController, "get_IsFakeDoor", false);
+                break;
+        
+            case current_SceneName?.includes("FallGuy_Crown_Maze_Topdown"):
+                manipulateObjects(CrownMazeDoor, "get_IsBreakable", true);
+                break;
+        
+            case current_SceneName?.includes("Fraggle"): // creative codename
+                manipulateObjects(FakeDoorController, "get_IsFakeDoor", false);
+                break;
             }
-
-        } catch (error: any ) {
-            console.error(error.stack);
-            Menu.toast(error.stack, 0);
         }
+
         return this.method("GameLevelLoaded", 1).invoke(ugcLevelHash);
-    }
+    };
     
+    // physics
     CheckCharacterControllerData_method.implementation = function (character: any) {
     
         FallGuysCharacterController_Instance = character;
@@ -236,9 +231,28 @@ function main() {
             return true;
         }
         return this.method<boolean>("CanJump").invoke();
-    }
+    };
 
-    // functions 
+    // helper functions 
+    const findObjectsOfTypeAll = (klass: Il2Cpp.Class) => {
+        return Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
+    };
+
+    const teleportTo = (target: Il2Cpp.Object) => {
+        const ObjectVector3Pos = target
+            .method<Il2Cpp.Object>("get_transform")
+            .invoke()
+            .method<Il2Cpp.Object>("get_position")
+            .invoke();
+
+        FallGuysCharacterController_Instance
+            .method<Il2Cpp.Object>("get_transform")
+            .invoke()
+            .method<Il2Cpp.Object>("set_position")
+            .invoke(ObjectVector3Pos);
+    };
+
+    // functions
     const FGDebug = {
         enable() {
             enableFGDebug = true;
@@ -272,10 +286,6 @@ function main() {
         },
     };
 
-    const findObjectsOfTypeAll = (klass: Il2Cpp.Class) => {
-        return Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
-    };
-
     const teleportToFinish = () => {
         // Check if enough time has passed since thelast teleport
         const currentTime = Date.now();
@@ -300,17 +310,7 @@ function main() {
     
         const FinishObject = EndZoneObject! ?? CrownObject!;
         if (FinishObject) {
-            const FinishVector3Pos = FinishObject
-                .method<Il2Cpp.Object>("get_transform")
-                .invoke()
-                .method<Il2Cpp.Object>("get_position")
-                .invoke();
-    
-            FallGuysCharacterController_Instance
-                .method<Il2Cpp.Object>("get_transform")
-                .invoke()
-                .method<Il2Cpp.Object>("set_position")
-                .invoke(FinishVector3Pos);
+            teleportTo(FinishObject);
         } else {
             Menu.toast(`No Finish or Crown was found. The round probably does not have a finish or a crown.`, 0);
         }
@@ -331,20 +331,6 @@ function main() {
             const ScoredButtonArray = findObjectsOfTypeAll(ScoredButton);
             const creativeScoreZonesArray = findObjectsOfTypeAll(LevelEditorTriggerZoneActiveBase); // creative scorezones
             const FollowTheLeaderZonesArray = findObjectsOfTypeAll(FollowTheLeaderZone) // leading light 
-    
-            const teleportTo = (target: Il2Cpp.Object) => {
-                const ObjectVector3Pos = target
-                    .method<Il2Cpp.Object>("get_transform")
-                    .invoke()
-                    .method<Il2Cpp.Object>("get_position")
-                    .invoke();
-        
-                FallGuysCharacterController_Instance
-                    .method<Il2Cpp.Object>("get_transform")
-                    .invoke()
-                    .method<Il2Cpp.Object>("set_position")
-                    .invoke(ObjectVector3Pos);
-            };
     
             // Rest of the function remains the same...
             for (const bubble of UnityBubblesArray) {
@@ -410,18 +396,8 @@ function main() {
         else if (FallGuysCharacterControllerArray.length > 0) {
             const RandomIndex = Math.floor(Math.random() * FallGuysCharacterControllerArray.length); // random
             const RandomPlayer = FallGuysCharacterControllerArray.get(RandomIndex);
-    
-            const RandomPlayerVector3Pos = RandomPlayer
-                .method<Il2Cpp.Object>("get_transform")
-                .invoke()
-                .method<Il2Cpp.Object>("get_position")
-                .invoke();
-        
-            FallGuysCharacterController_Instance
-                .method<Il2Cpp.Object>("get_transform")
-                .invoke()
-                .method<Il2Cpp.Object>("set_position")
-                .invoke(RandomPlayerVector3Pos);
+
+            teleportTo(RandomPlayer);
             return;
         } else {
             Menu.toast(`No Players were found!`, 0);
@@ -442,8 +418,29 @@ function main() {
             Menu.toast(error.stack, 1); 
             console.error(error.stack);
         }
-    }
+    };
 
+    // test
+    const showTipToePath = () => {
+        try {
+            const TipToe_PlatformArray = findObjectsOfTypeAll(TipToe_Platform);
+
+            console.log("TipToePlatforms found: ", TipToe_PlatformArray.length);
+            Menu.toast("TipToePlatforms found: ", TipToe_PlatformArray.length);
+    
+            for (const TipToe of TipToe_PlatformArray) {
+                const TipToeStatus = TipToe.method<boolean>("get_IsFakePlatform").invoke();
+                if (TipToeStatus) { // if fake
+                    console.log("Found FakePlatform, deactivating...")
+                    const TipToeObject = TipToe.method<Il2Cpp.Object>("get_gameObject").invoke();
+                    TipToeObject.method("SetActive").invoke(false);
+                }
+            }
+        } catch (error: any) {
+            Menu.toast(error.stack, 0);
+            console.error(error.stack);
+        }
+    };
 
     const initMenu = () => {
         try {
@@ -546,11 +543,13 @@ function main() {
             Menu.add(round);
 
             Menu.add(
-                layout.toggle("Hide Real Doors & Fake Tiptoe Platforms", (state: boolean) => {
+                layout.toggle("Hide Real Doors", (state: boolean) => {
                     enableHideStuff = state;
                     console.log(`enableHideStuff: ${enableHideStuff}`);
                 }),
             );
+
+            Menu.add(layout.button("Show TipToe Path", showTipToePath));
 
             // teleports
             const teleports = layout.textView("<b>--- Teleports ---</b>");
