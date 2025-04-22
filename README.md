@@ -1,11 +1,10 @@
 > [!WARNING]  
 > This project is for educational purposes only.  
-> The author is not responsible for any bans from the use of this tool.  
+> The author is not responsible for any bans from the use of this tool!  
 > Use it at your own risk.
-> Works on my machine.
 
 # Fall Guys Mod Menu
-Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge) <br>
+Android Fall Guys mod menu using [Frida](https://frida.re/) and [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge) <br>
 
 [Cheating Discord Server](https://discord.gg/cNFJ73P6p3)
 
@@ -42,7 +41,8 @@ Android Fall Guys cheat using [Frida](https://frida.re/) and [frida-il2cpp-bridg
 - Remove FPS Limit
 - Anti-AFK
   
-## Note
+## Installation
+Just download and install the .apk from [Releases](https://github.com/repinek/fallguys-frida-modmenu/releases/latest)
 > If you don't want to wait for game resources to download, copy the .obb file from: <br>
 > Android/obb/com.Mediatonic.FallGuys_client/ to <br>
 > Android/obb/com.Mediatonic.FallGuys_client.modmenu/, then rename it by adding .modmenu before .obb <br>
@@ -77,9 +77,9 @@ fgi -i <yourfallguys.apk> -t script -l ./dist/agent.js
 Apk will be saved at the path ./yourfallguys.patched.apk 
 
 ## Troubleshooting  
-> This project is created solely for educational and entertainment purposes. I won't be providing extensive support.
+> This project is created only for educational and entertainment purposes. I won't be providing support.
 
-On startup it will ask for permission to display over other apps, If it doesn’t ask for it, grant it manually. <br><br>
+In The Main Menu it will ask for permission to display over other apps, If it doesn’t ask for it, grant it manually. <br><br>
 **HyperOS, ColorOS, OneUI, HarmonyOS**, and other OEM ROMs may not work properly or at all. <br>
 **It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).** <br>
 
