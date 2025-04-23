@@ -24,7 +24,7 @@ function openURL(link: string) {
 // get_ResolutionScale saving
 // checkpoints teleports for lap
 // fix follow the leader teleport (add +y)
-const version = "1.40";
+const version = "1.53";
 
 // enablers
 let enable360Dives: boolean;
@@ -37,6 +37,7 @@ let enableCustomJump: boolean;
 let enableCustomDiveForce: boolean;
 let enableFGDebug: boolean;
 let enableHideStuff: boolean;
+let enableQueuedPlayers: boolean;
 
 // numbers
 let customNormalMaxSpeed = 9.5;
@@ -60,6 +61,7 @@ function main() {
     const GraphicsSettings = MTFGClient.class("FGClient.GraphicsSettings");
     const LobbyService = MTFGClient.class("FGClient.CatapultServices.LobbyService");
     const ClientGameManager = MTFGClient.class("FGClient.ClientGameManager");
+    const FNMMSClientRemoteService = MTFGClient.class("FGClient.FNMMSClientRemoteService");
 
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const FallGuysCharacterController = TheMultiplayerGuys.class("FallGuysCharacterController");
@@ -85,6 +87,7 @@ function main() {
     const get_ResolutionScale_method = GraphicsSettings.method("get_ResolutionScale");
     const set_ResolutionScale_method = GraphicsSettings.method("set_ResolutionScale", 1);
     const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
+    const ProcessMessageReceived_method = FNMMSClientRemoteService.method("ProcessMessageReceived");
 
     const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
     const CheckCharacterControllerData_method = CharacterDataMonitor.method("CheckCharacterControllerData", 1); 
@@ -130,11 +133,28 @@ function main() {
         return this.method("set_ResolutionScale", 1).invoke(customResolutionScale);
     };
 
+    //@ts-ignore code from wiki snippets
+    ProcessMessageReceived_method.implementation = function (jsonMessage: Il2Cpp.String) {
+        console.log("ProcessMessageReceived called!");
+
+        if (enableQueuedPlayers) {
+            const json = JSON.parse(jsonMessage.content!); // .content because it's Il2cpp.String
+
+            if (json.payload) {
+                if (json.payload.state == "Queued") { // if in queue 
+                    Menu.toast(`Queued Players: ${json.payload.queuedPlayers.toString()}`, 0);
+                }
+            }
+        }
+
+        return this.method("ProcessMessageReceived", 1).invoke(jsonMessage);
+    };
+
     // other stuff
     StartAFKManager_method.implementation = function () { 
         console.log("AFKManager Start Called!");
         return; // anti-afk implementation
-    }
+    };
 
     OnMainMenuDisplayed_method.implementation = function (event) {
         console.log("OnMainMenuDisplayed Called!");
@@ -316,7 +336,7 @@ function main() {
         }
     };
     
-    const TeleportToScorePoint = () => {
+    const teleportToScorePoint = () => {
         // Check if enough time has passed since last teleport
         const currentTime = Date.now();
         if (currentTime - lastTeleportTime < TELEPORT_COOLDOWN) {
@@ -378,7 +398,7 @@ function main() {
         Menu.toast("No bubbles or buttons were found. Please open an issue if it does not work.", 0);
     };
     
-    const TeleportToRandomPlayer = () => {
+    const teleportToRandomPlayer = () => {
         // Check if enough time has passed since the last teleport
         const currentTime = Date.now();
         if (currentTime - lastTeleportTime < TELEPORT_COOLDOWN) {
@@ -558,9 +578,9 @@ function main() {
             
             Menu.add(layout.button("Teleport To Finish or Crown", teleportToFinish));
 
-            Menu.add(layout.button("Teleport To Random Player", TeleportToRandomPlayer));
+            Menu.add(layout.button("Teleport To Random Player", teleportToRandomPlayer));
 
-            Menu.add(layout.button("Teleport To Bubble, Active Button, or Score Zone", TeleportToScorePoint));
+            Menu.add(layout.button("Teleport To Bubble, Active Button, or Score Zone", teleportToScorePoint));
 
             // other
             const other = layout.textView("<b>--- Other ---</b>");
@@ -571,6 +591,13 @@ function main() {
                 layout.toggle("Display FGDebug", (state: boolean) => {
                     state ? FGDebug.enable() : FGDebug.disable();
                 }),
+            );
+
+            Menu.add(
+                layout.toggle("Show Number of Queued Players", (state: boolean) => {
+                    enableQueuedPlayers = state;
+                    console.log(`enableQueuedPlayers: ${enableQueuedPlayers}`);
+                })
             );
 
             Menu.add(
