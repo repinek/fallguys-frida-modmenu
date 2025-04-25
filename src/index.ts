@@ -20,11 +20,32 @@ function openURL(link: string) {
     });
 }
 
+function copyToClipboard(text: string) {
+    Java.perform(() => {
+        try {
+            const context = Java.use("android.app.ActivityThread").currentApplication().getApplicationContext();
+            const clipboardManager = Java.cast(
+                context.getSystemService("clipboard"),
+                Java.use("android.content.ClipboardManager")
+            );
+            const javaString = Java.use("java.lang.String");
+            const clipData = Java.use("android.content.ClipData")
+                .newPlainText(javaString.$new("label"), javaString.$new(text));
+            clipboardManager.setPrimaryClip(clipData);
+        } catch (error: any) {
+            console.error(`Failed to copy to clipboard: ${error.message}`);
+        }
+    });
+}
+
+
 // TODO: 
-// get_ResolutionScale saving
-// checkpoints teleports for lap
+// get_ResolutionScale saving // invoke SetSettingPrefIfChanged(keypref, value), but idk why i cant, enums broken or smth
+// checkpoints teleports for lap // hard to implement
 // fix follow the leader teleport (add +y)
-const version = "1.53";
+// remainplayers in show game details
+// minimalistic fps display
+const version = "1.83";
 
 // enablers
 let enable360Dives: boolean;
@@ -52,7 +73,7 @@ function main() {
     const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
     const MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image;
     const WushuLevelEditorRuntime = Il2Cpp.domain.assembly("Wushu.LevelEditor.Runtime").image; // creative logic
-    
+
     // classes
     const Resources = CoreModule.class("UnityEngine.Resources");
     const Vector3class = CoreModule.class("UnityEngine.Vector3");
@@ -60,6 +81,7 @@ function main() {
 
     const GraphicsSettings = MTFGClient.class("FGClient.GraphicsSettings");
     const LobbyService = MTFGClient.class("FGClient.CatapultServices.LobbyService");
+    const GlobalGameStateClient = MTFGClient.class("FGClient.GlobalGameStateClient");
     const ClientGameManager = MTFGClient.class("FGClient.ClientGameManager");
     const FNMMSClientRemoteService = MTFGClient.class("FGClient.FNMMSClientRemoteService");
 
@@ -102,6 +124,9 @@ function main() {
     let JumpMotorFunction_Instance: Il2Cpp.Object;
     let FGDebug_Instance: Il2Cpp.Object;
     let GraphicsSettings_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in get_ResolutionScale
+    let GlobalGameStateClient_Instance: Il2Cpp.Object;
+    let ClientGameManager_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in GameLevelLoaded
+
     let reachedMainMenu = false;
     let current_SceneName;
     let lastTeleportTime = 0;
@@ -122,22 +147,33 @@ function main() {
         return this.method("set_TargetFrameRate", 1).invoke(1488);
     };
 
-    get_ResolutionScale_method.implementation = function () { // TODO: save to game config changed value
+    get_ResolutionScale_method.implementation = function () {
         console.log("get_ResolutionScale Called!");
         GraphicsSettings_Instance = this; // often gc.choose causes crashes
+
+        if (!reachedMainMenu) {
+            return this.method("get_ResolutionScale").invoke();
+        }
+
         return customResolutionScale;
     };
 
     set_ResolutionScale_method.implementation = function (scale) {
         console.log("set_ResolutionScale called!")
+
+        if (!reachedMainMenu) {
+            return this.method("set_ResolutionScale", 1).invoke(scale);
+        }
+
         return this.method("set_ResolutionScale", 1).invoke(customResolutionScale);
     };
 
-    //@ts-ignore code from wiki snippets
+    //@ts-ignore, code from wiki snippets btw lol
     ProcessMessageReceived_method.implementation = function (jsonMessage: Il2Cpp.String) {
         console.log("ProcessMessageReceived called!");
 
         if (enableQueuedPlayers) {
+            console.log(jsonMessage.content);
             const json = JSON.parse(jsonMessage.content!); // .content because it's Il2cpp.String
 
             if (json.payload) {
@@ -151,7 +187,7 @@ function main() {
     };
 
     // other stuff
-    StartAFKManager_method.implementation = function () { 
+    StartAFKManager_method.implementation = function () {
         console.log("AFKManager Start Called!");
         return; // anti-afk implementation
     };
@@ -179,6 +215,12 @@ function main() {
 
     GameLevelLoaded_method.implementation = function (ugcLevelHash) {
         console.log("GameLevelLoaded called!");
+
+        ClientGameManager_Instance = this;
+
+        Il2Cpp.gc.choose(GlobalGameStateClient).forEach((instance: Il2Cpp.Object) => { 
+            GlobalGameStateClient_Instance = instance;
+        });
 
         const Scene_Instance = SceneManager.method<Il2Cpp.Object>("GetActiveScene").invoke();
         current_SceneName = Scene_Instance.method<Il2Cpp.String>("get_name").invoke().content; // it's better to check by SceneName, instead round id (and easier lol)
@@ -440,6 +482,64 @@ function main() {
         }
     };
 
+    const showServerDetails = () => {
+        try {
+            if (GlobalGameStateClient_Instance) {
+                const NetworkManager = GlobalGameStateClient_Instance.method<Il2Cpp.Object>("get_NetworkManager").invoke();
+                const GameConnection = NetworkManager.method<Il2Cpp.Object>("get_ConnectionToServer").invoke();
+
+                const HostIPAddr = NetworkManager.method<Il2Cpp.String>("get_HostIPAddr").invoke().content;
+                const HostPortNo = NetworkManager.method<number>("get_HostPortNo").invoke();
+                const RTT = GameConnection.method<number>("CurrentRtt").invoke();
+                const LAG = GameConnection.method<number>("CurrentLag").invoke();
+
+                console.log(`Server: ${HostIPAddr}:${HostPortNo}\nPing: ${RTT}ms, LAG: ${LAG} `);
+                Menu.toast(`Server: ${HostIPAddr}:${HostPortNo}. Ping: ${RTT}ms, LAG: ${LAG}`, 0); // little secret, you can ddos these servers, and its not too hard.
+                copyToClipboard(`${HostIPAddr}:${HostPortNo}`);
+            } else {
+                Menu.toast("You are not in the game!", 0);
+            }
+        } catch (error: any) {
+            Menu.toast("You are not in the game!", 0);
+            console.error(error.stack);
+        }
+    };
+
+    // WIP
+    const showGameDetails = () => {
+        try {
+            if (ClientGameManager_Instance) {
+                const round = ClientGameManager_Instance.field<Il2Cpp.Object>("_round").value;
+                const roundID = round.method<Il2Cpp.String>("get_Id").invoke().content;
+                const Seed = ClientGameManager_Instance.method<number>("get_RandomSeed").invoke();
+                const initialNumParticipants = ClientGameManager_Instance.field<number>("_initialNumParticipants").value;
+                // const AllPlayers = ClientGameManager_Instance.method<Il2Cpp.Array<Il2Cpp.Object>>("get_AllPlayers").invoke();
+                const EliminatedPlayerCount = ClientGameManager_Instance.field<number>("_eliminatedPlayerCount").value;
+
+                // console.log(AllPlayers, typeof(AllPlayers), AllPlayers.length); // System.Collections.Generic.List`1[FGClient.NetworkPlayerDataClient] object undefined
+
+                /*
+                console.log(`RoundID: ${roundID}, Seed: ${Seed}, Initial Players: ${initialNumParticipants}, Remain Players: ${(AllPlayers.length - EliminatedPlayerCount)}, 
+                Eliminated Players: ${EliminatedPlayerCount}`);
+                Menu.toast(`RoundID: ${roundID}, Seed: ${Seed}, Initial Players: ${initialNumParticipants}, Remain Players: ${(AllPlayers.length - EliminatedPlayerCount)}, 
+                Eliminated Players: ${EliminatedPlayerCount}`, 0);
+                */ 
+
+                console.log(`RoundID: ${roundID}, Seed: ${Seed}, Initial Players: ${initialNumParticipants}, 
+                Eliminated Players: ${EliminatedPlayerCount}`);
+                
+                Menu.toast(`RoundID: ${roundID}, Seed: ${Seed}, Initial Players: ${initialNumParticipants}, 
+                Eliminated Players: ${EliminatedPlayerCount}`, 0);
+
+            } else {
+                Menu.toast("You are not in the game!", 0);
+            }
+        } catch (error: any) {
+            Menu.toast("You are not in the game!", 0);
+            console.error(error.stack);
+        }
+    };
+
     // test
     const showTipToePath = () => {
         try {
@@ -608,6 +708,9 @@ function main() {
                 }),
             );
 
+            Menu.add(layout.button("Show Game Details", showGameDetails));
+            Menu.add(layout.button("Show and Copy Server Details", showServerDetails));
+
             // links
             const links = layout.textView("<b>--- Links ---</b>");
             links.gravity = Menu.Api.CENTER;
@@ -617,8 +720,17 @@ function main() {
             Menu.add(layout.button("Cheating Discord Server", () => openURL("https://discord.gg/cNFJ73P6p3")));
             Menu.add(layout.button("Creator's Twitter", () => openURL("https://x.com/repinek840")));
 
+            const info = layout.textView("<b>--- Some info ---</b>");
+            info.gravity = Menu.Api.CENTER;
+            Menu.add(info);
+            
             Menu.add(layout.textView(`Version Mod Menu: ${version}`));
-            Menu.add(layout.textView(`Created by repinek`));
+            Menu.add(layout.textView(`Game Version: ${Il2Cpp.application.version}`));
+            Menu.add(layout.textView(`Package Name: ${Il2Cpp.application.identifier}`));
+
+            const author = layout.textView("Created by repinek");
+            author.gravity = Menu.Api.CENTER;
+            Menu.add(author);
 
             Java.scheduleOnMainThread(() => {
                 setTimeout(() => {
