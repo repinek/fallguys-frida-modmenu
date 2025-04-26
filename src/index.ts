@@ -45,6 +45,7 @@ function copyToClipboard(text: string) {
 // fix follow the leader teleport (add +y)
 // remainplayers in show game details
 // minimalistic fps display
+// add carryMaxSpeed, grabbingMaxSpeed, slide too;
 const version = "1.83";
 
 // enablers

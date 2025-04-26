@@ -82,6 +82,7 @@ Apk will be saved at the path ./yourfallguys.patched.apk
 In The Main Menu it will ask for permission to display over other apps, If it doesn’t ask for it, grant it manually. <br><br>
 **HyperOS, ColorOS, OneUI, HarmonyOS**, and other OEM ROMs may not work properly or at all. <br>
 **It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).** <br>
+**EMULATORS ARE NOT SUPPORTED!!** <br>
 
 ## Special Thanks
 Obed Guys Team - Some features powered by Obed Guys Team <br>
