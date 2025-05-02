@@ -44,10 +44,7 @@ function copyToClipboard(text: string) {
 // checkpoints teleports for lap // hard to implement
 // fix follow the leader teleport (add +y)
 // remainplayers in show game details
-// minimalistic fps display
-// add carryMaxSpeed, grabbingMaxSpeed, slide too;
-// leave match LeaveMatchPopupManager.LeaveMatch()
-const version = "1.87";
+const version = "1.88";
 
 // enablers
 let enable360Dives: boolean;
@@ -85,6 +82,7 @@ function main() {
     const LobbyService = MTFGClient.class("FGClient.CatapultServices.LobbyService");
     const GlobalGameStateClient = MTFGClient.class("FGClient.GlobalGameStateClient");
     const ClientGameManager = MTFGClient.class("FGClient.ClientGameManager");
+    const AFKManager = MTFGClient.class("FGClient.AFKManager");
     const FNMMSClientRemoteService = MTFGClient.class("FGClient.FNMMSClientRemoteService");
 
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
@@ -92,7 +90,7 @@ function main() {
     const MotorFunctionJump = TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
 
     const DebugClass = TheMultiplayerGuys.class("GvrFPS"); // debug info
-    const AFKManager = MTFGClient.class("FGClient.AFKManager");
+    const GlobalDebug = TheMultiplayerGuys.class("FGDebug.GlobalDebug");
 
     const ObjectiveReachEndZone = TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone"); // finish
     const GrabToQualify = TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crown
@@ -270,15 +268,17 @@ function main() {
     
         CharacterControllerData_Instance.field("divePlayerSensitivity").value = enable360Dives ? 14888 : 70;
         CharacterControllerData_Instance.field("normalMaxSpeed").value = enableCustomSpeed ? customNormalMaxSpeed : 9.5;
-    
+        CharacterControllerData_Instance.field("carryMaxSpeed").value = enableCustomSpeed ? customNormalMaxSpeed : 8;
+        CharacterControllerData_Instance.field("grabbingMaxSpeed").value = enableCustomSpeed ? customNormalMaxSpeed : 5;
+
         CharacterControllerData_Instance.field("maxGravityVelocity").value = enableCustomVelocity
-            ? enableNoVelocity
-                ? 0
+            ? enableNoVelocity 
+                ? 0 // if enable no velocity
                 : enableNegativeVelocity
-                  ? -customMaxGravityVelocity
+                  ? -customMaxGravityVelocity // if enable negative velocity
                   : customMaxGravityVelocity
             : 40;
-
+        
         CharacterControllerData_Instance.field("diveForce").value = enableCustomDiveForce ? customDiveForce : 17.5;
         CharacterControllerData_Instance.field("airDiveForce").value = enableCustomDiveForce ? customDiveForce : 7;
 
@@ -349,42 +349,6 @@ function main() {
             }
         },
     };
-
-    // WIP 
-    /* c# gvrfps class
-        private void ToggleMinimalisticFPSCounter(GlobalDebug.DebugToggleMinimalisticFPSCounter toggleEvent)
-        {
-            bool wasHidden = false;
-            bool flag = !base.gameObject.activeSelf;
-            if (flag)
-            {
-                base.gameObject.SetActive(true);
-                this._keepActive = true;
-                wasHidden = true;
-            }
-            TextMeshProUGUI[] list = base.GetComponentsInChildren<TextMeshProUGUI>(true);
-            foreach (TextMeshProUGUI item in list)
-            {
-                bool flag2 = item != this.fpsText;
-                if (flag2)
-                {
-                    item.gameObject.SetActive(!wasHidden && !item.gameObject.activeSelf);
-                }
-            }
-        }
-    */
-    /*
-    const MinimalisticFPS = {
-        enable() {
-            FGDebug_Instance = findObjectsOfTypeAll(DebugClass).get(0);
-
-            FGDebug_Instance.method("ToggleMinimalisticFPSCounter").invoke(); // needs event idk how
-        },
-        disable() {
-
-        }
-    };
-    */
 
     const teleportToFinish = () => {
         // Check if enough time has passed since thelast teleport
@@ -505,6 +469,17 @@ function main() {
         };
     };
 
+    const freezePlayer = {
+        enable() {
+            const characterRigidBody = FallGuysCharacterController_Instance.method<Il2Cpp.Object>("get_RigidBody").invoke();
+            characterRigidBody.method("set_isKinematic").invoke(true);
+        },
+        disable() {
+            const characterRigidBody = FallGuysCharacterController_Instance.method<Il2Cpp.Object>("get_RigidBody").invoke();
+            characterRigidBody.method("set_isKinematic").invoke(false);
+        }
+    };
+    
     const changeResolutionScale = () => {
         try {
             console.log("trying change resolution scale to", customResolutionScale);
@@ -600,16 +575,6 @@ function main() {
         }
     };
 
-    const freezePlayer = {
-        enable() {
-            const characterRigidBody = FallGuysCharacterController_Instance.method<Il2Cpp.Object>("get_RigidBody").invoke();
-            characterRigidBody.method("set_isKinematic").invoke(true);
-        },
-        disable() {
-            const characterRigidBody = FallGuysCharacterController_Instance.method<Il2Cpp.Object>("get_RigidBody").invoke();
-            characterRigidBody.method("set_isKinematic").invoke(false);
-        }
-    };
 
     const initMenu = () => {
         try {
@@ -747,13 +712,6 @@ function main() {
                     state ? FGDebug.enable() : FGDebug.disable();
                 }),
             );
-
-            // TODO needs rewrite
-            // Menu.add(
-            //     layout.toggle("Display Minimalistic FPS", (state: boolean) => {
-            //         state ? MinimalisticFPS.enable() : MinimalisticFPS.disable();
-            //     }),
-            // );
 
             Menu.add(
                 layout.toggle("Show Number of Queued Players", (state: boolean) => {
