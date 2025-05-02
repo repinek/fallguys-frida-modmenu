@@ -46,7 +46,8 @@ function copyToClipboard(text: string) {
 // remainplayers in show game details
 // minimalistic fps display
 // add carryMaxSpeed, grabbingMaxSpeed, slide too;
-const version = "1.83";
+// leave match LeaveMatchPopupManager.LeaveMatch()
+const version = "1.87";
 
 // enablers
 let enable360Dives: boolean;
@@ -219,9 +220,7 @@ function main() {
 
         ClientGameManager_Instance = this;
 
-        Il2Cpp.gc.choose(GlobalGameStateClient).forEach((instance: Il2Cpp.Object) => { 
-            GlobalGameStateClient_Instance = instance;
-        });
+        GlobalGameStateClient_Instance = GlobalGameStateClient.method<Il2Cpp.Object>("get_Instance").invoke();
 
         const Scene_Instance = SceneManager.method<Il2Cpp.Object>("GetActiveScene").invoke();
         current_SceneName = Scene_Instance.method<Il2Cpp.String>("get_name").invoke().content; // it's better to check by SceneName, instead round id (and easier lol)
@@ -330,7 +329,9 @@ function main() {
                 const localScale = Vector3class.alloc().unbox();
                 localScale.method(".ctor", 3).invoke(0.4, 0.4, 0.4); // new scale
 
-                FGDebug_Instance.method<Il2Cpp.Object>("get_transform").invoke().method<Il2Cpp.Object>("set_localScale").invoke(localScale);
+                FGDebug_Instance
+                .method<Il2Cpp.Object>("get_transform").invoke()
+                .method<Il2Cpp.Object>("set_localScale").invoke(localScale);
 
                 const gameObject = FGDebug_Instance.method<Il2Cpp.Object>("get_gameObject").invoke();
                 gameObject.method("SetActive").invoke(true);
@@ -348,6 +349,42 @@ function main() {
             }
         },
     };
+
+    // WIP 
+    /* c# gvrfps class
+        private void ToggleMinimalisticFPSCounter(GlobalDebug.DebugToggleMinimalisticFPSCounter toggleEvent)
+        {
+            bool wasHidden = false;
+            bool flag = !base.gameObject.activeSelf;
+            if (flag)
+            {
+                base.gameObject.SetActive(true);
+                this._keepActive = true;
+                wasHidden = true;
+            }
+            TextMeshProUGUI[] list = base.GetComponentsInChildren<TextMeshProUGUI>(true);
+            foreach (TextMeshProUGUI item in list)
+            {
+                bool flag2 = item != this.fpsText;
+                if (flag2)
+                {
+                    item.gameObject.SetActive(!wasHidden && !item.gameObject.activeSelf);
+                }
+            }
+        }
+    */
+    /*
+    const MinimalisticFPS = {
+        enable() {
+            FGDebug_Instance = findObjectsOfTypeAll(DebugClass).get(0);
+
+            FGDebug_Instance.method("ToggleMinimalisticFPSCounter").invoke(); // needs event idk how
+        },
+        disable() {
+
+        }
+    };
+    */
 
     const teleportToFinish = () => {
         // Check if enough time has passed since thelast teleport
@@ -563,6 +600,17 @@ function main() {
         }
     };
 
+    const freezePlayer = {
+        enable() {
+            const characterRigidBody = FallGuysCharacterController_Instance.method<Il2Cpp.Object>("get_RigidBody").invoke();
+            characterRigidBody.method("set_isKinematic").invoke(true);
+        },
+        disable() {
+            const characterRigidBody = FallGuysCharacterController_Instance.method<Il2Cpp.Object>("get_RigidBody").invoke();
+            characterRigidBody.method("set_isKinematic").invoke(false);
+        }
+    };
+
     const initMenu = () => {
         try {
             const layout = new Menu.ObsidianLayout(obsidianConfig);
@@ -585,6 +633,12 @@ function main() {
                 layout.toggle("Air Jump", (state: boolean) => {
                     enableAirJump = state;
                     console.log(`enableAirJump: ${enableAirJump}`);
+                }),
+            );
+
+            Menu.add(
+                layout.toggle("Freeze Player", (state: boolean) => {
+                    state ? freezePlayer.enable() : freezePlayer.disable();
                 }),
             );
 
@@ -693,6 +747,13 @@ function main() {
                     state ? FGDebug.enable() : FGDebug.disable();
                 }),
             );
+
+            // TODO needs rewrite
+            // Menu.add(
+            //     layout.toggle("Display Minimalistic FPS", (state: boolean) => {
+            //         state ? MinimalisticFPS.enable() : MinimalisticFPS.disable();
+            //     }),
+            // );
 
             Menu.add(
                 layout.toggle("Show Number of Queued Players", (state: boolean) => {
