@@ -44,7 +44,7 @@ function copyToClipboard(text: string) {
 // checkpoints teleports for lap // hard to implement
 // fix follow the leader teleport (add +y)
 // remainplayers in show game details
-const version = "1.88";
+const version = "1.92";
 
 // enablers
 let enable360Dives: boolean;
@@ -55,6 +55,7 @@ let enableNegativeVelocity: boolean;
 let enableNoVelocity: boolean;
 let enableCustomJump: boolean;
 let enableCustomDiveForce: boolean;
+let enableCustomFOV: boolean;
 let enableFGDebug: boolean;
 let enableHideStuff: boolean;
 let enableQueuedPlayers: boolean;
@@ -65,6 +66,7 @@ let customMaxGravityVelocity = 40;
 let customJumpForceUltimateParty = 17.5;
 let customDiveForce = 16.5;
 let customResolutionScale = 1;
+let customFOV = 68;
 
 function main() {
     // assemblies 
@@ -77,6 +79,7 @@ function main() {
     const Resources = CoreModule.class("UnityEngine.Resources");
     const Vector3class = CoreModule.class("UnityEngine.Vector3");
     const SceneManager = CoreModule.class("UnityEngine.SceneManagement.SceneManager");
+    const CCamera = CoreModule.class("UnityEngine.Camera"); 
 
     const GraphicsSettings = MTFGClient.class("FGClient.GraphicsSettings");
     const LobbyService = MTFGClient.class("FGClient.CatapultServices.LobbyService");
@@ -90,7 +93,6 @@ function main() {
     const MotorFunctionJump = TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
 
     const DebugClass = TheMultiplayerGuys.class("GvrFPS"); // debug info
-    const GlobalDebug = TheMultiplayerGuys.class("FGDebug.GlobalDebug");
 
     const ObjectiveReachEndZone = TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone"); // finish
     const GrabToQualify = TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crown
@@ -104,6 +106,8 @@ function main() {
     const LevelEditorTriggerZoneActiveBase = WushuLevelEditorRuntime.class("LevelEditorTriggerZoneActiveBase");
 
     // methods
+    const set_fieldOfView_method = CCamera.method("set_fieldOfView", 1);
+    
     const get_TargetFrameRate_method = GraphicsSettings.method("get_TargetFrameRate");
     const set_TargetFrameRate_method = GraphicsSettings.method("set_TargetFrameRate", 1);
     const get_ResolutionScale_method = GraphicsSettings.method("get_ResolutionScale");
@@ -126,6 +130,7 @@ function main() {
     let GraphicsSettings_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in get_ResolutionScale
     let GlobalGameStateClient_Instance: Il2Cpp.Object;
     let ClientGameManager_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in GameLevelLoaded
+    let Camera_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in set_fieldOfView
 
     let reachedMainMenu = false;
     let current_SceneName;
@@ -135,7 +140,7 @@ function main() {
     Menu.toast("Menu will appear once you enter the main menu", 1);
 
     // hooks
-
+    
     // graphics
     get_TargetFrameRate_method.implementation = function () {
         console.log("get_TargetFrameRate Called!");
@@ -168,24 +173,14 @@ function main() {
         return this.method("set_ResolutionScale", 1).invoke(customResolutionScale);
     };
 
-    //@ts-ignore, code from wiki snippets btw lol
-    ProcessMessageReceived_method.implementation = function (jsonMessage: Il2Cpp.String) {
-        console.log("ProcessMessageReceived called!");
-
-        if (enableQueuedPlayers) {
-            console.log(jsonMessage.content);
-            const json = JSON.parse(jsonMessage.content!); // .content because it's Il2cpp.String
-
-            if (json.payload) {
-                if (json.payload.state == "Queued") { // if in queue 
-                    Menu.toast(`Queued Players: ${json.payload.queuedPlayers.toString()}`, 0);
-                }
-            }
-        }
-
-        return this.method("ProcessMessageReceived", 1).invoke(jsonMessage);
+    set_fieldOfView_method.implementation = function (value) {
+        Camera_Instance = this;
+        if (enableCustomFOV) {
+            value = customFOV;
+        } 
+        return this.method("set_fieldOfView", 1).invoke(value);
     };
-
+    
     // other stuff
     StartAFKManager_method.implementation = function () {
         console.log("AFKManager Start Called!");
@@ -258,7 +253,25 @@ function main() {
 
         return this.method("GameLevelLoaded", 1).invoke(ugcLevelHash);
     };
-    
+
+    //@ts-ignore, code from wiki snippets btw lol
+    ProcessMessageReceived_method.implementation = function (jsonMessage: Il2Cpp.String) {
+        console.log("ProcessMessageReceived called!");
+
+        if (enableQueuedPlayers) {
+            console.log(jsonMessage.content);
+            const json = JSON.parse(jsonMessage.content!); // .content because it's Il2cpp.String
+
+            if (json.payload) {
+                if (json.payload.state == "Queued") { // if in queue 
+                    Menu.toast(`Queued Players: ${json.payload.queuedPlayers.toString()}`, 0);
+                }
+            }
+        }
+
+        return this.method("ProcessMessageReceived", 1).invoke(jsonMessage);
+    };
+
     // physics
     CheckCharacterControllerData_method.implementation = function (character: any) {
     
@@ -503,7 +516,7 @@ function main() {
 
                 const HostIPAddr = NetworkManager.method<Il2Cpp.String>("get_HostIPAddr").invoke().content;
                 const HostPortNo = NetworkManager.method<number>("get_HostPortNo").invoke();
-                const RTT = GameConnection.method<number>("CurrentRtt").invoke();
+                const RTT = GameConnection.method<number>("CurrentRtt").invoke(); 
                 const LAG = GameConnection.method<number>("CurrentLag").invoke();
 
                 console.log(`Server: ${HostIPAddr}:${HostPortNo}\nPing: ${RTT}ms, LAG: ${LAG} `);
@@ -591,90 +604,90 @@ function main() {
                 layout.toggle("360 Dives", (state: boolean) => {
                     enable360Dives = state;
                     console.log(`enable360Dives: ${enable360Dives}`);
-                }),
+                })
             );
 
             Menu.add(
                 layout.toggle("Air Jump", (state: boolean) => {
                     enableAirJump = state;
                     console.log(`enableAirJump: ${enableAirJump}`);
-                }),
+                })
             );
 
             Menu.add(
                 layout.toggle("Freeze Player", (state: boolean) => {
                     state ? freezePlayer.enable() : freezePlayer.disable();
-                }),
+                })
             );
 
             Menu.add(
-                layout.toggle("Use Custom Speed", (state: boolean) => {
+                layout.toggle("Enable Custom Speed", (state: boolean) => {
                     enableCustomSpeed = state;
                     console.log(`enableCustomSpeed: ${enableCustomSpeed}`);
-                }),
+                })
             );
 
             Menu.add(
                 layout.seekbar("Custom Speed: {0} / 100", 100, 1, (value: number) => {
                     customNormalMaxSpeed = value;
                     console.log(`customNormalMaxSpeed: ${customNormalMaxSpeed}`);
-                }),
+                })
             ); 
 
             Menu.add(
-                layout.toggle("Use Custom Velocity", (state: boolean) => {
+                layout.toggle("Enable Custom Velocity", (state: boolean) => {
                     enableCustomVelocity = state;
                     console.log(`enableCustomVelocity: ${enableCustomVelocity}`);
-                }),
+                })
             );
 
             Menu.add(
                 layout.seekbar("Vertical Gravity Velocity: {0} / 100", 100, 0, (value: number) => {
                     customMaxGravityVelocity = value;
                     console.log(`customMaxGravityVelocity: ${customMaxGravityVelocity}`);
-                }),
+                })
             );
 
             Menu.add(
                 layout.toggle("Negative Velocity", (state: boolean) => {
                     enableNegativeVelocity = state;
                     console.log(`enableNegativeVelocity: ${enableNegativeVelocity}`);
-                }),
+                })
             );
 
             Menu.add(
-                layout.toggle("No Velocity", (state: boolean) => {
+                layout.toggle("No Vertical Velocity", (state: boolean) => {
                     enableNoVelocity = state;
                     console.log(`enableNoVelocity: ${enableNoVelocity}`);
-                }),
+                })
             );
 
             Menu.add(
-                layout.toggle("Use Custom Jump Strength", (state: boolean) => {
+                layout.toggle("Enable Custom Jump Strength", (state: boolean) => {
                     enableCustomJump = state;
                     console.log(`enableCustomJump: ${enableCustomJump}`);
-                }),
+                })
             );
 
             Menu.add(
                 layout.seekbar("Jump Strength: {0} / 100", 100, 1, (value: number) => {
                     customJumpForceUltimateParty = value;
                     console.log(`customJumpForceUltimateParty: ${customJumpForceUltimateParty}`);
-                }),
+                })
             );
 
             Menu.add(
-                layout.toggle("Use Custom Dive Strength", (state: boolean) => {
+                layout.toggle("Enable Custom Dive Strength", (state: boolean) => {
                     enableCustomDiveForce = state;
                     console.log(`enableDiveForce: ${enableCustomDiveForce}`);
-                }),
+                })
             );
 
             Menu.add(
                 layout.seekbar("Dive Strength: {0} / 100", 100, 1, (value: number) => {
                     customDiveForce = value;
                     console.log(`customDiveForce: ${customDiveForce}`);
-                }),
+                })
             );
 
             // round
@@ -686,7 +699,7 @@ function main() {
                 layout.toggle("Hide Real Doors", (state: boolean) => {
                     enableHideStuff = state;
                     console.log(`enableHideStuff: ${enableHideStuff}`);
-                }),
+                })
             );
 
             Menu.add(layout.button("Show TipToe Path", showTipToePath));
@@ -708,9 +721,28 @@ function main() {
             Menu.add(other);
 
             Menu.add(
+                layout.toggle("Enable Custom FOV", (state: boolean) => {
+                    enableCustomFOV = state;
+                    console.log(`enableCustomFOV: ${enableCustomFOV}`);
+                })
+            );
+
+            Menu.add(
+                layout.seekbar("Custom FOV: {0}", 180, 1, (value: number) => {
+                    if (enableCustomFOV) {
+                        if (Camera_Instance) {
+                            customFOV = value;
+                            Camera_Instance.method("set_fieldOfView", 1).invoke(value);
+                            console.log(`customFOV: ${customFOV}`);
+                        };
+                    };
+                })
+            );
+
+            Menu.add(
                 layout.toggle("Display FGDebug", (state: boolean) => {
                     state ? FGDebug.enable() : FGDebug.disable();
-                }),
+                })
             );
 
             Menu.add(
@@ -725,7 +757,7 @@ function main() {
                     customResolutionScale = value / 100;
                     changeResolutionScale(); 
                     console.log(`customResolutionScale: ${customResolutionScale}`);
-                }),
+                })
             );
 
             Menu.add(layout.button("Show Game Details", showGameDetails));
