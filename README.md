@@ -34,14 +34,14 @@ Android Fall Guys mod menu using [Frida](https://frida.re/) and [frida-il2cpp-br
 
 ### Other
 - Change FOV
-- Display FGDebug  
-  Shows FPS (min/max/avg/current), Time, Ping, Dropped Packets
+- Display FGDebug
+  - Shows FPS (min/max/avg/current), Time, Ping, Dropped Packets
 - Change Resolution
 - Show Number of Queued Players
 - Show Game Details
-  Shows RoundID, seed Initial Players, Eliminated Players
+  - Shows RoundID, seed Initial Players, Eliminated Players
 - Show Server Details
-  Shows Server IP, Host, Ping, LAG
+  - Shows Server IP, Host, Ping, LAG
 
 
 ### Features that always work (cannot be disabled)
