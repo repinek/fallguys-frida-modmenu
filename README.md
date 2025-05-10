@@ -97,3 +97,4 @@ Obed Guys Team - Some features powered by Obed Guys Team <br>
 [FloyzI](https://github.com/FloyzI) - for how the game works <br>
 [commonuserlol](https://github.com/commonuserlol) - for help with code and [menu](https://github.com/commonuserlol/frida-java-menu) <br>
 [Dynasty-Dev](https://github.com/Dynasty-Dev) - for testing
+[igamegod](https://github.com/igamegod) - for help with some functions
