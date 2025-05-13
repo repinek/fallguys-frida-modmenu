@@ -33,6 +33,7 @@ Android Fall Guys mod menu using [Frida](https://frida.re/) and [frida-il2cpp-br
 - Teleport To Bubble, Active Button or Score Zone
 
 ### Other
+- Display UI
 - Change FOV
 - Display FGDebug
   - Shows FPS (min/max/avg/current), Time, Ping, Dropped Packets

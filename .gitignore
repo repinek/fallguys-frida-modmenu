@@ -4,3 +4,4 @@ dump/
 dist/
 src/test.ts
 src/private.ts
+src/utils.ts

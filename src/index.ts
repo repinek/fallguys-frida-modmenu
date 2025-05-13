@@ -44,7 +44,7 @@ function copyToClipboard(text: string) {
 // checkpoints teleports for lap // hard to implement
 // fix follow the leader teleport (add +y)
 // remainplayers in show game details
-const version = "1.92";
+const version = "1.94";
 
 // enablers
 let enable360Dives: boolean;
@@ -70,9 +70,9 @@ let customFOV = 68;
 
 function main() {
     // assemblies 
-    const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
+    const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image; // FG.Common namespace
     const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
-    const MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image;
+    const MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image; // FGClient namespace
     const WushuLevelEditorRuntime = Il2Cpp.domain.assembly("Wushu.LevelEditor.Runtime").image; // creative logic
 
     // classes
@@ -87,6 +87,7 @@ function main() {
     const ClientGameManager = MTFGClient.class("FGClient.ClientGameManager");
     const AFKManager = MTFGClient.class("FGClient.AFKManager");
     const FNMMSClientRemoteService = MTFGClient.class("FGClient.FNMMSClientRemoteService");
+    const UICanvas = MTFGClient.class("FGClient.UI.Core.UICanvas");
 
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const FallGuysCharacterController = TheMultiplayerGuys.class("FallGuysCharacterController");
@@ -131,6 +132,7 @@ function main() {
     let GlobalGameStateClient_Instance: Il2Cpp.Object;
     let ClientGameManager_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in GameLevelLoaded
     let Camera_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in set_fieldOfView
+    let UICanvas_Instance: Il2Cpp.Object;
 
     let reachedMainMenu = false;
     let current_SceneName;
@@ -140,7 +142,7 @@ function main() {
     Menu.toast("Menu will appear once you enter the main menu", 1);
 
     // hooks
-    
+
     // graphics
     get_TargetFrameRate_method.implementation = function () {
         console.log("get_TargetFrameRate Called!");
@@ -310,21 +312,21 @@ function main() {
 
     // helper functions 
     const findObjectsOfTypeAll = (klass: Il2Cpp.Class) => {
-        return Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
+    return Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
     };
 
     const teleportTo = (target: Il2Cpp.Object) => {
-        const ObjectVector3Pos = target
-            .method<Il2Cpp.Object>("get_transform")
-            .invoke()
-            .method<Il2Cpp.Object>("get_position")
-            .invoke();
+    const ObjectVector3Pos = target
+        .method<Il2Cpp.Object>("get_transform")
+        .invoke()
+        .method<Il2Cpp.Object>("get_position")
+        .invoke();
 
-        FallGuysCharacterController_Instance
-            .method<Il2Cpp.Object>("get_transform")
-            .invoke()
-            .method<Il2Cpp.Object>("set_position")
-            .invoke(ObjectVector3Pos);
+    FallGuysCharacterController_Instance
+        .method<Il2Cpp.Object>("get_transform")
+        .invoke()
+        .method<Il2Cpp.Object>("set_position")
+        .invoke(ObjectVector3Pos);
     };
 
     // functions
@@ -361,6 +363,21 @@ function main() {
                 gameObject.method("SetActive").invoke(false);
             }
         },
+    };
+
+    const UICanvas_util = {
+        enable() {
+            UICanvas_Instance = findObjectsOfTypeAll(UICanvas).get(0);
+            if (UICanvas_Instance) {
+                UICanvas_Instance.method("SetEnabled").invoke(true);
+            }
+        },
+        disable() {
+            UICanvas_Instance = findObjectsOfTypeAll(UICanvas).get(0);
+            if (UICanvas_Instance) {
+                UICanvas_Instance.method("SetEnabled").invoke(false);
+            }
+        }
     };
 
     const teleportToFinish = () => {
@@ -736,6 +753,12 @@ function main() {
                             console.log(`customFOV: ${customFOV}`);
                         };
                     };
+                })
+            );
+
+            Menu.add(
+                layout.toggle("Display UI (controls won't be work)", (state: boolean) => {
+                    state ? UICanvas_util.enable() : UICanvas_util.disable();
                 })
             );
 
