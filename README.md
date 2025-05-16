@@ -97,5 +97,5 @@ In The Main Menu it will ask for permission to display over other apps, If it do
 Obed Guys Team - Some features powered by Obed Guys Team <br>
 [FloyzI](https://github.com/FloyzI) - for how the game works <br>
 [commonuserlol](https://github.com/commonuserlol) - for help with code and [menu](https://github.com/commonuserlol/frida-java-menu) <br>
-[Dynasty-Dev](https://github.com/Dynasty-Dev) - for testing
+[Dynasty-Dev](https://github.com/Dynasty-Dev) - for testing and Contribution <br>
 [igamegod](https://github.com/igamegod) - for help with some functions
