@@ -44,7 +44,7 @@ function copyToClipboard(text: string) {
 // checkpoints teleports for lap // hard to implement
 // fix follow the leader teleport (add +y)
 // remainplayers in show game details
-const version = "1.94";
+const version = "1.95";
 
 // enablers
 let enable360Dives: boolean;
@@ -59,6 +59,7 @@ let enableCustomFOV: boolean;
 let enableFGDebug: boolean;
 let enableHideStuff: boolean;
 let enableQueuedPlayers: boolean;
+let disableSendFallGuyState: boolean;
 
 // numbers
 let customNormalMaxSpeed = 9.5;
@@ -92,6 +93,7 @@ function main() {
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const FallGuysCharacterController = TheMultiplayerGuys.class("FallGuysCharacterController");
     const MotorFunctionJump = TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
+    const MPGNetMotorTasks = TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks");
 
     const DebugClass = TheMultiplayerGuys.class("GvrFPS"); // debug info
 
@@ -118,6 +120,7 @@ function main() {
 
     const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
     const CheckCharacterControllerData_method = CharacterDataMonitor.method("CheckCharacterControllerData", 1); 
+    const SendMessage_method = MPGNetMotorTasks.method("SendMessage", 1);
     const CanJump_method = MotorFunctionJump.method<boolean>("CanJump");
     const StartAFKManager_method = AFKManager.method("Start");
 
@@ -254,6 +257,13 @@ function main() {
         }
 
         return this.method("GameLevelLoaded", 1).invoke(ugcLevelHash);
+    };
+
+    SendMessage_method.implementation = function (bypassNetworkLOD) {
+        if (disableSendFallGuyState) {
+            return false;
+        }
+        return this.method("SendMessage", 1).invoke(bypassNetworkLOD);
     };
 
     //@ts-ignore, code from wiki snippets btw lol
@@ -707,6 +717,14 @@ function main() {
                 })
             );
 
+            
+            Menu.add(
+                layout.toggle("Stop sending Fall Guy state", (state: boolean) => {
+                    disableSendFallGuyState = state;
+                    console.log(`disableSendFallGuyState: ${disableSendFallGuyState}`);
+                })
+            );
+
             // round
             const round = layout.textView("<b>--- Round ---</b>");
             round.gravity = Menu.Api.CENTER;
@@ -757,8 +775,8 @@ function main() {
             );
 
             Menu.add(
-                layout.toggle("Display UI (controls won't be work)", (state: boolean) => {
-                    state ? UICanvas_util.enable() : UICanvas_util.disable();
+                layout.toggle("Disable UI (controls won't be work)", (state: boolean) => {
+                    state ? UICanvas_util.disable() : UICanvas_util.enable();
                 })
             );
 
@@ -806,6 +824,10 @@ function main() {
             const author = layout.textView("Created by repinek");
             author.gravity = Menu.Api.CENTER;
             Menu.add(author);
+            
+            const secondAuthor = layout.textView("Special Thanks to Floyzi102");
+            secondAuthor.gravity = Menu.Api.CENTER;
+            Menu.add(secondAuthor);
 
             Java.scheduleOnMainThread(() => {
                 setTimeout(() => {
