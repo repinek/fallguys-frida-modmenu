@@ -1,6 +1,7 @@
 import "frida-il2cpp-bridge";
 import "frida-java-menu";
 import { obsidianConfig } from "./menuConfig.js";
+import { kill } from "process";
 
 // helper functions
 function openURL(link: string) {
@@ -44,7 +45,7 @@ function copyToClipboard(text: string) {
 // checkpoints teleports for lap // hard to implement
 // fix follow the leader teleport (add +y)
 // remainplayers in show game details
-const version = "1.95";
+const version = "1.97";
 
 // enablers
 let enable360Dives: boolean;
@@ -69,6 +70,14 @@ let customDiveForce = 16.5;
 let customResolutionScale = 1;
 let customFOV = 68;
 
+// build info
+let appVersion: string;
+let unityVersion: string;
+let buildNumber = "Local build";
+let commit = "(no commit info)";
+let buildDate = "n/a";
+let EOSVersion: string; // EOS SDK
+
 function main() {
     // assemblies 
     const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image; // FG.Common namespace
@@ -89,6 +98,7 @@ function main() {
     const AFKManager = MTFGClient.class("FGClient.AFKManager");
     const FNMMSClientRemoteService = MTFGClient.class("FGClient.FNMMSClientRemoteService");
     const UICanvas = MTFGClient.class("FGClient.UI.Core.UICanvas");
+    const BuildInfo = TheMultiplayerGuys.class("FG.Common.BuildInfo");
 
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const FallGuysCharacterController = TheMultiplayerGuys.class("FallGuysCharacterController");
@@ -117,6 +127,7 @@ function main() {
     const set_ResolutionScale_method = GraphicsSettings.method("set_ResolutionScale", 1);
     const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
     const ProcessMessageReceived_method = FNMMSClientRemoteService.method("ProcessMessageReceived");
+    const BuildInfo_OnEnable_method = BuildInfo.method("OnEnable");
 
     const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
     const CheckCharacterControllerData_method = CharacterDataMonitor.method("CheckCharacterControllerData", 1); 
@@ -186,7 +197,7 @@ function main() {
         return this.method("set_fieldOfView", 1).invoke(value);
     };
     
-    // other stuff
+    // things
     StartAFKManager_method.implementation = function () {
         console.log("AFKManager Start Called!");
         return; // anti-afk implementation
@@ -282,6 +293,18 @@ function main() {
         }
 
         return this.method("ProcessMessageReceived", 1).invoke(jsonMessage);
+    };
+
+    BuildInfo_OnEnable_method.implementation = function () {
+        appVersion = Il2Cpp.application.version!;
+        unityVersion = Il2Cpp.unityVersion;
+        buildNumber = this.field<Il2Cpp.String>("buildNumber").value.content!;
+        commit = this.field<Il2Cpp.String>("commit").value.content!;
+        buildDate = this.field<Il2Cpp.String>("buildDate").value.content!;
+        EOSVersion = this.field<Il2Cpp.String>("eosVersion").value.content!;
+        // you can also get pewVersion and kittVersion here if you want. also _fullString and _shortString
+
+        return this.method("OnEnable").invoke();
     };
 
     // physics
@@ -813,12 +836,17 @@ function main() {
             Menu.add(layout.button("Cheating Discord Server", () => openURL("https://discord.gg/cNFJ73P6p3")));
             Menu.add(layout.button("Creator's Twitter", () => openURL("https://x.com/repinek840")));
 
-            const info = layout.textView("<b>--- Some info ---</b>");
+            const info = layout.textView("<b>--- Info About Build ---</b>");
             info.gravity = Menu.Api.CENTER;
             Menu.add(info);
             
             Menu.add(layout.textView(`Version Mod Menu: ${version}`));
-            Menu.add(layout.textView(`Game Version: ${Il2Cpp.application.version}`));
+            Menu.add(layout.textView(`Game Version: ${appVersion}`));
+            Menu.add(layout.textView(`Unity Version: ${unityVersion}`))
+            Menu.add(layout.textView(`Game Build Number: ${buildNumber}`));
+            Menu.add(layout.textView(`Game Commit: ${commit}`));
+            Menu.add(layout.textView(`Game build Date: ${buildDate}`));
+            Menu.add(layout.textView(`EOS SDK: ${EOSVersion}`));
             Menu.add(layout.textView(`Package Name: ${Il2Cpp.application.identifier}`));
 
             const author = layout.textView("Created by repinek");
