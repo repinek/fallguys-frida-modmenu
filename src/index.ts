@@ -1,7 +1,6 @@
 import "frida-il2cpp-bridge";
 import "frida-java-menu";
 import { obsidianConfig } from "./menuConfig.js";
-import { kill } from "process";
 
 // helper functions
 function openURL(link: string) {
@@ -39,13 +38,10 @@ function copyToClipboard(text: string) {
     });
 }
 
-
 // TODO: 
-// get_ResolutionScale saving // invoke SetSettingPrefIfChanged(keypref, value), but idk why i cant, enums broken or smth
-// checkpoints teleports for lap // hard to implement
 // fix follow the leader teleport (add +y)
-// remainplayers in show game details
-const version = "1.97";
+// fix freeze player TypeError: cannot read property 'method' of undefined
+const version = "1.101";
 
 // enablers
 let enable360Dives: boolean;
@@ -92,6 +88,7 @@ function main() {
     const CCamera = CoreModule.class("UnityEngine.Camera"); 
 
     const GraphicsSettings = MTFGClient.class("FGClient.GraphicsSettings");
+    const PlayerInfoHUDBase = MTFGClient.class("FGClient.PlayerInfoHUDBase");
     const LobbyService = MTFGClient.class("FGClient.CatapultServices.LobbyService");
     const GlobalGameStateClient = MTFGClient.class("FGClient.GlobalGameStateClient");
     const ClientGameManager = MTFGClient.class("FGClient.ClientGameManager");
@@ -120,11 +117,12 @@ function main() {
 
     // methods
     const set_fieldOfView_method = CCamera.method("set_fieldOfView", 1);
-    
+
     const get_TargetFrameRate_method = GraphicsSettings.method("get_TargetFrameRate");
     const set_TargetFrameRate_method = GraphicsSettings.method("set_TargetFrameRate", 1);
     const get_ResolutionScale_method = GraphicsSettings.method("get_ResolutionScale");
     const set_ResolutionScale_method = GraphicsSettings.method("set_ResolutionScale", 1);
+    const SetShowPlayerNamesByDefault_method = PlayerInfoHUDBase.method("SetShowPlayerNamesByDefault", 1);
     const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
     const ProcessMessageReceived_method = FNMMSClientRemoteService.method("ProcessMessageReceived");
     const BuildInfo_OnEnable_method = BuildInfo.method("OnEnable");
@@ -150,6 +148,7 @@ function main() {
 
     let reachedMainMenu = false;
     let current_SceneName;
+    let showPlayerNames_state: boolean;
     let lastTeleportTime = 0;
     const TELEPORT_COOLDOWN = 1000; // teleport cooldown for Teleports
     
@@ -196,7 +195,14 @@ function main() {
         } 
         return this.method("set_fieldOfView", 1).invoke(value);
     };
-    
+
+    SetShowPlayerNamesByDefault_method.implementation = function (value) {
+        console.log("SetShowPlayerNamesByDefault Called!");
+        //@ts-ignore idk i cant set value: boolean
+        showPlayerNames_state = value;
+        return this.method("SetShowPlayerNamesByDefault", 1).invoke(value);
+    };
+
     // things
     StartAFKManager_method.implementation = function () {
         console.log("AFKManager Start Called!");
@@ -777,6 +783,10 @@ function main() {
             const other = layout.textView("<b>--- Other ---</b>");
             other.gravity = Menu.Api.CENTER;
             Menu.add(other);
+
+            Menu.add(layout.button("Toggle View Names", () => {
+                SetShowPlayerNamesByDefault_method.invoke(!showPlayerNames_state);
+            }));
 
             Menu.add(
                 layout.toggle("Enable Custom FOV", (state: boolean) => {
