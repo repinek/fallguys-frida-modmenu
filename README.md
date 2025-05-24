@@ -49,6 +49,7 @@ Android Fall Guys mod menu using [Frida](https://frida.re/) and [frida-il2cpp-br
 - Bypass Character Physics Checks
 - Remove FPS Limit
 - Anti-AFK
+- Bypass permanent ban (not temporary)
   
 ## Installation
 Just download and install the .apk from [Releases](https://github.com/repinek/fallguys-frida-modmenu/releases/latest)

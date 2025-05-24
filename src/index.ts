@@ -19,8 +19,9 @@ function main() {
 
     const BuildInfo = TheMultiplayerGuys.class("FG.Common.BuildInfo");
     const GraphicsSettings = MTFGClient.class("FGClient.GraphicsSettings");
-    const PlayerInfoHUDBase = MTFGClient.class("FGClient.PlayerInfoHUDBase");
+    const PlayerInfoHUDBase = MTFGClient.class("FGClient.PlayerInfoHUDBase"); // ShowNames field storing here
     const UICanvas = MTFGClient.class("FGClient.UI.Core.UICanvas");
+    const MainMenuViewModel = MTFGClient.class("FGClient.MainMenuViewModel");
     const LobbyService = MTFGClient.class("FGClient.CatapultServices.LobbyService");
     const GlobalGameStateClient = MTFGClient.class("FGClient.GlobalGameStateClient");
     const ClientGameManager = MTFGClient.class("FGClient.ClientGameManager");
@@ -53,6 +54,9 @@ function main() {
     const get_ResolutionScale_method = GraphicsSettings.method("get_ResolutionScale");
     const set_ResolutionScale_method = GraphicsSettings.method("set_ResolutionScale", 1);
     const SetShowPlayerNamesByDefault_method = PlayerInfoHUDBase.method("SetShowPlayerNamesByDefault", 1);
+        
+    const CheckAntiCheatClientServiceForError_method = MainMenuViewModel.method<boolean>("CheckAntiCheatClientServiceForError"); 
+    const ShowAntiCheatPopup_method = MainMenuViewModel.method("ShowAntiCheatPopup", 2);
 
     const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
 
@@ -86,6 +90,31 @@ function main() {
     Menu.toast("Menu will appear once you enter the main menu", 1);
 
     // === Hooks ===
+
+    // Bypass permanent ban
+    // you can't bypass a temporary ban, but you can bypass a permanent one, lmao
+    CheckAntiCheatClientServiceForError_method.implementation = function () {
+        console.log("CheckAntiCheatClientServiceForError Called!"); 
+        return false; // idk how it works, but it works (you can't enter the match without this hook)
+    };
+    
+    ShowAntiCheatPopup_method.implementation = function (errorMessage, shouldQuit) { // AntiCheatError errorMessage, bool shouldQuit
+        console.log("ShowAntiCheatPopup Called with args:", errorMessage, shouldQuit); 
+        // Called by: bool FGClient::MainMenuViewModel::_CheckRestrictedGameAccess_d__69::MoveNext
+
+        //@ts-ignore
+        const AntiCheatErrorMessageString = errorMessage.method("get_Message").invoke().content;
+        if (AntiCheatErrorMessageString === "restrict_game_access" && shouldQuit === true) {
+            console.log("Detected permanent ban");
+            /* 
+            You can probably can hook FGClient::UI::PopupManager::Show
+            and get cool Popup if you change something in ModalMessageData data argument
+            */
+            Menu.toast("Your account has permanent ban, but you can still play with mod menu. Enjoy", 1); 
+        };
+
+        return; 
+    };
 
     // Graphics 
     set_fieldOfView_method.implementation = function (value) {
@@ -489,11 +518,12 @@ function main() {
         try {
             console.log("trying change resolution scale to", Config.CustomValues.ResolutionScale);
             GraphicsSettings_Instance.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale);
+
             /*
             i wanted to make this value changeable in the game, but unfortunately 
-            calling ResolutionScaling::UpdateResolutionScaleStatus() doesn't do anything,
-            maybe i should call something else, but idk exactly (will check later with IDA)
+            calling ResolutionScaling::UpdateResolutionScaleStatus() just crashes the game for now.
             */
+
         } catch (error: any) {
             Menu.toast(error.stack, 1); 
             console.error(error.stack);
