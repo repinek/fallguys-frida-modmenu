@@ -2,7 +2,6 @@ export namespace Config {
     
     // TODO: 
     // fix follow the leader teleport (add +y)
-    // fix freeze player TypeError: cannot read property 'method' of undefined
     export const version = "1.104";
 
     export namespace Toggles {
