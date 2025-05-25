@@ -33,6 +33,7 @@ Android Fall Guys mod menu using [Frida](https://frida.re/) and [frida-il2cpp-br
 - Teleport To Bubble, Active Button or Score Zone
 
 ### Other
+- View Names Shortcut
 - Display UI
 - Change FOV
 - Display FGDebug
@@ -43,7 +44,7 @@ Android Fall Guys mod menu using [Frida](https://frida.re/) and [frida-il2cpp-br
   - Shows RoundID, seed Initial Players, Eliminated Players
 - Show Server Details
   - Shows Server IP, Host, Ping, LAG
-
+- Show Build Info
 
 ### Features that always work (cannot be disabled)
 - Bypass Character Physics Checks
