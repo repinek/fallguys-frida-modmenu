@@ -60,6 +60,14 @@ Just download and install the .apk from [Releases](https://github.com/repinek/fa
 > Final file name example: main.XXXX.com.mediatonic.FallGuys_client.modmenu.obb <br>
 
 ## Build 
+**— Install dependencies**
+1. Make sure you have Python Installed. 
+2. Install Frida-Tools 13.6.1
+```
+pip install frida-tools==13.6.1
+```
+That should install frida 16.7.19 too <br>
+
 **— Build script**
 1. Clone the repository:
 ```
@@ -74,16 +82,25 @@ npm install
 ```
 npm run build
 ```
-Script will be saved at the path dist/agent.js <br> <br>
-**— Build APK <br>**
-1. Download FallGuys Latest APK
+Script will be saved at the path dist/agent.js <br>
+
+**— Build APK**
+1. Download Fall Guys Latest APK
 2. Add permission to AndroidManifest.xml
 ```
 <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 ```
-3. Inject frida-gadget. I'm using [that](https://github.com/commonuserlol/fgi)
+3. Download frida-gadget 16.7.19 for [arm](https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm.so.xz) and [arm64](https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm64.so.xz)
+4. Install [frida-gadget injector](https://github.com/commonuserlol/fgi) (I'm using that, but you can use any other to inject gadget)
+5. Extract .so files and copy downloaded frida gadgets to C:\Users\YOURUSER\.fgi\arm.so and C:\Users\YOURUSER\.fgi\arm64.so (rename it to arm.so and arm64.so as well)
+6. Open terminal and execute command 
+###### short command:
 ```
-fgi -i <yourfallguys.apk> -t script -l ./dist/agent.js
+fgi -i <yourpathtofallguys.apk> -t script -l ./dist/agent.js --offline-mode
+```
+###### full command:
+```
+fgi -i <yourfallguys.apk> -t script -l ./dist/agent.js -n libModMenu.so -s libModMenu.s.so --offline-mode
 ```
 Apk will be saved at the path ./yourfallguys.patched.apk 
 
