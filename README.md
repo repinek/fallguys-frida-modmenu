@@ -6,19 +6,21 @@
 # Fall Guys Mod Menu
 Android Fall Guys mod menu using [Frida](https://frida.re/) and [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge) <br>
 
-[Cheating Discord Server](https://discord.gg/cNFJ73P6p3)
+[Cheating Discord Server](https://discord.gg/cNFJ73P6p3) 
 
-## Screenshots
+## 📸 Screenshots
 ![Demo](https://github.com/user-attachments/assets/57b9a4cd-3a62-47b7-8a3e-17dc801ea0b3)
 
 <img src="https://github.com/user-attachments/assets/59ddff53-6dc1-49cc-8396-4243bb3c096a" width="500" height="224"/>
 <img src="https://github.com/user-attachments/assets/f2164534-1700-4ba6-b681-576dca29583d" width="500" height="224"/>
 
-## Features 
+## ✨ Features
 
 ### Movement
 - 360 Dives
 - Air Jump
+- Freeze Player
+- Stop sending Fall Guy State (packets)
 - Change Speed
 - Change Vertical Velocity / No Velocity / Negative Velocity
 - Change Jump and Dive Strength
@@ -34,7 +36,7 @@ Android Fall Guys mod menu using [Frida](https://frida.re/) and [frida-il2cpp-br
 
 ### Other
 - View Names Shortcut
-- Display UI
+- Toggle Display UI
 - Change FOV
 - Display FGDebug
   - Shows FPS (min/max/avg/current), Time, Ping, Dropped Packets
@@ -52,14 +54,24 @@ Android Fall Guys mod menu using [Frida](https://frida.re/) and [frida-il2cpp-br
 - Anti-AFK
 - Bypass permanent ban (not temporary)
   
-## Installation
-Just download and install the .apk from [Releases](https://github.com/repinek/fallguys-frida-modmenu/releases/latest)
+## 📦 Installation
+Just download and install the .apk from [Releases](https://github.com/repinek/fallguys-frida-modmenu/releases/latest) <br>
+Not working? Look [🛠️ Troubleshooting](#troubleshooting)
+
 > If you don't want to wait for game resources to download, copy the .obb file from: <br>
 > Android/obb/com.Mediatonic.FallGuys_client/ to <br>
 > Android/obb/com.Mediatonic.FallGuys_client.modmenu/, then rename it by adding .modmenu before .obb <br>
 > Final file name example: main.XXXX.com.mediatonic.FallGuys_client.modmenu.obb <br>
 
-## Build 
+## 🛠️ Troubleshooting
+> This project is created only for educational and entertainment purposes. I won't be providing support.
+
+In The Main Menu it will ask for permission to display over other apps, If it doesn’t ask for it, grant it manually. <br><br>
+**HyperOS, ColorOS, OneUI, HarmonyOS**, and other OEM ROMs may not work properly or at all. <br>
+**It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).** <br>
+**EMULATORS ARE NOT SUPPORTED!!** <br>
+
+## 🏗️ Build
 **— Install dependencies**
 1. Make sure you have Python Installed. 
 2. Install Frida-Tools 13.6.1
@@ -104,17 +116,22 @@ fgi -i <yourfallguys.apk> -t script -l ./dist/agent.js -n libModMenu.so -s libMo
 ```
 Apk will be saved at the path ./yourfallguys.patched.apk 
 
-## Troubleshooting  
-> This project is created only for educational and entertainment purposes. I won't be providing support.
+## 🤝 Contribution
+Pull requests are welcome. Got ideas or questions? Join our [Discord!](https://discord.gg/cNFJ73P6p3) <br>
+Short instruction to contribute: 
+1. Follow the instructions in [🏗️ Build](#build) up to the step with injecting frida-gadget
+2. Use frida-server (if you have root) or run this command to inject frida-gadget in your apk in listen mode:
+```
+fgi -i <yourfallguys.apk>
+```
+3. Install and launch the apk, then inject the script (this command works only if you have frida-gadget, use other if you use frida-server):
+```
+npm run spawn
+```
 
-In The Main Menu it will ask for permission to display over other apps, If it doesn’t ask for it, grant it manually. <br><br>
-**HyperOS, ColorOS, OneUI, HarmonyOS**, and other OEM ROMs may not work properly or at all. <br>
-**It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).** <br>
-**EMULATORS ARE NOT SUPPORTED!!** <br>
-
-## Special Thanks
+## 🙏 Special Thanks
 Obed Guys Team - Some features powered by Obed Guys Team <br>
-[FloyzI](https://github.com/FloyzI) - for how the game works <br>
-[commonuserlol](https://github.com/commonuserlol) - for help with code and [menu](https://github.com/commonuserlol/frida-java-menu) <br>
-[Dynasty-Dev](https://github.com/Dynasty-Dev) - for testing and Contribution <br>
-[igamegod](https://github.com/igamegod) - for help with some functions
+[FloyzI](https://github.com/FloyzI) - For how the game works, help with some features<br>
+[commonuserlol](https://github.com/commonuserlol) - For help with code and [menu](https://github.com/commonuserlol/frida-java-menu) <br>
+[Dynasty-Dev](https://github.com/Dynasty-Dev) - For testing and contribution <br>
+[igamegod](https://github.com/igamegod) - For help with some features
