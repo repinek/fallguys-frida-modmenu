@@ -56,7 +56,7 @@ Android Fall Guys mod menu using [Frida](https://frida.re/) and [frida-il2cpp-br
   
 ## 📦 Installation
 Just download and install the .apk from [Releases](https://github.com/repinek/fallguys-frida-modmenu/releases/latest) <br>
-Not working? Look [🛠️ Troubleshooting](#troubleshooting)
+Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 
 > If you don't want to wait for game resources to download, copy the .obb file from: <br>
 > Android/obb/com.Mediatonic.FallGuys_client/ to <br>
@@ -119,7 +119,7 @@ Apk will be saved at the path ./yourfallguys.patched.apk
 ## 🤝 Contribution
 Pull requests are welcome. Got ideas or questions? Join our [Discord!](https://discord.gg/cNFJ73P6p3) <br>
 Short instruction to contribute: 
-1. Follow the instructions in [🏗️ Build](#build) up to the step with injecting frida-gadget
+1. Follow the instructions in [🏗️ Build](#%EF%B8%8F-build) up to the step with injecting frida-gadget
 2. Use frida-server (if you have root) or run this command to inject frida-gadget in your apk in listen mode:
 ```
 fgi -i <yourfallguys.apk>
