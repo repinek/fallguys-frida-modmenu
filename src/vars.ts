@@ -2,7 +2,7 @@ export namespace Config {
     
     // TODO: 
     // fix follow the leader teleport (add +y)
-    export const version = "1.104";
+    export const version = "2.00";
 
     export namespace Toggles {
         // === Movement === 

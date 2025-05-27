@@ -122,7 +122,7 @@ Short instruction to contribute:
 1. Follow the instructions in [🏗️ Build](#%EF%B8%8F-build) up to the step with injecting frida-gadget
 2. Use frida-server (if you have root) or run this command to inject frida-gadget in your apk in listen mode:
 ```
-fgi -i <yourfallguys.apk>
+fgi -i <yourfallguys.apk> --offline-mode
 ```
 3. Install and launch the apk, then inject the script (this command works only if you have frida-gadget, use other if you use frida-server):
 ```
