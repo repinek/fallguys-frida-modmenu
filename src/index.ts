@@ -238,7 +238,7 @@ function main() {
 
     SendMessage_method.implementation = function (bypassNetworkLOD) {
         if (Config.Toggles.enableDontSendFallGuyState) {
-            return false;
+            return;
         }
         return this.method("SendMessage", 1).invoke(bypassNetworkLOD);
     };
@@ -645,6 +645,10 @@ function main() {
             Menu.add(
                 layout.toggle("Don't send Fall Guy state", (state: boolean) => {
                     Config.Toggles.enableDontSendFallGuyState = state;
+                    if (state)
+                    {
+                        Menu.toast("You enable Don't send Fall Guy state — You can't qualify or respawn.", 0)
+                    }
                     console.log(`enableDontSendFallGuyState: ${Config.Toggles.enableDontSendFallGuyState}`);
                 })
             );
@@ -808,7 +812,7 @@ function main() {
             Menu.add(links);
 
             Menu.add(layout.button("Github Repository (Leave a star!)", () => openURL("https://github.com/repinek/fallguys-frida-modmenu")));
-            Menu.add(layout.button("Cheating Discord Server", () => openURL("https://discord.gg/cNFJ73P6p3")));
+            Menu.add(layout.button("Discord Server (Mod Menu for other platforms too)", () => openURL("https://discord.gg/cNFJ73P6p3")));
             Menu.add(layout.button("Creator's Twitter", () => openURL("https://x.com/repinek840")));
 
             // === Build Info Tab ===

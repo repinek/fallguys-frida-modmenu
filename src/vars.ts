@@ -2,7 +2,7 @@ export namespace Config {
     
     // TODO: 
     // fix follow the leader teleport (add +y)
-    export const version = "2.00";
+    export const version = "2.02";
 
     export namespace Toggles {
         // === Movement === 
@@ -42,9 +42,9 @@ export namespace Config {
         export let carryMaxSpeed = 8;
         export let grabbingMaxSpeed = 5;
         export let maxGravityVelocity = 40;
-        export let diveForce = 16.5;
-        export let airDiveForce = 7;
         export let jumpForce = 17.5;
+        export let airDiveForce = 7;
+        export let diveForce = 16.5;
     }
 
     export namespace BuildInfo {

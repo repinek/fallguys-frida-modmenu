@@ -6,7 +6,8 @@
 # Fall Guys Mod Menu
 Android Fall Guys mod menu using [Frida](https://frida.re/) and [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge) <br>
 
-[Cheating Discord Server](https://discord.gg/cNFJ73P6p3) 
+For help, updates announcements, and additional platforms support, join our community in Discord:
+[Make FG Great Again Discord Server](https://discord.gg/cNFJ73P6p3) 
 
 ## 📸 Screenshots
 ![Demo](https://github.com/user-attachments/assets/57b9a4cd-3a62-47b7-8a3e-17dc801ea0b3)
