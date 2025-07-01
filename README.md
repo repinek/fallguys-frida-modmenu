@@ -105,7 +105,7 @@ Script will be saved at the path dist/agent.js <br>
 ```
 3. Download frida-gadget 16.7.19 for [arm](https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm.so.xz) and [arm64](https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm64.so.xz)
 4. Install [frida-gadget injector](https://github.com/commonuserlol/fgi) (I'm using that, but you can use any other to inject gadget)
-5. Extract .so files and copy downloaded frida gadgets to C:\Users\YOURUSER\.fgi\arm.so and C:\Users\YOURUSER\.fgi\arm64.so (rename it to arm.so and arm64.so as well)
+5. Extract .so files and copy downloaded frida gadgets to C:\Users\YOURUSER\\.fgi\arm.so and C:\Users\YOURUSER\\.fgi\arm64.so (rename it to arm.so and arm64.so as well)
 6. Open terminal and execute command 
 ###### short command:
 ```
