@@ -1,8 +1,8 @@
 import "frida-il2cpp-bridge";
 import "frida-java-menu";
 import { obsidianConfig } from "./menuConfig.js";
-import { openURL, copyToClipboard } from "./utils.js";
-import { Config } from "./vars.js";
+import { openURL, copyToClipboard, httpGet } from "./utils.js";
+import { Config } from "./config.js";
 
 function main() {
     // === Assemblies === 
@@ -27,6 +27,7 @@ function main() {
     const ClientGameManager = MTFGClient.class("FGClient.ClientGameManager");
     const AFKManager = MTFGClient.class("FGClient.AFKManager");
     const FNMMSClientRemoteService = MTFGClient.class("FGClient.FNMMSClientRemoteService");
+    const CatapultServicesManager = MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager"); 
 
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const FallGuysCharacterController = TheMultiplayerGuys.class("FallGuysCharacterController");
@@ -47,6 +48,8 @@ function main() {
     const LevelEditorTriggerZoneActiveBase = WushuLevelEditorRuntime.class("LevelEditorTriggerZoneActiveBase"); // trigger zone creative
 
     // === Methods === 
+    const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
+
     const set_fieldOfView_method = CCamera.method("set_fieldOfView", 1);
     const BuildInfo_OnEnable_method = BuildInfo.method("OnEnable");
     const get_TargetFrameRate_method = GraphicsSettings.method("get_TargetFrameRate");
@@ -68,7 +71,19 @@ function main() {
     const CanJump_method = MotorFunctionJump.method<boolean>("CanJump");
     const SendMessage_method = MPGNetMotorTasks.method("SendMessage", 1);
 
-    console.log("Loaded il2cpp, assemblies, classes and method pointers")
+    console.log("Loaded il2cpp, assemblies, classes and method pointers.")
+
+    // wip commit
+    let loginSpoofVars = null;
+    httpGet(Config.VERSION_URL, (response) => {
+        try {
+            loginSpoofVars = JSON.parse(response);
+            console.log("Fetched actual signature and client version:", response);
+        } catch (e) {
+            console.log("error:", e);
+            Menu.toast("Actual signature can't be fetched, spoof won't be work", 0)
+        }
+    });
 
     // === Cache === 
     let FallGuysCharacterController_Instance: Il2Cpp.Object; 
@@ -81,7 +96,7 @@ function main() {
     let Camera_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in set_fieldOfView
     let UICanvas_Instance: Il2Cpp.Object;
 
-    let reachedMainMenu = false;
+    let reachedMainMenu = false; // variable naming not standardized, but I'm to lazy for refactoring for this project, sorry! I hate it so much
     let current_SceneName;
     let showPlayerNames_state: boolean;
     let lastTeleportTime = 0;
@@ -91,6 +106,52 @@ function main() {
 
     // === Hooks ===
 
+    // === Helpers === 
+    const findObjectsOfTypeAll = (klass: Il2Cpp.Class) => {
+    return Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
+    };
+
+    const teleportTo = (target: Il2Cpp.Object) => {
+    const ObjectVector3Pos = target
+        .method<Il2Cpp.Object>("get_transform")
+        .invoke()
+        .method<Il2Cpp.Object>("get_position")
+        .invoke();
+
+    FallGuysCharacterController_Instance
+        .method<Il2Cpp.Object>("get_transform")
+        .invoke()
+        .method<Il2Cpp.Object>("set_position")
+        .invoke(ObjectVector3Pos);
+    };
+
+    // === Spoofs ===
+
+    BuildCatapultConfig_method.implementation = function (): Il2Cpp.Object {
+        console.log("BuildCatapultConfig Called!");
+
+        if (Config.use_spoof) {
+            const NewConfig = this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // create new config
+
+            Config.BuildInfo.original_signature = NewConfig.field<Il2Cpp.String>("ClientVersionSignature").value.content!;
+            Config.BuildInfo.using_signature = loginSpoofVars!.signature;
+
+            NewConfig.field("Platform").value = Il2Cpp.string(Config.BuildInfo.current_platform);
+            NewConfig.field("ClientVersion").value = Il2Cpp.string(loginSpoofVars!.client_version);
+            NewConfig.field("ClientVersionSignature").value = Il2Cpp.string(loginSpoofVars!.signature);
+    
+            console.log("Modified Config Platform:", NewConfig.field("Platform").value);
+            console.log("Modified Config ClientVersion:", NewConfig.field("ClientVersion").value);	
+            console.log("Modified config ClientVersionSignature:", NewConfig.field("ClientVersionSignature").value);
+
+            console.log("Modified some vars while login...")
+            return NewConfig; 
+        } else {
+            return this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // without any changes
+        }
+    };
+    
+    
     // Bypass permanent ban
     // you can't bypass a temporary ban, but you can bypass a permanent one, lmao
     CheckAntiCheatClientServiceForError_method.implementation = function () {
@@ -119,7 +180,7 @@ function main() {
     // Graphics 
     set_fieldOfView_method.implementation = function (value) {
         Camera_Instance = this;
-        if (Config.Toggles.enableCustomFOV) {
+        if (Config.Toggles.toggleCustomFov) {
             value = Config.CustomValues.FOV;
         } 
         return this.method("set_fieldOfView", 1).invoke(value);
@@ -176,13 +237,13 @@ function main() {
             Menu.toast("Showing menu", 0);
             /*
             sooo, if you load all these assemblies before the menu appears, the game will freeze when entering the main menu. 
-            probably, the shitcode from the menu is affecting this, idk.
+            probably, shitcode from menu is a reason, idk.
 
             you can load the menu here, in this function, and it will wait another 2 seconds in the initMenu function before showing it (bad, but working (not always)), 
             */
             Menu.waitForInit(initMenu);
             reachedMainMenu = true;
-            if (Config.Toggles.enableFGDebug) {
+            if (Config.Toggles.toggleFGDebug) {
                 FGDebug.enable();
             }
         }
@@ -201,7 +262,7 @@ function main() {
         current_SceneName = Scene_Instance.method<Il2Cpp.String>("get_name").invoke().content; // it's better to check by SceneName, instead round id (and easier lol)
         console.log(current_SceneName);
 
-        if (Config.Toggles.enableHideDoors) {
+        if (Config.Toggles.toggleHideDoors) {
             const manipulateObjects = (
                 type: Il2Cpp.Class, // class of object
                 field: string, // getter method name like get_IsFakeDoor 
@@ -237,7 +298,7 @@ function main() {
     };
 
     SendMessage_method.implementation = function (bypassNetworkLOD) {
-        if (Config.Toggles.enableDontSendFallGuyState) {
+        if (Config.Toggles.toggleDontSendFallGuyState) {
             return;
         }
         return this.method("SendMessage", 1).invoke(bypassNetworkLOD);
@@ -247,7 +308,7 @@ function main() {
     ProcessMessageReceived_method.implementation = function (jsonMessage: Il2Cpp.String) {
         console.log("ProcessMessageReceived called!");
 
-        if (Config.Toggles.enableShowQueuedPlayers) {
+        if (Config.Toggles.toggleShowQueuedPlayers) {
             console.log(jsonMessage.content);
             const json = JSON.parse(jsonMessage.content!); // .content because it's Il2cpp.String
             
@@ -280,59 +341,40 @@ function main() {
         CharacterControllerData_Instance = character.method("get_Data").invoke(); // get Data instance
         JumpMotorFunction_Instance = character.method("get_JumpMotorFunction").invoke(); // get JumpMotorFunction 
     
-        CharacterControllerData_Instance.field("divePlayerSensitivity").value = Config.Toggles.enable360Dives ? 14888 : Config.DefaultValues.divePlayerSensitivity;
+        CharacterControllerData_Instance.field("divePlayerSensitivity").value = Config.Toggles.toggle360Dives ? 14888 : Config.DefaultValues.divePlayerSensitivity;
 
-        CharacterControllerData_Instance.field("normalMaxSpeed").value = Config.Toggles.enableCustomSpeed ? Config.CustomValues.normalMaxSpeed : Config.DefaultValues.normalMaxSpeed;
-        CharacterControllerData_Instance.field("carryMaxSpeed").value = Config.Toggles.enableCustomSpeed ? Config.CustomValues.normalMaxSpeed : Config.DefaultValues.carryMaxSpeed;
-        CharacterControllerData_Instance.field("grabbingMaxSpeed").value = Config.Toggles.enableCustomSpeed ? Config.CustomValues.normalMaxSpeed : Config.DefaultValues.grabbingMaxSpeed;
+        CharacterControllerData_Instance.field("normalMaxSpeed").value = Config.Toggles.toggleCustomSpeed ? Config.CustomValues.normalMaxSpeed : Config.DefaultValues.normalMaxSpeed;
+        CharacterControllerData_Instance.field("carryMaxSpeed").value = Config.Toggles.toggleCustomSpeed ? Config.CustomValues.normalMaxSpeed : Config.DefaultValues.carryMaxSpeed;
+        CharacterControllerData_Instance.field("grabbingMaxSpeed").value = Config.Toggles.toggleCustomSpeed ? Config.CustomValues.normalMaxSpeed : Config.DefaultValues.grabbingMaxSpeed;
 
-        CharacterControllerData_Instance.field("maxGravityVelocity").value = Config.Toggles.enableCustomVelocity
-            ? Config.Toggles.enableNoVelocity 
+        CharacterControllerData_Instance.field("maxGravityVelocity").value = Config.Toggles.toggleCustomVelocity
+            ? Config.Toggles.toggleNoVelocity 
                 ? 0 // if enable no velocity
-                : Config.Toggles.enableNegativeVelocity
+                : Config.Toggles.toggleNegativeVelocity
                   ? -Config.CustomValues.maxGravityVelocity // if enable negative velocity
                   : Config.CustomValues.maxGravityVelocity
             : Config.DefaultValues.maxGravityVelocity;
         
-        CharacterControllerData_Instance.field("diveForce").value = Config.Toggles.enableCustomDiveForce ? Config.CustomValues.diveForce : Config.DefaultValues.diveForce;
-        CharacterControllerData_Instance.field("airDiveForce").value = Config.Toggles.enableCustomDiveForce ? Config.CustomValues.diveForce : Config.DefaultValues.airDiveForce;
+        CharacterControllerData_Instance.field("diveForce").value = Config.Toggles.toggleCustomDiveForce ? Config.CustomValues.diveForce : Config.DefaultValues.diveForce;
+        CharacterControllerData_Instance.field("airDiveForce").value = Config.Toggles.toggleCustomDiveForce ? Config.CustomValues.diveForce : Config.DefaultValues.airDiveForce;
 
         const jumpForce = JumpMotorFunction_Instance.field<Il2Cpp.Object>("_jumpForce").value;
-        jumpForce.field("y").value = Config.Toggles.enableCustomJumpForce ? Config.CustomValues.jumpForce : Config.DefaultValues.jumpForce;
+        jumpForce.field("y").value = Config.Toggles.toggleCustomJumpForce ? Config.CustomValues.jumpForce : Config.DefaultValues.jumpForce;
     
         return true;
     };
 
     CanJump_method.implementation = function () {
-        if (Config.Toggles.enableAirJump) {
+        if (Config.Toggles.toggleAirJump) {
             return true;
         }
         return this.method<boolean>("CanJump").invoke();
     };
 
-    // === Helpers === 
-    const findObjectsOfTypeAll = (klass: Il2Cpp.Class) => {
-    return Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
-    };
-
-    const teleportTo = (target: Il2Cpp.Object) => {
-    const ObjectVector3Pos = target
-        .method<Il2Cpp.Object>("get_transform")
-        .invoke()
-        .method<Il2Cpp.Object>("get_position")
-        .invoke();
-
-    FallGuysCharacterController_Instance
-        .method<Il2Cpp.Object>("get_transform")
-        .invoke()
-        .method<Il2Cpp.Object>("set_position")
-        .invoke(ObjectVector3Pos);
-    };
-
     // === Functions === 
     const FGDebug = {
         enable() {
-            Config.Toggles.enableFGDebug = true;
+            Config.Toggles.toggleFGDebug = true;
 
             if (!reachedMainMenu) {
                 return; // it will enable after hook onMainMenuDisplayed
@@ -356,7 +398,7 @@ function main() {
             }
         },
         disable() {
-            Config.Toggles.enableFGDebug = false;
+            Config.Toggles.toggleFGDebug = false;
             FGDebug_Instance = findObjectsOfTypeAll(DebugClass).get(0);
             if (FGDebug_Instance) {
                 const gameObject = FGDebug_Instance.method<Il2Cpp.Object>("get_gameObject").invoke();
@@ -377,6 +419,13 @@ function main() {
             if (UICanvas_Instance) {
                 UICanvas_Instance.method("SetEnabled").invoke(false);
             }
+        }
+    };
+
+    const changeFov = (value: number) => {
+        if (Camera_Instance) {
+            Config.CustomValues.FOV = value;
+            Camera_Instance.method("set_fieldOfView", 1).invoke(value);
         }
     };
 
@@ -614,8 +663,8 @@ function main() {
     const initMenu = () => {
         try {
             const layout = new Menu.ObsidianLayout(obsidianConfig);
-            const composer = new Menu.Composer("Fall Guys Mod Menu", "IF YOU BOUGHT IT YOU WERE SCAMMED", layout);
-            composer.icon("https://floyzi.github.io/images/obed-guys-present.png", "Web");
+            const composer = new Menu.Composer("Fall Guys mod menu", "IF YOU BOUGHT IT YOU WERE SCAMMED", layout);
+            composer.icon(Config.ICON_URL, "Web");
 
             // === Movement Tab === 
             const movement = layout.textView("<b>--- Movement ---</b>");
@@ -624,15 +673,13 @@ function main() {
 
             Menu.add(
                 layout.toggle("360 Dives", (state: boolean) => {
-                    Config.Toggles.enable360Dives = state;
-                    console.log(`enable360Dives: ${Config.Toggles.enable360Dives}`);
+                    Config.Toggles.toggle360Dives = state;
                 })
             );
 
             Menu.add(
                 layout.toggle("Air Jump", (state: boolean) => {
-                    Config.Toggles.enableAirJump = state;
-                    console.log(`enableAirJump: ${Config.Toggles.enableAirJump}`);
+                    Config.Toggles.toggleAirJump = state;
                 })
             );
 
@@ -644,82 +691,69 @@ function main() {
 
             Menu.add(
                 layout.toggle("Don't send Fall Guy state", (state: boolean) => {
-                    Config.Toggles.enableDontSendFallGuyState = state;
-                    if (state)
-                    {
-                        Menu.toast("You enable Don't send Fall Guy state — You can't qualify or respawn.", 0)
-                    }
-                    console.log(`enableDontSendFallGuyState: ${Config.Toggles.enableDontSendFallGuyState}`);
+                    Config.Toggles.toggleDontSendFallGuyState = state;
                 })
             );
+            
+            Menu.add(layout.textView("If you're using Don't send Fall Guy state — You can't qualify, respawn, grabbing. For other playes you will be frozen"));
 
             Menu.add(
                 layout.toggle("Enable Custom Speed", (state: boolean) => {
-                    Config.Toggles.enableCustomSpeed = state;
-                    console.log(`enableCustomSpeed: ${Config.Toggles.enableCustomSpeed}`);
+                    Config.Toggles.toggleCustomSpeed = state;
                 })
             );
 
             Menu.add(
                 layout.seekbar("Custom Speed: {0} / 100", 100, 1, (value: number) => {
                     Config.CustomValues.normalMaxSpeed = value;
-                    console.log(`normalMaxSpeed: ${Config.CustomValues.normalMaxSpeed}`);
                 })
             ); 
 
             Menu.add(
                 layout.toggle("Enable Custom Velocity", (state: boolean) => {
-                    Config.Toggles.enableCustomVelocity = state;
-                    console.log(`enableCustomVelocity: ${Config.Toggles.enableCustomVelocity}`);
+                    Config.Toggles.toggleCustomVelocity = state;
                 })
             );
 
             Menu.add(
                 layout.seekbar("Vertical Gravity Velocity: {0} / 100", 100, 0, (value: number) => {
                     Config.CustomValues.maxGravityVelocity = value;
-                    console.log(`maxGravityVelocity: ${Config.CustomValues.maxGravityVelocity}`);
                 })
             );
 
             Menu.add(
                 layout.toggle("Negative Velocity", (state: boolean) => {
-                    Config.Toggles.enableNegativeVelocity = state;
-                    console.log(`enableNegativeVelocity: ${Config.Toggles.enableNegativeVelocity}`);
+                    Config.Toggles.toggleNegativeVelocity = state;
                 })
             );
 
             Menu.add(
                 layout.toggle("No Vertical Velocity", (state: boolean) => {
-                    Config.Toggles.enableNoVelocity = state;
-                    console.log(`enableNoVelocity: ${Config.Toggles.enableNoVelocity}`);
+                    Config.Toggles.toggleNoVelocity = state;
                 })
             );
 
             Menu.add(
                 layout.toggle("Enable Custom Jump Strength", (state: boolean) => {
-                    Config.Toggles.enableCustomJumpForce = state;
-                    console.log(`enableCustomJumpForce: ${Config.Toggles.enableCustomJumpForce}`);
+                    Config.Toggles.toggleCustomJumpForce = state;
                 })
             );
 
             Menu.add(
                 layout.seekbar("Jump Strength: {0} / 100", 100, 1, (value: number) => {
                     Config.CustomValues.jumpForce = value;
-                    console.log(`jumpForce: ${Config.CustomValues.jumpForce}`);
                 })
             );
 
             Menu.add(
                 layout.toggle("Enable Custom Dive Strength", (state: boolean) => {
-                    Config.Toggles.enableCustomDiveForce = state;
-                    console.log(`enableCustomDiveForce: ${Config.Toggles.enableCustomDiveForce}`);
+                    Config.Toggles.toggleCustomDiveForce = state;
                 })
             );
 
             Menu.add(
                 layout.seekbar("Dive Strength: {0} / 100", 100, 1, (value: number) => {
                     Config.CustomValues.diveForce = value;
-                    console.log(`diveForce: ${Config.CustomValues.diveForce}`);
                 })
             );
 
@@ -730,8 +764,7 @@ function main() {
 
             Menu.add(
                 layout.toggle("Hide Real Doors", (state: boolean) => {
-                    Config.Toggles.enableHideDoors = state;
-                    console.log(`enableHideDoors: ${Config.Toggles.enableHideDoors}`);
+                    Config.Toggles.toggleHideDoors = state;
                 })
             );
 
@@ -759,19 +792,14 @@ function main() {
 
             Menu.add(
                 layout.toggle("Enable Custom FOV", (state: boolean) => {
-                    Config.Toggles.enableCustomFOV = state;
-                    console.log(`enableCustomFOV: ${Config.Toggles.enableCustomFOV}`);
+                    Config.Toggles.toggleCustomFov = state;
                 })
             );
 
             Menu.add(
                 layout.seekbar("Custom FOV: {0}", 180, 1, (value: number) => {
-                    if (Config.Toggles.enableCustomFOV) {
-                        if (Camera_Instance) {
-                            Config.CustomValues.FOV = value;
-                            Camera_Instance.method("set_fieldOfView", 1).invoke(value);
-                            console.log(`customFOV: ${Config.CustomValues.FOV}`);
-                        };
+                    if (Config.Toggles.toggleCustomFov) {
+                        changeFov(value);
                     };
                 })
             );
@@ -790,8 +818,7 @@ function main() {
 
             Menu.add(
                 layout.toggle("Show Number of Queued Players", (state: boolean) => {
-                    Config.Toggles.enableShowQueuedPlayers = state;
-                    console.log(`enableQueuedPlayers: ${Config.Toggles.enableShowQueuedPlayers}`);
+                    Config.Toggles.toggleShowQueuedPlayers = state;
                 })
             );
 
@@ -799,7 +826,6 @@ function main() {
                 layout.seekbar("Custom Resolution (Applied in Next Round): {0}% / 100%", 100, 1, (value: number) => {
                     Config.CustomValues.ResolutionScale = value / 100;
                     changeResolutionScale(); 
-                    console.log(`customResolutionScale: ${Config.CustomValues.ResolutionScale}`);
                 })
             );
 
@@ -820,20 +846,23 @@ function main() {
             info.gravity = Menu.Api.CENTER;
             Menu.add(info);
             
-            Menu.add(layout.textView(`Version Mod Menu: ${Config.version}`));
-            Menu.add(layout.textView(`Game Version: ${Config.BuildInfo.appVersion}`));
-            Menu.add(layout.textView(`Unity Version: ${Config.BuildInfo.unityVersion}`))
-            Menu.add(layout.textView(`Game Build Number: ${Config.BuildInfo.buildNumber}`));
-            Menu.add(layout.textView(`Game Commit: ${Config.BuildInfo.commit}`));
-            Menu.add(layout.textView(`Game build Date: ${Config.BuildInfo.buildDate}`));
+            Menu.add(layout.textView(`Version mod menu: ${Config.VERSION}`));
+            Menu.add(layout.textView(`Game version: ${Config.BuildInfo.appVersion}`));
+            Menu.add(layout.textView(`Original signature: ${Config.BuildInfo.original_signature}`));
+            Menu.add(layout.textView(`Using signature: ${Config.BuildInfo.using_signature}`));
+            Menu.add(layout.textView(`Unity version: ${Config.BuildInfo.unityVersion}`))
+            Menu.add(layout.textView(`Game build number: ${Config.BuildInfo.buildNumber}`));
+            Menu.add(layout.textView(`Game commit: ${Config.BuildInfo.commit}`));
+            Menu.add(layout.textView(`Game build date: ${Config.BuildInfo.buildDate}`));
             Menu.add(layout.textView(`EOS SDK: ${Config.BuildInfo.EOSVersion}`));
-            Menu.add(layout.textView(`Package Name: ${Il2Cpp.application.identifier}`));
+
+            Menu.add(layout.textView(`Package name: ${Il2Cpp.application.identifier}`));
 
             const author = layout.textView("Created by repinek");
             author.gravity = Menu.Api.CENTER;
             Menu.add(author);
             
-            const secondAuthor = layout.textView("Special Thanks to Floyzi102");
+            const secondAuthor = layout.textView("Special thanks to Floyzi102");
             secondAuthor.gravity = Menu.Api.CENTER;
             Menu.add(secondAuthor);
 
