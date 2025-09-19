@@ -3,6 +3,7 @@ import "frida-java-menu";
 import { obsidianConfig } from "./menuConfig.js";
 import { openURL, copyToClipboard, httpGet } from "./utils.js";
 import { Config } from "./config.js";
+import en from "./localization/en.json"; // floyzi plz refactore it 
 
 function main() {
     // === Assemblies === 
@@ -96,7 +97,7 @@ function main() {
     let Camera_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in set_fieldOfView
     let UICanvas_Instance: Il2Cpp.Object;
 
-    let reachedMainMenu = false; // variable naming not standardized, but I'm to lazy for refactoring for this project, sorry! I hate it so much
+    let reachedMainMenu = false; // variable naming not standardized, but I'm to lazy for refactoring for this project, sorry! I hate it so much. upd: i lied prob
     let current_SceneName;
     let showPlayerNames_state: boolean;
     let lastTeleportTime = 0;
@@ -128,8 +129,6 @@ function main() {
     // === Spoofs ===
 
     BuildCatapultConfig_method.implementation = function (): Il2Cpp.Object {
-        console.log("BuildCatapultConfig Called!");
-
         if (Config.use_spoof) {
             const NewConfig = this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // create new config
 
@@ -155,12 +154,10 @@ function main() {
     // Bypass permanent ban
     // you can't bypass a temporary ban, but you can bypass a permanent one, lmao
     CheckAntiCheatClientServiceForError_method.implementation = function () {
-        console.log("CheckAntiCheatClientServiceForError Called!"); 
         return false; // idk how it works, but it works (you can't enter the match without this hook)
     };
     
     ShowAntiCheatPopup_method.implementation = function (errorMessage, shouldQuit) { // AntiCheatError errorMessage, bool shouldQuit
-        console.log("ShowAntiCheatPopup Called with args:", errorMessage, shouldQuit); 
         // Called by: bool FGClient::MainMenuViewModel::_CheckRestrictedGameAccess_d__69::MoveNext
 
         //@ts-ignore
@@ -187,19 +184,17 @@ function main() {
     };
 
     get_TargetFrameRate_method.implementation = function () {
-        console.log("get_TargetFrameRate Called!");
         return 1488; // fps limit
     };
 
     set_TargetFrameRate_method.implementation = function (fps) {
-        console.log("set_TargetFrameRate Called!");
         return this.method("set_TargetFrameRate", 1).invoke(1488); // fps limit
     };
 
     get_ResolutionScale_method.implementation = function () {
-        console.log("get_ResolutionScale Called!");
         GraphicsSettings_Instance = this; // often gc.choose causes crashes
 
+        // remove, causes bad resolution on some maps
         if (!reachedMainMenu) {
             return this.method("get_ResolutionScale").invoke(); // return value from game config, if the menu is not loaded
         }
@@ -208,8 +203,6 @@ function main() {
     };
 
     set_ResolutionScale_method.implementation = function (scale) {
-        console.log("set_ResolutionScale called!")
-
         if (!reachedMainMenu) {
             return this.method("set_ResolutionScale", 1).invoke(scale); // return value from game config, if the menu is not loaded
         }
@@ -218,7 +211,6 @@ function main() {
     };
 
     SetShowPlayerNamesByDefault_method.implementation = function (value) {
-        console.log("SetShowPlayerNamesByDefault Called!");
         //@ts-ignore idk i can't set value: boolean
         showPlayerNames_state = value;
         return this.method("SetShowPlayerNamesByDefault", 1).invoke(value);
@@ -226,7 +218,6 @@ function main() {
 
     // Some Utils 
     StartAFKManager_method.implementation = function () {
-        console.log("AFKManager Start Called!");
         return; // anti-afk implementation 
     };
 
@@ -260,7 +251,6 @@ function main() {
 
         const Scene_Instance = SceneManager.method<Il2Cpp.Object>("GetActiveScene").invoke();
         current_SceneName = Scene_Instance.method<Il2Cpp.String>("get_name").invoke().content; // it's better to check by SceneName, instead round id (and easier lol)
-        console.log(current_SceneName);
 
         if (Config.Toggles.toggleHideDoors) {
             const manipulateObjects = (
@@ -306,7 +296,6 @@ function main() {
 
     //@ts-ignore, code from wiki snippets btw lol
     ProcessMessageReceived_method.implementation = function (jsonMessage: Il2Cpp.String) {
-        console.log("ProcessMessageReceived called!");
 
         if (Config.Toggles.toggleShowQueuedPlayers) {
             console.log(jsonMessage.content);
@@ -326,9 +315,7 @@ function main() {
         Config.BuildInfo.appVersion = Il2Cpp.application.version!;
         Config.BuildInfo.unityVersion = Il2Cpp.unityVersion;
         Config.BuildInfo.buildNumber = this.field<Il2Cpp.String>("buildNumber").value.content!;
-        Config.BuildInfo.commit = this.field<Il2Cpp.String>("commit").value.content!;
         Config.BuildInfo.buildDate = this.field<Il2Cpp.String>("buildDate").value.content!;
-        Config.BuildInfo.EOSVersion = this.field<Il2Cpp.String>("eosVersion").value.content!;
         // you can also get pewVersion and kittVersion here if you want. also _fullString and _shortString
 
         return this.method("OnEnable").invoke();
@@ -641,14 +628,10 @@ function main() {
     const showTipToePath = () => {
         try {
             const TipToe_PlatformArray = findObjectsOfTypeAll(TipToe_Platform);
-
-            console.log("TipToePlatforms found: ", TipToe_PlatformArray.length);
-            Menu.toast("TipToePlatforms found: ", TipToe_PlatformArray.length);
     
             for (const TipToe of TipToe_PlatformArray) {
                 const TipToeStatus = TipToe.method<boolean>("get_IsFakePlatform").invoke();
                 if (TipToeStatus) { // if fake
-                    console.log("Found FakePlatform, deactivating...")
                     const TipToeObject = TipToe.method<Il2Cpp.Object>("get_gameObject").invoke();
                     TipToeObject.method("SetActive").invoke(false);
                 }
@@ -663,11 +646,11 @@ function main() {
     const initMenu = () => {
         try {
             const layout = new Menu.ObsidianLayout(obsidianConfig);
-            const composer = new Menu.Composer("Fall Guys mod menu", "IF YOU BOUGHT IT YOU WERE SCAMMED", layout);
+            const composer = new Menu.Composer(`${en.info.name}`, `${en.info.attention}`, layout);
             composer.icon(Config.ICON_URL, "Web");
 
             // === Movement Tab === 
-            const movement = layout.textView("<b>--- Movement ---</b>");
+            const movement = layout.textView(`<b>--- ${en.tabs.movement_tab} ---</b>`);
             movement.gravity = Menu.Api.CENTER;
             Menu.add(movement);
 
@@ -758,9 +741,9 @@ function main() {
             );
 
             // === Round Tab === 
-            const round = layout.textView("<b>--- Round ---</b>");
-            round.gravity = Menu.Api.CENTER;
-            Menu.add(round);
+            const round_tab = layout.textView(`<b>--- ${en.tabs.round_tab} ---</b>`);
+            round_tab.gravity = Menu.Api.CENTER;
+            Menu.add(round_tab);
 
             Menu.add(
                 layout.toggle("Hide Real Doors", (state: boolean) => {
@@ -771,7 +754,7 @@ function main() {
             Menu.add(layout.button("Show TipToe Path", showTipToePath));
 
             // === Teleports Tab === 
-            const teleports = layout.textView("<b>--- Teleports ---</b>");
+            const teleports = layout.textView(`<b>--- ${en.tabs.teleports_tab} ---</b>`);
             teleports.gravity = Menu.Api.CENTER;
             Menu.add(teleports);
             
@@ -782,7 +765,7 @@ function main() {
             Menu.add(layout.button("Teleport To Bubble, Active Button, or Score Zone", teleportToScorePoint));
 
             // === Utility Tab === 
-            const utility = layout.textView("<b>--- Utility ---</b>");
+            const utility = layout.textView(`<b>--- ${en.tabs.utility_tab} ---</b>`);
             utility.gravity = Menu.Api.CENTER;
             Menu.add(utility);
 
@@ -833,16 +816,15 @@ function main() {
             Menu.add(layout.button("Show and Copy Server Details", showServerDetails));
 
             // === Links Tab === 
-            const links = layout.textView("<b>--- Links ---</b>");
+            const links = layout.textView(`<b>--- ${en.tabs.credits_tab} ---</b>`);
             links.gravity = Menu.Api.CENTER;
             Menu.add(links);
 
             Menu.add(layout.button("Github Repository (Leave a star!)", () => openURL("https://github.com/repinek/fallguys-frida-modmenu")));
             Menu.add(layout.button("Discord Server (Mod Menu for other platforms too)", () => openURL("https://discord.gg/cNFJ73P6p3")));
-            Menu.add(layout.button("Creator's Twitter", () => openURL("https://x.com/repinek840")));
 
             // === Build Info Tab ===
-            const info = layout.textView("<b>--- Build Info ---</b>");
+            const info = layout.textView(`<b>--- ${en.tabs.build_info_tab} ---</b>`);
             info.gravity = Menu.Api.CENTER;
             Menu.add(info);
             
@@ -852,9 +834,7 @@ function main() {
             Menu.add(layout.textView(`Using signature: ${Config.BuildInfo.using_signature}`));
             Menu.add(layout.textView(`Unity version: ${Config.BuildInfo.unityVersion}`))
             Menu.add(layout.textView(`Game build number: ${Config.BuildInfo.buildNumber}`));
-            Menu.add(layout.textView(`Game commit: ${Config.BuildInfo.commit}`));
             Menu.add(layout.textView(`Game build date: ${Config.BuildInfo.buildDate}`));
-            Menu.add(layout.textView(`EOS SDK: ${Config.BuildInfo.EOSVersion}`));
 
             Menu.add(layout.textView(`Package name: ${Il2Cpp.application.identifier}`));
 

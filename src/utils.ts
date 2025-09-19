@@ -73,3 +73,8 @@ export function httpGet(targetUrl: string, onReceive: (response: string) => void
         return response;
     });
 }
+
+export function load_localization(path_to_file: string)
+{
+    
+}

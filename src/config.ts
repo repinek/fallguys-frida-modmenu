@@ -1,5 +1,4 @@
 export namespace Config {
-    
     // TODO: 
     // fix follow the leader teleport (add +y)
     export const VERSION = "2.02";
@@ -60,8 +59,6 @@ export namespace Config {
         export let current_platform = "android_ega"; // you can change it to other one, like pc_egs, ps5...
         export let unityVersion: string;
         export let buildNumber = "Local build";
-        export let commit = "(no commit info)";
         export let buildDate = "n/a";
-        export let EOSVersion: string; // EOS SDK
     }
 }

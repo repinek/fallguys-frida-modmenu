@@ -1,0 +1,72 @@
+{   
+    "messages": {
+        "permanent_ban": "Your account has permanent ban, but you can still play with mod menu. Enjoy",
+        "not_in_the_game": "You are not in the game!",
+        "server": "Server",
+        "ping": "Ping"
+    },
+    "debug_messages": {
+        "loaded": "Loaded il2cpp, assemblies, classes and method pointers.",
+        "fetched": "Fetched actual signature and client version:", 
+        "not_fetched": "Actual signature can't be fetched, spoof won't be work",
+        "login_spoofed": "Modified signature and client version", 
+        "login_spoofed_with_platform": "Modified signature, client version and platform",
+        "detected_permanent_ban": "Detected permanent ban",
+        "change_resolution": "trying change resolution scale to"
+    },
+    "tabs": {
+        "movement_tab": "Movement",
+        "round_tab": "Round",
+        "teleports_tab": "Teleports",
+        "utility_tab": "Utility",
+        "credits_tab": "Credits",
+        "build_info_tab": "Build Info"
+        
+    },
+    "functions": {
+        "360_dives": "360 Dives",
+        "air_jump": "Air Jump",
+        "freeze_player": "Freeze Player",
+        "dont_send_fallguy_state": "Don't send Fall Guy state",
+        "toggle_custom_speed": "Enable Custom Speed",
+        "custom_speed": "Custom Speed",
+        "toggle_custom_velocity": "Enable Custom Velocity",
+        "vertical_gravity_velocity": "Vertical Gravity Velocity",
+        "negative velocity": "Negative Velocity",
+        "no_vertical_velocity": "No Vertical Velocity",
+        "toggle_custom_jump_strength": "Enable Custom Jump Strength",
+        "jump_strength": "Jump Strength",
+        "toggle_custom_dive_strength": "Enable Custom Dive Strength",
+        "dive_strength": "Dive Strength",
+        "hide_real_doors": "Hide Real Doors",
+        "show_tiptoe_path": "Show TipToe Path",
+        "teleport_to_finish_or_crown": "Teleport To Finish or Crown",
+        "teleport_to_random_player": "Teleport To Random Player",
+        "teleport_to_score": "Teleport To Bubble or Active Button",
+        "toggle_view_names": "Toggle View Names",
+        "toggle_custom_fov": "Enable Custom FOV",
+        "custom_fov": "Custom FOV",
+        "disable_ui": "Disable UI (controls won't be work)",
+        "show_number_of_queued_players": "Show Number of Queued Players",
+        "custom_resolution": "Custom Resolution (Applied in Next Round)",
+        "show_game_details": "Show Game Details",
+        "show_and_copy_details": "Show and Copy Server Details"
+    },
+    "info": {
+        "name": "Fall Guys mod menu",
+        "attention": "IF YOU BOUGHT IT YOU WERE SCAMMED",
+        "author": "Created by repinek",
+        "special_thanks": "Special thanks to Floyzi102",
+        "dont_send_fallguy_state_attention": "If you're using Don't send Fall Guy state — You can't qualify, respawn, grabbing. For other playes you will be frozen",
+        "github_link": "Github Repository (Leave a star!)",
+        "discord_link": "Discord Server",
+        "mod_menu_version": "Mod menu version",
+        "game_version": "Game version",
+        "original_signature": "Original signature",
+        "spoofed_signature": "Spoofed signature",
+        "unity_version": "Unity version",
+        "game_build_number": "Game build number",
+        "game_build_date": "Game build date",
+        "Package name": "Package name"
+    }
+}
