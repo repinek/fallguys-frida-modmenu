@@ -54,10 +54,10 @@
     },
     "info": {
         "name": "Fall Guys mod menu",
-        "attention": "IF YOU BOUGHT IT YOU WERE SCAMMED",
+        "warn": "IF YOU BOUGHT IT YOU WERE SCAMMED",
         "author": "Created by repinek",
         "special_thanks": "Special thanks to Floyzi102",
-        "dont_send_fallguy_state_attention": "If you're using Don't send Fall Guy state — You can't qualify, respawn, grabbing. For other playes you will be frozen",
+        "fg_state_warn": "If you're using Don't send Fall Guy state — You can't qualify, respawn, grabbing. For other playes you will be frozen",
         "github_link": "Github Repository (Leave a star!)",
         "discord_link": "Discord Server",
         "mod_menu_version": "Mod menu version",
@@ -67,6 +67,6 @@
         "unity_version": "Unity version",
         "game_build_number": "Game build number",
         "game_build_date": "Game build date",
-        "Package name": "Package name"
+        "package_name": "Package name"
     }
 }
