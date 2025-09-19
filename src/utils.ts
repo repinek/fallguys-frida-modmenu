@@ -33,7 +33,6 @@ export function copyToClipboard(text: string) {
     });
 }
 
-
 // Thanks a lot: https://github.com/frida/frida/issues/1158#issuecomment-1227967229
 export function httpGet(targetUrl: string, onReceive: (response: string) => void = function(response: string) { /*console.log("response:", response);*/ }) {
     Java.perform(() => {
@@ -72,9 +71,4 @@ export function httpGet(targetUrl: string, onReceive: (response: string) => void
         onReceive(response);
         return response;
     });
-}
-
-export function load_localization(path_to_file: string)
-{
-    
 }

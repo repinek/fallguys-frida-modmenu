@@ -3,7 +3,7 @@ import "frida-java-menu";
 import { obsidianConfig } from "./menuConfig.js";
 import { openURL, copyToClipboard, httpGet } from "./utils.js";
 import { Config } from "./config.js";
-import en from "./localization/en.json"; // floyzi plz refactore it 
+import en from "./localization/en.json";
 
 function main() {
     // === Assemblies === 
@@ -16,7 +16,7 @@ function main() {
     const Resources = CoreModule.class("UnityEngine.Resources");
     const Vector3class = CoreModule.class("UnityEngine.Vector3");
     const SceneManager = CoreModule.class("UnityEngine.SceneManagement.SceneManager");
-    const CCamera = CoreModule.class("UnityEngine.Camera"); 
+    const Camera = CoreModule.class("UnityEngine.Camera"); 
 
     const BuildInfo = TheMultiplayerGuys.class("FG.Common.BuildInfo");
     const GraphicsSettings = MTFGClient.class("FGClient.GraphicsSettings");
@@ -49,42 +49,28 @@ function main() {
     const LevelEditorTriggerZoneActiveBase = WushuLevelEditorRuntime.class("LevelEditorTriggerZoneActiveBase"); // trigger zone creative
 
     // === Methods === 
-    const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
-
-    const set_fieldOfView_method = CCamera.method("set_fieldOfView", 1);
+    const set_fieldOfView_method = Camera.method("set_fieldOfView", 1);
     const BuildInfo_OnEnable_method = BuildInfo.method("OnEnable");
     const get_TargetFrameRate_method = GraphicsSettings.method("get_TargetFrameRate");
     const set_TargetFrameRate_method = GraphicsSettings.method("set_TargetFrameRate", 1);
     const get_ResolutionScale_method = GraphicsSettings.method("get_ResolutionScale");
     const set_ResolutionScale_method = GraphicsSettings.method("set_ResolutionScale", 1);
     const SetShowPlayerNamesByDefault_method = PlayerInfoHUDBase.method("SetShowPlayerNamesByDefault", 1);
-        
     const CheckAntiCheatClientServiceForError_method = MainMenuViewModel.method<boolean>("CheckAntiCheatClientServiceForError"); 
     const ShowAntiCheatPopup_method = MainMenuViewModel.method("ShowAntiCheatPopup", 2);
+    const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
 
+    const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
+    
     const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
 
-    const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
+
     const StartAFKManager_method = AFKManager.method("Start");
     const ProcessMessageReceived_method = FNMMSClientRemoteService.method("ProcessMessageReceived");
 
     const CheckCharacterControllerData_method = CharacterDataMonitor.method("CheckCharacterControllerData", 1); 
     const CanJump_method = MotorFunctionJump.method<boolean>("CanJump");
     const SendMessage_method = MPGNetMotorTasks.method("SendMessage", 1);
-
-    console.log("Loaded il2cpp, assemblies, classes and method pointers.")
-
-    // wip commit
-    let loginSpoofVars = null;
-    httpGet(Config.VERSION_URL, (response) => {
-        try {
-            loginSpoofVars = JSON.parse(response);
-            console.log("Fetched actual signature and client version:", response);
-        } catch (e) {
-            console.log("error:", e);
-            Menu.toast("Actual signature can't be fetched, spoof won't be work", 0)
-        }
-    });
 
     // === Cache === 
     let FallGuysCharacterController_Instance: Il2Cpp.Object; 
@@ -97,23 +83,33 @@ function main() {
     let Camera_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in set_fieldOfView
     let UICanvas_Instance: Il2Cpp.Object;
 
-    let reachedMainMenu = false; // variable naming not standardized, but I'm to lazy for refactoring for this project, sorry! I hate it so much. upd: i lied prob
-    let current_SceneName;
-    let showPlayerNames_state: boolean;
+    let fetchedClientDetails;
+    let reachedMainMenu = false;
+    let currentSceneName;
+    let showPlayerNames: boolean;
     let lastTeleportTime = 0;
-    const TELEPORT_COOLDOWN = 1000; // teleport cooldown for Teleports
-    
-    Menu.toast("Menu will appear once you enter the main menu", 1);
 
-    // === Hooks ===
+    console.log(en.debug_messages.loaded);
+
+    httpGet(Config.VERSION_URL, (response) => {
+        try {
+            fetchedClientDetails = JSON.parse(response);
+            console.log(en.debug_messages.fetched, response);
+        } catch (error: any) {
+            console.log("error:", error);
+            Menu.toast(en.debug_messages.not_fetched, 1)
+        }
+    });
+
+    Menu.toast(en.messages.menu_will_appear_later, 1);
 
     // === Helpers === 
     const findObjectsOfTypeAll = (klass: Il2Cpp.Class) => {
-    return Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
+        return Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
     };
 
     const teleportTo = (target: Il2Cpp.Object) => {
-    const ObjectVector3Pos = target
+    const objectVector3Pos = target
         .method<Il2Cpp.Object>("get_transform")
         .invoke()
         .method<Il2Cpp.Object>("get_position")
@@ -123,34 +119,46 @@ function main() {
         .method<Il2Cpp.Object>("get_transform")
         .invoke()
         .method<Il2Cpp.Object>("set_position")
-        .invoke(ObjectVector3Pos);
+        .invoke(objectVector3Pos);
     };
 
-    // === Spoofs ===
+    const checkTeleportCooldown = () => {
+        // Check if enough time has passed since the last teleport
+        const currentTime = Date.now();
+        if (currentTime - lastTeleportTime < Config.TELEPORT_COOLDOWN) {
+            Menu.toast(`Please wait ${((Config.TELEPORT_COOLDOWN - (currentTime - lastTeleportTime)) / 1000).toFixed(1)} seconds before teleporting again!`, 0);
+            return false;
+        };
+        lastTeleportTime = currentTime;
+        return true;
+    };
+
+    // === Hooks ===
+    // Spoofs
 
     BuildCatapultConfig_method.implementation = function (): Il2Cpp.Object {
-        if (Config.use_spoof) {
-            const NewConfig = this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // create new config
+        if (Config.USE_SPOOF && fetchedClientDetails!) {
+            const newConfig = this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // create new config
 
-            Config.BuildInfo.original_signature = NewConfig.field<Il2Cpp.String>("ClientVersionSignature").value.content!;
-            Config.BuildInfo.using_signature = loginSpoofVars!.signature;
+            Config.BuildInfo.original_signature = newConfig.field<Il2Cpp.String>("ClientVersionSignature").value.content!;
+            Config.BuildInfo.used_signature = fetchedClientDetails.signature;
 
-            NewConfig.field("Platform").value = Il2Cpp.string(Config.BuildInfo.current_platform);
-            NewConfig.field("ClientVersion").value = Il2Cpp.string(loginSpoofVars!.client_version);
-            NewConfig.field("ClientVersionSignature").value = Il2Cpp.string(loginSpoofVars!.signature);
-    
-            console.log("Modified Config Platform:", NewConfig.field("Platform").value);
-            console.log("Modified Config ClientVersion:", NewConfig.field("ClientVersion").value);	
-            console.log("Modified config ClientVersionSignature:", NewConfig.field("ClientVersionSignature").value);
+            newConfig.field("ClientVersion").value = Il2Cpp.string(fetchedClientDetails.client_version);
+            newConfig.field("ClientVersionSignature").value = Il2Cpp.string(fetchedClientDetails.signature);
 
-            console.log("Modified some vars while login...")
-            return NewConfig; 
+            if (Config.BuildInfo.platform != "android_ega") {
+                newConfig.field("Platform").value = Il2Cpp.string(Config.BuildInfo.platform);
+                console.log(en.debug_messages.login_spoofed_with_platform);
+            } else {
+                console.log(en.debug_messages.login_spoofed);
+            }
+
+            return newConfig; 
         } else {
             return this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // without any changes
         }
     };
-    
-    
+        
     // Bypass permanent ban
     // you can't bypass a temporary ban, but you can bypass a permanent one, lmao
     CheckAntiCheatClientServiceForError_method.implementation = function () {
@@ -212,7 +220,7 @@ function main() {
 
     SetShowPlayerNamesByDefault_method.implementation = function (value) {
         //@ts-ignore idk i can't set value: boolean
-        showPlayerNames_state = value;
+        showPlayerNames = value;
         return this.method("SetShowPlayerNamesByDefault", 1).invoke(value);
     };
 
@@ -250,7 +258,7 @@ function main() {
         GlobalGameStateClient_Instance = GlobalGameStateClient.method<Il2Cpp.Object>("get_Instance").invoke();
 
         const Scene_Instance = SceneManager.method<Il2Cpp.Object>("GetActiveScene").invoke();
-        current_SceneName = Scene_Instance.method<Il2Cpp.String>("get_name").invoke().content; // it's better to check by SceneName, instead round id (and easier lol)
+        currentSceneName = Scene_Instance.method<Il2Cpp.String>("get_name").invoke().content; // it's better to check by SceneName, instead round id (and easier lol)
 
         if (Config.Toggles.toggleHideDoors) {
             const manipulateObjects = (
@@ -270,15 +278,15 @@ function main() {
             };  
 
             switch (true) {
-            case current_SceneName?.includes("FallGuy_DoorDash"):
+            case currentSceneName?.includes("FallGuy_DoorDash"):
                 manipulateObjects(FakeDoorController, "get_IsFakeDoor", false);
                 break;
         
-            case current_SceneName?.includes("FallGuy_Crown_Maze_Topdown"):
+            case currentSceneName?.includes("FallGuy_Crown_Maze_Topdown"):
                 manipulateObjects(CrownMazeDoor, "get_IsBreakable", true);
                 break;
         
-            case current_SceneName?.includes("Fraggle"): // creative codename
+            case currentSceneName?.includes("Fraggle"): // creative codename
                 manipulateObjects(FakeDoorController, "get_IsFakeDoor", false);
                 break;
             }
@@ -417,13 +425,7 @@ function main() {
     };
 
     const teleportToFinish = () => {
-        // Check if enough time has passed since thelast teleport
-        const currentTime = Date.now();
-        if (currentTime - lastTeleportTime < TELEPORT_COOLDOWN) {
-            Menu.toast(`Please wait ${((TELEPORT_COOLDOWN - (currentTime - lastTeleportTime)) / 1000).toFixed(1)} seconds before teleporting again!`, 0);
-            return;
-        }
-        lastTeleportTime = currentTime;
+        if (!checkTeleportCooldown()) return;
         
         let EndZoneObject: Il2Cpp.Object | null;
         let CrownObject: Il2Cpp.Object | null;
@@ -447,13 +449,7 @@ function main() {
     };
     
     const teleportToScorePoint = () => {
-        // Check if enough time has passed since last teleport
-        const currentTime = Date.now();
-        if (currentTime - lastTeleportTime < TELEPORT_COOLDOWN) {
-            Menu.toast(`Please wait ${((TELEPORT_COOLDOWN - (currentTime - lastTeleportTime)) / 1000).toFixed(1)} seconds before teleporting again!`, 0);
-            return;
-        }
-        lastTeleportTime = currentTime;
+        if (!checkTeleportCooldown()) return;
         
         try {
             const UnityBubblesArray = findObjectsOfTypeAll(SpawnableCollectable); // unity bubbles
@@ -509,13 +505,7 @@ function main() {
     };
     
     const teleportToRandomPlayer = () => {
-        // Check if enough time has passed since the last teleport
-        const currentTime = Date.now();
-        if (currentTime - lastTeleportTime < TELEPORT_COOLDOWN) {
-            Menu.toast(`Please wait ${((TELEPORT_COOLDOWN - (currentTime - lastTeleportTime)) / 1000).toFixed(1)} seconds before teleporting again!`, 0);
-            return;
-        }
-        lastTeleportTime = currentTime;
+        if (!checkTeleportCooldown()) return;
         
         const FallGuysCharacterControllerArray = findObjectsOfTypeAll(FallGuysCharacterController); 
         
@@ -646,7 +636,7 @@ function main() {
     const initMenu = () => {
         try {
             const layout = new Menu.ObsidianLayout(obsidianConfig);
-            const composer = new Menu.Composer(`${en.info.name}`, `${en.info.attention}`, layout);
+            const composer = new Menu.Composer(`${en.info.name}`, `${en.info.warn}`, layout);
             composer.icon(Config.ICON_URL, "Web");
 
             // === Movement Tab === 
@@ -655,25 +645,25 @@ function main() {
             Menu.add(movement);
 
             Menu.add(
-                layout.toggle("360 Dives", (state: boolean) => {
+                layout.toggle(`${en.functions.toggle_360_dives}`, (state: boolean) => {
                     Config.Toggles.toggle360Dives = state;
                 })
             );
 
             Menu.add(
-                layout.toggle("Air Jump", (state: boolean) => {
+                layout.toggle(`${en.functions.toggle_air_jump}`, (state: boolean) => {
                     Config.Toggles.toggleAirJump = state;
                 })
             );
 
             Menu.add(
-                layout.toggle("Freeze Player", (state: boolean) => {
+                layout.toggle(`${en.functions.toggle_freeze_player}`, (state: boolean) => {
                     state ? freezePlayer.enable() : freezePlayer.disable();
                 })
             );
 
             Menu.add(
-                layout.toggle("Don't send Fall Guy state", (state: boolean) => {
+                layout.toggle(`${en.functions.toggle_dont_send_fallguy_state}`, (state: boolean) => {
                     Config.Toggles.toggleDontSendFallGuyState = state;
                 })
             );
@@ -681,61 +671,61 @@ function main() {
             Menu.add(layout.textView("If you're using Don't send Fall Guy state — You can't qualify, respawn, grabbing. For other playes you will be frozen"));
 
             Menu.add(
-                layout.toggle("Enable Custom Speed", (state: boolean) => {
+                layout.toggle(`${en.functions.toggle_custom_speed}`, (state: boolean) => {
                     Config.Toggles.toggleCustomSpeed = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar("Custom Speed: {0} / 100", 100, 1, (value: number) => {
+                layout.seekbar(`${en.functions.custom_speed}: {0} / 100`, 100, 1, (value: number) => {
                     Config.CustomValues.normalMaxSpeed = value;
                 })
             ); 
 
             Menu.add(
-                layout.toggle("Enable Custom Velocity", (state: boolean) => {
+                layout.toggle(`${en.functions.toggle_custom_velocity}`, (state: boolean) => {
                     Config.Toggles.toggleCustomVelocity = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar("Vertical Gravity Velocity: {0} / 100", 100, 0, (value: number) => {
+                layout.seekbar(`${en.functions.vertical_gravity_velocity}: {0} / 100`, 100, 0, (value: number) => {
                     Config.CustomValues.maxGravityVelocity = value;
                 })
             );
 
             Menu.add(
-                layout.toggle("Negative Velocity", (state: boolean) => {
+                layout.toggle(`${en.functions.toggle_negative_velocity}`, (state: boolean) => {
                     Config.Toggles.toggleNegativeVelocity = state;
                 })
             );
 
             Menu.add(
-                layout.toggle("No Vertical Velocity", (state: boolean) => {
+                layout.toggle(`${en.functions.toggle_no_vertical_velocity}`, (state: boolean) => {
                     Config.Toggles.toggleNoVelocity = state;
                 })
             );
 
             Menu.add(
-                layout.toggle("Enable Custom Jump Strength", (state: boolean) => {
+                layout.toggle(`${en.functions.toggle_custom_jump_strength}`, (state: boolean) => {
                     Config.Toggles.toggleCustomJumpForce = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar("Jump Strength: {0} / 100", 100, 1, (value: number) => {
+                layout.seekbar(`${en.functions.jump_strength}: {0} / 100`, 100, 1, (value: number) => {
                     Config.CustomValues.jumpForce = value;
                 })
             );
 
             Menu.add(
-                layout.toggle("Enable Custom Dive Strength", (state: boolean) => {
+                layout.toggle(`${en.functions.toggle_custom_dive_strength}`, (state: boolean) => {
                     Config.Toggles.toggleCustomDiveForce = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar("Dive Strength: {0} / 100", 100, 1, (value: number) => {
+                layout.seekbar(`${en.functions.dive_strength}: {0} / 100`, 100, 1, (value: number) => {
                     Config.CustomValues.diveForce = value;
                 })
             );
@@ -770,7 +760,7 @@ function main() {
             Menu.add(utility);
 
             Menu.add(layout.button("Toggle View Names", () => {
-                SetShowPlayerNamesByDefault_method.invoke(!showPlayerNames_state);
+                SetShowPlayerNamesByDefault_method.invoke(!showPlayerNames);
             }));
 
             Menu.add(
@@ -831,7 +821,7 @@ function main() {
             Menu.add(layout.textView(`Version mod menu: ${Config.VERSION}`));
             Menu.add(layout.textView(`Game version: ${Config.BuildInfo.appVersion}`));
             Menu.add(layout.textView(`Original signature: ${Config.BuildInfo.original_signature}`));
-            Menu.add(layout.textView(`Using signature: ${Config.BuildInfo.using_signature}`));
+            Menu.add(layout.textView(`Using signature: ${Config.BuildInfo.used_signature}`));
             Menu.add(layout.textView(`Unity version: ${Config.BuildInfo.unityVersion}`))
             Menu.add(layout.textView(`Game build number: ${Config.BuildInfo.buildNumber}`));
             Menu.add(layout.textView(`Game build date: ${Config.BuildInfo.buildDate}`));

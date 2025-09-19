@@ -1,5 +1,6 @@
 {   
     "messages": {
+        "menu_will_appear_later": "Menu will appear once you enter the main menu",
         "permanent_ban": "Your account permanently banned, but you can still play with mod menu. Enjoy",
         "not_in_the_game": "You are not in the game!",
         "server": "Server",
@@ -24,16 +25,16 @@
         
     },
     "functions": {
-        "360_dives": "Enable 360 Dives",
-        "air_jump": "Air Jump",
-        "freeze_player": "Freeze Player",
-        "dont_send_fallguy_state": "Don't send Fall Guy state",
+        "toggle_360_dives": "Enable 360 Dives",
+        "toggle_air_jump": "Air Jump",
+        "toggle_freeze_player": "Freeze Player",
+        "toggle_dont_send_fallguy_state": "Don't send Fall Guy state",
         "toggle_custom_speed": "Use Custom Speed",
         "custom_speed": "Custom Speed",
         "toggle_custom_velocity": "Enable Custom Velocity",
         "vertical_gravity_velocity": "Vertical Gravity Velocity",
-        "negative velocity": "Negative Velocity",
-        "no_vertical_velocity": "No Vertical Velocity",
+        "toggle_negative_velocity": "Negative Velocity",
+        "toggle_no_vertical_velocity": "No Vertical Velocity",
         "toggle_custom_jump_strength": "Use Custom Jump Strength",
         "jump_strength": "Jump Strength",
         "toggle_custom_dive_strength": "Use Custom Dive Strength",
