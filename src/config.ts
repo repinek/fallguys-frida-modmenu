@@ -2,7 +2,7 @@ export namespace Config {
     // TODO: 
     // fix follow the leader teleport (add +y)
     export const VERSION = "2.08";
-    export const VERSION_URL = "https://floyzi.github.io/FGTools/mobile/version.json1";
+    export const VERSION_URL = "https://floyzi.github.io/FGTools/mobile/version.json";
     export const ICON_URL = "https://floyzi.github.io/images/obed-guys-present.png";
     export const TELEPORT_COOLDOWN = 1000;
 
