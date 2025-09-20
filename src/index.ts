@@ -45,8 +45,8 @@ function main() {
     const TipToe_Platform = TheMultiplayerGuys.class("Levels.TipToe.TipToe_Platform");
     const FakeDoorController = TheMultiplayerGuys.class("Levels.DoorDash.FakeDoorController");
     const CrownMazeDoor = TheMultiplayerGuys.class("Levels.CrownMaze.CrownMazeDoor");
-    const FollowTheLeaderZone = TheMultiplayerGuys.class("Levels.ScoreZone.FollowTheLeader.FollowTheLeaderZone"); // leading light
-    const LevelEditorTriggerZoneActiveBase = WushuLevelEditorRuntime.class("LevelEditorTriggerZoneActiveBase"); // trigger zone creative
+    // const FollowTheLeaderZone = TheMultiplayerGuys.class("Levels.ScoreZone.FollowTheLeader.FollowTheLeaderZone"); // leading light
+    // const LevelEditorTriggerZoneActiveBase = WushuLevelEditorRuntime.class("LevelEditorTriggerZoneActiveBase"); // trigger zone creative
 
     // === Methods === 
     const set_fieldOfView_method = Camera.method("set_fieldOfView", 1);
@@ -135,13 +135,23 @@ function main() {
 
     // === Hooks ===
     // Spoofs
-
     BuildCatapultConfig_method.implementation = function (): Il2Cpp.Object {
+        /*
+        Change the signature and client version for the request, so that it thinks we are using the latest one.
+        Getting it from Config.VERSION_URL, thx to floyzi. You can find it yourself if you want.
+
+        You can also change the platform here, but make sure it exists (otherwise you won't be able to login, mediatonic fixed this)
+        Some existing platforms: ps5, pc_steam, pc_standalone (no longer used for official clients), ports3_2...
+        More can be found in the CMS and game code 
+
+        You can also change LoginServerHost and GatewayServerHost if you want to connect to a custom server.
+        */
         if (Config.USE_SPOOF && fetchedClientDetails!) {
             const newConfig = this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // create new config
 
-            Config.BuildInfo.original_signature = newConfig.field<Il2Cpp.String>("ClientVersionSignature").value.content!;
-            Config.BuildInfo.used_signature = fetchedClientDetails.signature;
+            Config.BuildInfo.originalSignature = newConfig.field<Il2Cpp.String>("ClientVersionSignature").value.content!;
+            Config.BuildInfo.spoofedSignature = fetchedClientDetails.signature;
+            Config.BuildInfo.spoofedGameVersion = fetchedClientDetails.client_version;
 
             newConfig.field("ClientVersion").value = Il2Cpp.string(fetchedClientDetails.client_version);
             newConfig.field("ClientVersionSignature").value = Il2Cpp.string(fetchedClientDetails.signature);
@@ -165,20 +175,14 @@ function main() {
         return false; // idk how it works, but it works (you can't enter the match without this hook)
     };
     
-    ShowAntiCheatPopup_method.implementation = function (errorMessage, shouldQuit) { // AntiCheatError errorMessage, bool shouldQuit
+    //@ts-ignore should work lol
+    ShowAntiCheatPopup_method.implementation = function (errorMessage: Il2Cpp.Object, shouldQuit: boolean) {
         // Called by: bool FGClient::MainMenuViewModel::_CheckRestrictedGameAccess_d__69::MoveNext
-
-        //@ts-ignore
-        const AntiCheatErrorMessageString = errorMessage.method("get_Message").invoke().content;
+        const AntiCheatErrorMessageString = errorMessage.method<Il2Cpp.String>("get_Message").invoke().content;
         if (AntiCheatErrorMessageString === "restrict_game_access" && shouldQuit === true) {
-            console.log("Detected permanent ban");
-            /* 
-            You can probably can hook FGClient::UI::PopupManager::Show
-            and get cool Popup if you change something in ModalMessageData data argument
-            */
-            Menu.toast("Your account has permanent ban, but you can still play with mod menu. Enjoy", 1); 
+            console.log(en.debug_messages.detected_permanent_ban);
+            Menu.toast(en.messages.permanent_ban, 1); 
         };
-
         return; 
     };
 
@@ -192,58 +196,62 @@ function main() {
     };
 
     get_TargetFrameRate_method.implementation = function () {
-        return 1488; // fps limit
+        return 1337; // litterally unlimited, because it's linked to the screen refresh rate
     };
 
     set_TargetFrameRate_method.implementation = function (fps) {
-        return this.method("set_TargetFrameRate", 1).invoke(1488); // fps limit
+        return this.method("set_TargetFrameRate", 1).invoke(1337);
     };
 
     get_ResolutionScale_method.implementation = function () {
         GraphicsSettings_Instance = this; // often gc.choose causes crashes
 
         // remove, causes bad resolution on some maps
+        /*
         if (!reachedMainMenu) {
             return this.method("get_ResolutionScale").invoke(); // return value from game config, if the menu is not loaded
         }
+        */
 
         return Config.CustomValues.ResolutionScale;
     };
 
     set_ResolutionScale_method.implementation = function (scale) {
+        /*
         if (!reachedMainMenu) {
             return this.method("set_ResolutionScale", 1).invoke(scale); // return value from game config, if the menu is not loaded
         }
+        */
 
         return this.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale); 
     };
 
     SetShowPlayerNamesByDefault_method.implementation = function (value) {
-        //@ts-ignore idk i can't set value: boolean
-        showPlayerNames = value;
+        showPlayerNames = value as boolean;
         return this.method("SetShowPlayerNamesByDefault", 1).invoke(value);
     };
 
-    // Some Utils 
+    // Utils 
     StartAFKManager_method.implementation = function () {
-        return; // anti-afk implementation 
+        return; // anti-afk
     };
 
     OnMainMenuDisplayed_method.implementation = function (event) {
         console.log("OnMainMenuDisplayed Called!");
 
         if (!reachedMainMenu) {
-            Menu.toast("Showing menu", 0);
             /*
             sooo, if you load all these assemblies before the menu appears, the game will freeze when entering the main menu. 
             probably, shitcode from menu is a reason, idk.
 
             you can load the menu here, in this function, and it will wait another 2 seconds in the initMenu function before showing it (bad, but working (not always)), 
             */
+            Menu.toast(en.messages.display_menu, 0);
+
             Menu.waitForInit(initMenu);
             reachedMainMenu = true;
             if (Config.Toggles.toggleFGDebug) {
-                FGDebug.enable();
+                FGDebug.enable(); // may cause error, frida & il2cpp-bridge lore, so unstable tbh
             }
         }
 
@@ -254,11 +262,10 @@ function main() {
         console.log("GameLevelLoaded called!");
 
         ClientGameManager_Instance = this;
-
         GlobalGameStateClient_Instance = GlobalGameStateClient.method<Il2Cpp.Object>("get_Instance").invoke();
 
         const Scene_Instance = SceneManager.method<Il2Cpp.Object>("GetActiveScene").invoke();
-        currentSceneName = Scene_Instance.method<Il2Cpp.String>("get_name").invoke().content; // it's better to check by SceneName, instead round id (and easier lol)
+        currentSceneName = Scene_Instance.method<Il2Cpp.String>("get_name").invoke().content; // It's better to check by SceneName, instead round id (and easier lol)
 
         if (Config.Toggles.toggleHideDoors) {
             const manipulateObjects = (
@@ -304,7 +311,6 @@ function main() {
 
     //@ts-ignore, code from wiki snippets btw lol
     ProcessMessageReceived_method.implementation = function (jsonMessage: Il2Cpp.String) {
-
         if (Config.Toggles.toggleShowQueuedPlayers) {
             console.log(jsonMessage.content);
             const json = JSON.parse(jsonMessage.content!); // .content because it's Il2cpp.String
@@ -320,11 +326,11 @@ function main() {
     };
 
     BuildInfo_OnEnable_method.implementation = function () {
-        Config.BuildInfo.appVersion = Il2Cpp.application.version!;
+        Config.BuildInfo.gameVersion = Il2Cpp.application.version!;
         Config.BuildInfo.unityVersion = Il2Cpp.unityVersion;
         Config.BuildInfo.buildNumber = this.field<Il2Cpp.String>("buildNumber").value.content!;
         Config.BuildInfo.buildDate = this.field<Il2Cpp.String>("buildDate").value.content!;
-        // you can also get pewVersion and kittVersion here if you want. also _fullString and _shortString
+        // other fields are useless, if you want you can grab it too
 
         return this.method("OnEnable").invoke();
     };
@@ -336,7 +342,7 @@ function main() {
         CharacterControllerData_Instance = character.method("get_Data").invoke(); // get Data instance
         JumpMotorFunction_Instance = character.method("get_JumpMotorFunction").invoke(); // get JumpMotorFunction 
     
-        CharacterControllerData_Instance.field("divePlayerSensitivity").value = Config.Toggles.toggle360Dives ? 14888 : Config.DefaultValues.divePlayerSensitivity;
+        CharacterControllerData_Instance.field("divePlayerSensitivity").value = Config.Toggles.toggle360Dives ? 69420 : Config.DefaultValues.divePlayerSensitivity;
 
         CharacterControllerData_Instance.field("normalMaxSpeed").value = Config.Toggles.toggleCustomSpeed ? Config.CustomValues.normalMaxSpeed : Config.DefaultValues.normalMaxSpeed;
         CharacterControllerData_Instance.field("carryMaxSpeed").value = Config.Toggles.toggleCustomSpeed ? Config.CustomValues.normalMaxSpeed : Config.DefaultValues.carryMaxSpeed;
@@ -351,7 +357,7 @@ function main() {
             : Config.DefaultValues.maxGravityVelocity;
         
         CharacterControllerData_Instance.field("diveForce").value = Config.Toggles.toggleCustomDiveForce ? Config.CustomValues.diveForce : Config.DefaultValues.diveForce;
-        CharacterControllerData_Instance.field("airDiveForce").value = Config.Toggles.toggleCustomDiveForce ? Config.CustomValues.diveForce : Config.DefaultValues.airDiveForce;
+        CharacterControllerData_Instance.field("airDiveForce").value = Config.Toggles.toggleCustomDiveForce ? Config.CustomValues.diveForce / Config.DefaultValues.diveMultiplier : Config.DefaultValues.airDiveForce;
 
         const jumpForce = JumpMotorFunction_Instance.field<Il2Cpp.Object>("_jumpForce").value;
         jumpForce.field("y").value = Config.Toggles.toggleCustomJumpForce ? Config.CustomValues.jumpForce : Config.DefaultValues.jumpForce;
@@ -427,46 +433,75 @@ function main() {
     const teleportToFinish = () => {
         if (!checkTeleportCooldown()) return;
         
-        let EndZoneObject: Il2Cpp.Object | null;
-        let CrownObject: Il2Cpp.Object | null;
+        let endZoneObject: Il2Cpp.Object | null;
+        let crownObject: Il2Cpp.Object | null;
     
-        const EndZoneArray = findObjectsOfTypeAll(ObjectiveReachEndZone);
-        if (EndZoneArray.length > 0) {
-            EndZoneObject = EndZoneArray.get(0);
+        const endZoneArray = findObjectsOfTypeAll(ObjectiveReachEndZone);
+        if (endZoneArray.length > 0) {
+            endZoneObject = endZoneArray.get(0);
         }
     
-        const CrownArray = findObjectsOfTypeAll(GrabToQualify);
-        if (CrownArray.length > 0) {
-            CrownObject = CrownArray.get(0);
+        const crownArray = findObjectsOfTypeAll(GrabToQualify);
+        if (crownArray.length > 0) {
+            crownObject = crownArray.get(0);
         }
     
-        const FinishObject = EndZoneObject! ?? CrownObject!;
-        if (FinishObject) {
-            teleportTo(FinishObject);
+        const finishObject = endZoneObject! ?? crownObject!;
+        if (finishObject) {
+            teleportTo(finishObject);
         } else {
-            Menu.toast(`No Finish or Crown was found. The round probably does not have a finish or a crown.`, 0);
+            Menu.toast(en.messages.no_finish, 0);
         }
     };
     
-    const teleportToScorePoint = () => {
+    // TODO: exclude PB_FallGuyBot (FallGuysCharacterController) (it's a placeholder)
+    const teleportToRandomPlayer = () => {
+        if (!checkTeleportCooldown()) return;
+
+        try {
+            const fallGuysCharacterControllerArray = findObjectsOfTypeAll(FallGuysCharacterController); 
+            console.log(fallGuysCharacterControllerArray, fallGuysCharacterControllerArray.length);
+            if (fallGuysCharacterControllerArray.length === 1) {
+                Menu.toast(en.messages.cant_teleport_to_yourself, 0);
+                return;
+            }
+            else if (fallGuysCharacterControllerArray.length > 1) {
+                const randomIndex = Math.floor(Math.random() * fallGuysCharacterControllerArray.length); // random
+                const randomPlayer = fallGuysCharacterControllerArray.get(randomIndex);
+
+                teleportTo(randomPlayer);
+                return;
+            }
+            else if (fallGuysCharacterControllerArray.length === 0) {
+                Menu.toast(en.messages.no_players_found, 0);
+                return;
+            };
+        } catch (error: any) {
+            console.error(error.stack);
+            Menu.toast(en.messages.cant_teleport_to_player, 0);
+        }
+    };
+
+    const teleportToScore = () => {
         if (!checkTeleportCooldown()) return;
         
         try {
-            const UnityBubblesArray = findObjectsOfTypeAll(SpawnableCollectable); // unity bubbles
-            const CreativeBubblesArray = findObjectsOfTypeAll(COMMON_ScoringBubble); // creative bubbles
-            const ScoredButtonArray = findObjectsOfTypeAll(ScoredButton);
-            const creativeScoreZonesArray = findObjectsOfTypeAll(LevelEditorTriggerZoneActiveBase); // creative scorezones
-            const FollowTheLeaderZonesArray = findObjectsOfTypeAll(FollowTheLeaderZone) // leading light 
+            const unityBubblesArray = findObjectsOfTypeAll(SpawnableCollectable);
+            const creativeBubblesArray = findObjectsOfTypeAll(COMMON_ScoringBubble);
+            const scoredButtonArray = findObjectsOfTypeAll(ScoredButton);
+            // I'm too lazy to add these sorry
+            // const creativeScoreZonesArray = findObjectsOfTypeAll(LevelEditorTriggerZoneActiveBase);
+            // const FollowTheLeaderZonesArray = findObjectsOfTypeAll(FollowTheLeaderZone) 
     
             // Rest of the function remains the same...
-            for (const bubble of UnityBubblesArray) {
+            for (const bubble of unityBubblesArray) {
                 if (bubble.method<boolean>("get_Spawned").invoke()) {
                     teleportTo(bubble);
                     return;
                 }
             }
     
-            for (const bubble of CreativeBubblesArray) {
+            for (const bubble of creativeBubblesArray) {
                 if (bubble.field<number>("_pointsAwarded").value > 0) {
                     let bubbleHandle = bubble.field<Il2Cpp.Object>("_bubbleHandle").value;
                     if (bubbleHandle.field<boolean>("_spawned").value) {
@@ -476,13 +511,14 @@ function main() {
                 }
             }
     
-            for (const button of ScoredButtonArray) {
+            for (const button of scoredButtonArray) {
                 if (button.field<boolean>("_isAnActiveTarget").value) {
                     teleportTo(button);
                     return;
                 }
             }
-    
+            
+            /*
             for (const scoreZone of creativeScoreZonesArray) {
                 if (scoreZone.field<boolean>("_useForPointScoring").value) {
                     if (scoreZone.field<number>("_pointsScored").value > 0) {
@@ -496,33 +532,13 @@ function main() {
                 teleportTo(scoreZone);
                 return;
             }
+            */
     
         } catch (error: any) {
             console.error(error.stack);
             Menu.toast(error.stack, 0);
         }
-        Menu.toast("No bubbles or buttons were found. Please open an issue if it does not work.", 0);
-    };
-    
-    const teleportToRandomPlayer = () => {
-        if (!checkTeleportCooldown()) return;
-        
-        const FallGuysCharacterControllerArray = findObjectsOfTypeAll(FallGuysCharacterController); 
-        
-        if (FallGuysCharacterControllerArray.length === 1) {
-            Menu.toast(`You can't teleport to yourself.`, 0);
-            return;
-        }
-        else if (FallGuysCharacterControllerArray.length > 0) {
-            const RandomIndex = Math.floor(Math.random() * FallGuysCharacterControllerArray.length); // random
-            const RandomPlayer = FallGuysCharacterControllerArray.get(RandomIndex);
-
-            teleportTo(RandomPlayer);
-            return;
-        } else {
-            Menu.toast(`No Players were found!`, 0);
-            return;
-        };
+        Menu.toast(en.messages.no_score, 0);
     };
 
     const freezePlayer = {
@@ -542,14 +558,12 @@ function main() {
     
     const changeResolutionScale = () => {
         try {
-            console.log("trying change resolution scale to", Config.CustomValues.ResolutionScale);
+            console.log(en.debug_messages.change_resolution, Config.CustomValues.ResolutionScale);
             GraphicsSettings_Instance.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale);
-
             /*
             i wanted to make this value changeable in the game, but unfortunately 
             calling ResolutionScaling::UpdateResolutionScaleStatus() just crashes the game for now.
             */
-
         } catch (error: any) {
             Menu.toast(error.stack, 1); 
             console.error(error.stack);
@@ -559,71 +573,54 @@ function main() {
     const showServerDetails = () => {
         try {
             if (GlobalGameStateClient_Instance) {
-                const NetworkManager = GlobalGameStateClient_Instance.method<Il2Cpp.Object>("get_NetworkManager").invoke();
-                const GameConnection = NetworkManager.method<Il2Cpp.Object>("get_ConnectionToServer").invoke();
+                const networkManager = GlobalGameStateClient_Instance.method<Il2Cpp.Object>("get_NetworkManager").invoke();
+                const gameConnection = networkManager.method<Il2Cpp.Object>("get_ConnectionToServer").invoke();
 
-                const HostIPAddr = NetworkManager.method<Il2Cpp.String>("get_HostIPAddr").invoke().content;
-                const HostPortNo = NetworkManager.method<number>("get_HostPortNo").invoke();
-                const RTT = GameConnection.method<number>("CurrentRtt").invoke(); 
-                const LAG = GameConnection.method<number>("CurrentLag").invoke();
+                const hostIPAddr = networkManager.method<Il2Cpp.String>("get_HostIPAddr").invoke().content;
+                const hostPortNo = networkManager.method<number>("get_HostPortNo").invoke();
+                const rtt = gameConnection.method<number>("CurrentRtt").invoke(); 
 
-                console.log(`Server: ${HostIPAddr}:${HostPortNo}\nPing: ${RTT}ms, LAG: ${LAG} `);
-                Menu.toast(`Server: ${HostIPAddr}:${HostPortNo}. Ping: ${RTT}ms, LAG: ${LAG}`, 0); // little secret, you can ddos these servers, and its not too hard.
-                copyToClipboard(`${HostIPAddr}:${HostPortNo}`);
+                console.log(`Server: ${hostIPAddr}:${hostPortNo}\nPing: ${rtt}ms`);
+                Menu.toast(`Server: ${hostIPAddr}:${hostPortNo}. Ping: ${rtt}ms`, 0); // little secret, you can ddos these servers, and it's not too hard.
+                copyToClipboard(`${hostIPAddr}:${hostPortNo}`);
             } else {
-                Menu.toast("You are not in the game!", 0);
+                Menu.toast(en.messages.not_in_the_game, 0);
             }
         } catch (error: any) {
-            Menu.toast("You are not in the game!", 0);
+            Menu.toast(en.messages.not_in_the_game, 0);
             console.error(error.stack);
         }
     };
 
-    // WIP
     const showGameDetails = () => {
         try {
             if (ClientGameManager_Instance) {
                 const round = ClientGameManager_Instance.field<Il2Cpp.Object>("_round").value;
                 const roundID = round.method<Il2Cpp.String>("get_Id").invoke().content;
-                const Seed = ClientGameManager_Instance.method<number>("get_RandomSeed").invoke();
-                const initialNumParticipants = ClientGameManager_Instance.field<number>("_initialNumParticipants").value;
-                // const AllPlayers = ClientGameManager_Instance.method<Il2Cpp.Array<Il2Cpp.Object>>("get_AllPlayers").invoke();
-                const EliminatedPlayerCount = ClientGameManager_Instance.field<number>("_eliminatedPlayerCount").value;
+                const seed = ClientGameManager_Instance.method<number>("get_RandomSeed").invoke();
+                const eliminatedPlayerCount = ClientGameManager_Instance.field<number>("_eliminatedPlayerCount").value;
+                // const initialNumParticipants = ClientGameManager_Instance.field<number>("_initialNumParticipants").value;
+                // const allPlayers = ClientGameManager_Instance.method<Il2Cpp.Array<Il2Cpp.Object>>("get_AllPlayers").invoke();
 
-                // console.log(AllPlayers, typeof(AllPlayers), AllPlayers.length); // System.Collections.Generic.List`1[FGClient.NetworkPlayerDataClient] object undefined
-
-                /*
-                console.log(`RoundID: ${roundID}, Seed: ${Seed}, Initial Players: ${initialNumParticipants}, Remain Players: ${(AllPlayers.length - EliminatedPlayerCount)}, 
-                Eliminated Players: ${EliminatedPlayerCount}`);
-                Menu.toast(`RoundID: ${roundID}, Seed: ${Seed}, Initial Players: ${initialNumParticipants}, Remain Players: ${(AllPlayers.length - EliminatedPlayerCount)}, 
-                Eliminated Players: ${EliminatedPlayerCount}`, 0);
-                */ 
-
-                console.log(`RoundID: ${roundID}, Seed: ${Seed}, Initial Players: ${initialNumParticipants}, 
-                Eliminated Players: ${EliminatedPlayerCount}`);
-                
-                Menu.toast(`RoundID: ${roundID}, Seed: ${Seed}, Initial Players: ${initialNumParticipants}, 
-                Eliminated Players: ${EliminatedPlayerCount}`, 0);
-
+                console.log(`RoundID: ${roundID}, Seed: ${seed}, Eliminated: ${eliminatedPlayerCount}`);
+                Menu.toast(`RoundID: ${roundID}, Seed: ${seed}, Eliminated: ${eliminatedPlayerCount}`, 0);
             } else {
-                Menu.toast("You are not in the game!", 0);
+                Menu.toast(en.messages.not_in_the_game, 0);
             }
         } catch (error: any) {
-            Menu.toast("You are not in the game!", 0);
+            Menu.toast(en.messages.not_in_the_game, 0);
             console.error(error.stack);
         }
     };
 
-    // test
     const showTipToePath = () => {
         try {
-            const TipToe_PlatformArray = findObjectsOfTypeAll(TipToe_Platform);
-    
-            for (const TipToe of TipToe_PlatformArray) {
-                const TipToeStatus = TipToe.method<boolean>("get_IsFakePlatform").invoke();
-                if (TipToeStatus) { // if fake
-                    const TipToeObject = TipToe.method<Il2Cpp.Object>("get_gameObject").invoke();
-                    TipToeObject.method("SetActive").invoke(false);
+            const tiptoePlatformArray = findObjectsOfTypeAll(TipToe_Platform);
+            for (const tiptoe of tiptoePlatformArray) {
+                const tiptoeStatus = tiptoe.method<boolean>("get_IsFakePlatform").invoke();
+                if (tiptoeStatus) { // if fake
+                    const tiptoeObject = tiptoe.method<Il2Cpp.Object>("get_gameObject").invoke();
+                    tiptoeObject.method("SetActive").invoke(false);
                 }
             }
         } catch (error: any) {
@@ -636,141 +633,141 @@ function main() {
     const initMenu = () => {
         try {
             const layout = new Menu.ObsidianLayout(obsidianConfig);
-            const composer = new Menu.Composer(`${en.info.name}`, `${en.info.warn}`, layout);
+            const composer = new Menu.Composer(en.info.name, en.info.warn, layout);
             composer.icon(Config.ICON_URL, "Web");
 
             // === Movement Tab === 
-            const movement = layout.textView(`<b>--- ${en.tabs.movement_tab} ---</b>`);
+            const movement = layout.textView(en.tabs.movement_tab);
             movement.gravity = Menu.Api.CENTER;
             Menu.add(movement);
 
             Menu.add(
-                layout.toggle(`${en.functions.toggle_360_dives}`, (state: boolean) => {
+                layout.toggle(en.functions.toggle_360_dives, (state: boolean) => {
                     Config.Toggles.toggle360Dives = state;
                 })
             );
 
             Menu.add(
-                layout.toggle(`${en.functions.toggle_air_jump}`, (state: boolean) => {
+                layout.toggle(en.functions.toggle_air_jump, (state: boolean) => {
                     Config.Toggles.toggleAirJump = state;
                 })
             );
 
             Menu.add(
-                layout.toggle(`${en.functions.toggle_freeze_player}`, (state: boolean) => {
+                layout.toggle(en.functions.toggle_freeze_player, (state: boolean) => {
                     state ? freezePlayer.enable() : freezePlayer.disable();
                 })
             );
 
             Menu.add(
-                layout.toggle(`${en.functions.toggle_dont_send_fallguy_state}`, (state: boolean) => {
+                layout.toggle(en.functions.toggle_dont_send_fallguy_state, (state: boolean) => {
                     Config.Toggles.toggleDontSendFallGuyState = state;
                 })
             );
             
-            Menu.add(layout.textView("If you're using Don't send Fall Guy state — You can't qualify, respawn, grabbing. For other playes you will be frozen"));
+            Menu.add(layout.textView(en.info.fg_state_warn));
 
             Menu.add(
-                layout.toggle(`${en.functions.toggle_custom_speed}`, (state: boolean) => {
+                layout.toggle(en.functions.toggle_custom_speed, (state: boolean) => {
                     Config.Toggles.toggleCustomSpeed = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar(`${en.functions.custom_speed}: {0} / 100`, 100, 1, (value: number) => {
+                layout.seekbar(en.functions.custom_speed, 100, 1, (value: number) => {
                     Config.CustomValues.normalMaxSpeed = value;
                 })
             ); 
 
             Menu.add(
-                layout.toggle(`${en.functions.toggle_custom_velocity}`, (state: boolean) => {
+                layout.toggle(en.functions.toggle_custom_velocity, (state: boolean) => {
                     Config.Toggles.toggleCustomVelocity = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar(`${en.functions.vertical_gravity_velocity}: {0} / 100`, 100, 0, (value: number) => {
+                layout.seekbar(en.functions.vertical_gravity_velocity, 100, 0, (value: number) => {
                     Config.CustomValues.maxGravityVelocity = value;
                 })
             );
 
             Menu.add(
-                layout.toggle(`${en.functions.toggle_negative_velocity}`, (state: boolean) => {
+                layout.toggle(en.functions.toggle_negative_velocity, (state: boolean) => {
                     Config.Toggles.toggleNegativeVelocity = state;
                 })
             );
 
             Menu.add(
-                layout.toggle(`${en.functions.toggle_no_vertical_velocity}`, (state: boolean) => {
+                layout.toggle(en.functions.toggle_no_vertical_velocity, (state: boolean) => {
                     Config.Toggles.toggleNoVelocity = state;
                 })
             );
 
             Menu.add(
-                layout.toggle(`${en.functions.toggle_custom_jump_strength}`, (state: boolean) => {
+                layout.toggle(en.functions.toggle_custom_jump_strength, (state: boolean) => {
                     Config.Toggles.toggleCustomJumpForce = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar(`${en.functions.jump_strength}: {0} / 100`, 100, 1, (value: number) => {
+                layout.seekbar(en.functions.jump_strength, 100, 1, (value: number) => {
                     Config.CustomValues.jumpForce = value;
                 })
             );
 
             Menu.add(
-                layout.toggle(`${en.functions.toggle_custom_dive_strength}`, (state: boolean) => {
+                layout.toggle(en.functions.toggle_custom_dive_strength, (state: boolean) => {
                     Config.Toggles.toggleCustomDiveForce = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar(`${en.functions.dive_strength}: {0} / 100`, 100, 1, (value: number) => {
+                layout.seekbar(en.functions.dive_strength, 100, 1, (value: number) => {
                     Config.CustomValues.diveForce = value;
                 })
             );
 
             // === Round Tab === 
-            const round_tab = layout.textView(`<b>--- ${en.tabs.round_tab} ---</b>`);
+            const round_tab = layout.textView(en.tabs.round_tab);
             round_tab.gravity = Menu.Api.CENTER;
             Menu.add(round_tab);
 
             Menu.add(
-                layout.toggle("Hide Real Doors", (state: boolean) => {
+                layout.toggle(en.functions.hide_real_doors, (state: boolean) => {
                     Config.Toggles.toggleHideDoors = state;
                 })
             );
 
-            Menu.add(layout.button("Show TipToe Path", showTipToePath));
+            Menu.add(layout.button(en.functions.show_tiptoe_path, showTipToePath));
 
             // === Teleports Tab === 
-            const teleports = layout.textView(`<b>--- ${en.tabs.teleports_tab} ---</b>`);
+            const teleports = layout.textView(en.tabs.teleports_tab);
             teleports.gravity = Menu.Api.CENTER;
             Menu.add(teleports);
             
-            Menu.add(layout.button("Teleport To Finish or Crown", teleportToFinish));
+            Menu.add(layout.button(en.functions.teleport_to_finish_or_crown, teleportToFinish));
 
-            Menu.add(layout.button("Teleport To Random Player", teleportToRandomPlayer));
+            Menu.add(layout.button(en.functions.teleport_to_random_player, teleportToRandomPlayer));
 
-            Menu.add(layout.button("Teleport To Bubble, Active Button, or Score Zone", teleportToScorePoint));
+            Menu.add(layout.button(en.functions.teleport_to_score, teleportToScore));
 
             // === Utility Tab === 
-            const utility = layout.textView(`<b>--- ${en.tabs.utility_tab} ---</b>`);
+            const utility = layout.textView(en.tabs.utility_tab);
             utility.gravity = Menu.Api.CENTER;
             Menu.add(utility);
 
-            Menu.add(layout.button("Toggle View Names", () => {
+            Menu.add(layout.button(en.functions.toggle_view_names, () => {
                 SetShowPlayerNamesByDefault_method.invoke(!showPlayerNames);
             }));
 
             Menu.add(
-                layout.toggle("Enable Custom FOV", (state: boolean) => {
+                layout.toggle(en.functions.toggle_custom_fov, (state: boolean) => {
                     Config.Toggles.toggleCustomFov = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar("Custom FOV: {0}", 180, 1, (value: number) => {
+                layout.seekbar(en.functions.custom_fov, 180, 1, (value: number) => {
                     if (Config.Toggles.toggleCustomFov) {
                         changeFov(value);
                     };
@@ -778,63 +775,63 @@ function main() {
             );
 
             Menu.add(
-                layout.toggle("Disable UI (controls won't be work)", (state: boolean) => {
+                layout.toggle(en.functions.disable_ui, (state: boolean) => {
                     state ? UICanvas_util.disable() : UICanvas_util.enable();
                 })
             );
 
             Menu.add(
-                layout.toggle("Display FGDebug", (state: boolean) => {
+                layout.toggle(en.functions.toggle_fgdebug, (state: boolean) => {
                     state ? FGDebug.enable() : FGDebug.disable();
                 })
             );
 
             Menu.add(
-                layout.toggle("Show Number of Queued Players", (state: boolean) => {
+                layout.toggle(en.functions.show_number_of_queued_players, (state: boolean) => {
                     Config.Toggles.toggleShowQueuedPlayers = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar("Custom Resolution (Applied in Next Round): {0}% / 100%", 100, 1, (value: number) => {
+                layout.seekbar(en.functions.custom_resolution, 100, 1, (value: number) => {
                     Config.CustomValues.ResolutionScale = value / 100;
                     changeResolutionScale(); 
                 })
             );
 
-            Menu.add(layout.button("Show Game Details", showGameDetails));
-            Menu.add(layout.button("Show and Copy Server Details", showServerDetails));
+            Menu.add(layout.button(en.functions.show_game_details, showGameDetails));
+            Menu.add(layout.button(en.functions.show_and_copy_server_details, showServerDetails));
 
             // === Links Tab === 
-            const links = layout.textView(`<b>--- ${en.tabs.credits_tab} ---</b>`);
+            const links = layout.textView(en.tabs.credits_tab);
             links.gravity = Menu.Api.CENTER;
             Menu.add(links);
 
-            Menu.add(layout.button("Github Repository (Leave a star!)", () => openURL("https://github.com/repinek/fallguys-frida-modmenu")));
-            Menu.add(layout.button("Discord Server (Mod Menu for other platforms too)", () => openURL("https://discord.gg/cNFJ73P6p3")));
+            Menu.add(layout.button(en.info.github_link, () => openURL("https://github.com/repinek/fallguys-frida-modmenu")));
+            Menu.add(layout.button(en.info.discord_link, () => openURL("https://discord.gg/cNFJ73P6p3")));
 
             // === Build Info Tab ===
-            const info = layout.textView(`<b>--- ${en.tabs.build_info_tab} ---</b>`);
+            const info = layout.textView(en.tabs.build_info_tab);
             info.gravity = Menu.Api.CENTER;
             Menu.add(info);
-            
-            Menu.add(layout.textView(`Version mod menu: ${Config.VERSION}`));
-            Menu.add(layout.textView(`Game version: ${Config.BuildInfo.appVersion}`));
-            Menu.add(layout.textView(`Original signature: ${Config.BuildInfo.original_signature}`));
-            Menu.add(layout.textView(`Using signature: ${Config.BuildInfo.used_signature}`));
-            Menu.add(layout.textView(`Unity version: ${Config.BuildInfo.unityVersion}`))
-            Menu.add(layout.textView(`Game build number: ${Config.BuildInfo.buildNumber}`));
-            Menu.add(layout.textView(`Game build date: ${Config.BuildInfo.buildDate}`));
 
-            Menu.add(layout.textView(`Package name: ${Il2Cpp.application.identifier}`));
+            Menu.add(layout.textView(`${en.info.mod_menu_version}: ${Config.VERSION}`));
+            Menu.add(layout.textView(`${en.info.game_version}: ${Config.BuildInfo.gameVersion}`));
+            Menu.add(layout.textView(`${en.info.spoofed_game_version}: ${Config.BuildInfo.spoofedGameVersion}`));
+            Menu.add(layout.textView(`${en.info.original_signature}: ${Config.BuildInfo.originalSignature}`));
+            Menu.add(layout.textView(`${en.info.spoofed_signature}: ${Config.BuildInfo.spoofedSignature}`));
+            Menu.add(layout.textView(`${en.info.unity_version}: ${Config.BuildInfo.unityVersion}`));
+            Menu.add(layout.textView(`${en.info.game_build_number}: ${Config.BuildInfo.buildNumber}`));
+            Menu.add(layout.textView(`${en.info.game_build_date}: ${Config.BuildInfo.buildDate}`));
+            Menu.add(layout.textView(`${en.info.package_name}: ${Il2Cpp.application.identifier}`));
 
-            const author = layout.textView("Created by repinek");
+            const author = layout.textView(en.info.author);
             author.gravity = Menu.Api.CENTER;
             Menu.add(author);
             
-            const secondAuthor = layout.textView("Special thanks to Floyzi102");
-            secondAuthor.gravity = Menu.Api.CENTER;
-            Menu.add(secondAuthor);
+            const specialThanks = layout.textView(en.info.special_thanks);
+            specialThanks.gravity = Menu.Api.CENTER;
+            Menu.add(specialThanks);
 
             Java.scheduleOnMainThread(() => {
                 setTimeout(() => {

@@ -1,6 +1,4 @@
 export namespace Config {
-    // TODO: 
-    // fix follow the leader teleport (add +y)
     export const VERSION = "2.08";
     export const VERSION_URL = "https://floyzi.github.io/FGTools/mobile/version.json";
     export const ICON_URL = "https://floyzi.github.io/images/obed-guys-present.png";
@@ -49,15 +47,17 @@ export namespace Config {
         export let grabbingMaxSpeed = 5;
         export let maxGravityVelocity = 40;
         export let jumpForce = 17.5;
-        export let airDiveForce = 7;
+        export let airDiveForce = 7; 
         export let diveForce = 16.5;
+        export let diveMultiplier = diveForce / airDiveForce;
     }
 
     export namespace BuildInfo {
-        export let appVersion: string;
-        export let original_signature: string;
-        export let used_signature: string;
-        export let platform = "android_ega"; // you can change it to other one, like pc_egs, ps5...
+        export let gameVersion: string;
+        export let spoofedGameVersion: string;
+        export let originalSignature: string;
+        export let spoofedSignature: string;
+        export let platform = "android_ega"; // you can change it to other one, like pc_egs, ps5, switch...
         export let unityVersion: string;
         export let buildNumber = "Local build";
         export let buildDate = "n/a";
