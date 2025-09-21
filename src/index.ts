@@ -153,8 +153,8 @@ function main() {
             newConfig.field("ClientVersion").value = Il2Cpp.string(fetchedClientDetails.client_version);
             newConfig.field("ClientVersionSignature").value = Il2Cpp.string(fetchedClientDetails.signature);
 
-            if (Config.BuildInfo.platform != "android_ega") {
-                newConfig.field("Platform").value = Il2Cpp.string(Config.BuildInfo.platform);
+            if (Config.BuildInfo.PLATFORM != "android_ega") {
+                newConfig.field("Platform").value = Il2Cpp.string(Config.BuildInfo.PLATFORM);
                 console.log(en.debug_messages.login_spoofed_with_platform);
             } else {
                 console.log(en.debug_messages.login_spoofed);
@@ -773,7 +773,7 @@ function main() {
             Menu.add(layout.textView(`${en.info.spoofed_game_version} ${Config.BuildInfo.spoofedGameVersion}`));
             Menu.add(layout.textView(`${en.info.original_signature} ${Config.BuildInfo.originalSignature}`));
             Menu.add(layout.textView(`${en.info.spoofed_signature} ${Config.BuildInfo.spoofedSignature}`));
-            Menu.add(layout.textView(`${en.info.platform} ${Config.BuildInfo.platform}`));
+            Menu.add(layout.textView(`${en.info.platform} ${Config.BuildInfo.PLATFORM}`));
             Menu.add(layout.textView(`${en.info.unity_version}: ${Config.BuildInfo.unityVersion}`));
             Menu.add(layout.textView(`${en.info.game_build_number} ${Config.BuildInfo.buildNumber}`));
             Menu.add(layout.textView(`${en.info.game_build_date} ${Config.BuildInfo.buildDate}`));

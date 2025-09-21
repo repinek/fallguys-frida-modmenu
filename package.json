@@ -9,7 +9,7 @@
     "spawn": "frida -U gadget -l dist/agent.js",
     "build": "frida-compile src/index.ts -o dist/agent.js -c",
     "test": "frida-compile src/test.ts -o dist/agent.js -c",
-    "build-apk": "fgi -i ./data/APKs/Fall_Guys_21.0.0_perm.apk -t script -l ./dist/agent.js -o ./data/APKs-modmenu/FallGuys-21.0.0-modmenu-2.11.apk --offline-mode"
+    "build-apk": "fgi -i ./data/APKs/Fall_Guys_21.0.0_perm.apk -t script -l ./dist/agent.js -o ./data/APKs-modmenu/FallGuys-21.0.0-modmenu-2.12.apk --offline-mode"
   }, 
   "keywords": [],
   "author": "repinek",
