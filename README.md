@@ -21,7 +21,7 @@ For help, updates announcements, and additional platforms support, join our comm
 - 360 Dives
 - Air Jump
 - Freeze Player
-- Stop sending Fall Guy State (packets)
+- Don't send Fall Guy state (packets)
 - Change Speed
 - Change Vertical Velocity / No Velocity / Negative Velocity
 - Change Jump and Dive Strength
@@ -32,8 +32,7 @@ For help, updates announcements, and additional platforms support, join our comm
 
 ### Teleports
 - Teleport To Finish or Crown
-- Teleport To Random Player
-- Teleport To Bubble, Active Button or Score Zone
+- Teleport To Bubble or Active Button
 
 ### Other
 - View Names Shortcut
@@ -44,16 +43,18 @@ For help, updates announcements, and additional platforms support, join our comm
 - Change Resolution
 - Show Number of Queued Players
 - Show Game Details
-  - Shows RoundID, seed Initial Players, Eliminated Players
+  - Shows RoundID, seed and Eliminated Players
 - Show Server Details
-  - Shows Server IP, Host, Ping, LAG
+  - Shows Server IP, Host and Ping
 - Show Build Info
 
 ### Features that always work (cannot be disabled)
 - Bypass Character Physics Checks
 - Remove FPS Limit
 - Anti-AFK
-- Bypass permanent ban (not temporary)
+- Bypass Permanent Ban (not temporary)
+- Spoofs to Latest Game Version automatically
+- Spoof Platform (edit script manually)
   
 ## 📦 Installation
 Just download and install the .apk from [Releases](https://github.com/repinek/fallguys-frida-modmenu/releases/latest) <br>
@@ -132,7 +133,7 @@ npm run spawn
 
 ## 🙏 Special Thanks
 Obed Guys Team - Some features powered by Obed Guys Team <br>
-[FloyzI](https://github.com/FloyzI) - For how the game works, help with some features<br>
+[FloyzI](https://github.com/FloyzI) - For how the game works, help with some features, localization<br>
 [commonuserlol](https://github.com/commonuserlol) - For help with code and [menu](https://github.com/commonuserlol/frida-java-menu) <br>
 [Dynasty-Dev](https://github.com/Dynasty-Dev) - For testing and contribution <br>
 [igamegod](https://github.com/igamegod) - For help with some features
