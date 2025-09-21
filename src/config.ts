@@ -1,16 +1,16 @@
 export namespace Config {
-    export const VERSION = "2.08";
+    export const VERSION = "2.12";
     export const VERSION_URL = "https://floyzi.github.io/FGTools/mobile/version.json";
     export const ICON_URL = "https://floyzi.github.io/images/obed-guys-present.png";
-    export const TELEPORT_COOLDOWN = 1000;
+    export const TELEPORT_COOLDOWN = 500;
 
     // === Spoof ===
     export const USE_SPOOF = true;
     export let customSignature: string;
-    export let customGameVersion: string; 
+    export let customGameVersion: string;
 
     export namespace Toggles {
-        // === Movement === 
+        // === Movement ===
         export let toggle360Dives: boolean;
         export let toggleAirJump: boolean;
         export let toggleDontSendFallGuyState: boolean;
@@ -23,13 +23,12 @@ export namespace Config {
         export let toggleCustomJumpForce: boolean;
         export let toggleCustomDiveForce: boolean;
 
-        // === Visuals === 
+        // === Visuals ===
         export let toggleCustomFov: boolean;
         export let toggleFGDebug: boolean;
         export let toggleHideDoors: boolean;
         export let toggleShowQueuedPlayers: boolean;
-    }
-
+    };
 
     export namespace CustomValues {
         export let normalMaxSpeed = 9.5;
@@ -38,7 +37,7 @@ export namespace Config {
         export let diveForce = 16.5;
         export let ResolutionScale = 1;
         export let FOV = 70;
-    }
+    };
 
     export namespace DefaultValues {
         export let divePlayerSensitivity = 70;
@@ -47,10 +46,10 @@ export namespace Config {
         export let grabbingMaxSpeed = 5;
         export let maxGravityVelocity = 40;
         export let jumpForce = 17.5;
-        export let airDiveForce = 7; 
+        export let airDiveForce = 7;
         export let diveForce = 16.5;
         export let diveMultiplier = diveForce / airDiveForce;
-    }
+    };
 
     export namespace BuildInfo {
         export let gameVersion: string;
@@ -61,5 +60,5 @@ export namespace Config {
         export let unityVersion: string;
         export let buildNumber = "Local build";
         export let buildDate = "n/a";
-    }
-}
+    };
+};

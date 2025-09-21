@@ -6,17 +6,17 @@ import { Config } from "./config.js";
 import en from "./localization/en.json";
 
 function main() {
-    // === Assemblies === 
+    // === Assemblies ===
     const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image; // FG.Common namespace
     const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
     const MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image; // FGClient namespace
-    const WushuLevelEditorRuntime = Il2Cpp.domain.assembly("Wushu.LevelEditor.Runtime").image; // creative logic
+    // const WushuLevelEditorRuntime = Il2Cpp.domain.assembly("Wushu.LevelEditor.Runtime").image; // creative logic
 
     // === Classes === 
     const Resources = CoreModule.class("UnityEngine.Resources");
     const Vector3class = CoreModule.class("UnityEngine.Vector3");
     const SceneManager = CoreModule.class("UnityEngine.SceneManagement.SceneManager");
-    const Camera = CoreModule.class("UnityEngine.Camera"); 
+    const Camera = CoreModule.class("UnityEngine.Camera");
 
     const BuildInfo = TheMultiplayerGuys.class("FG.Common.BuildInfo");
     const GraphicsSettings = MTFGClient.class("FGClient.GraphicsSettings");
@@ -28,10 +28,9 @@ function main() {
     const ClientGameManager = MTFGClient.class("FGClient.ClientGameManager");
     const AFKManager = MTFGClient.class("FGClient.AFKManager");
     const FNMMSClientRemoteService = MTFGClient.class("FGClient.FNMMSClientRemoteService");
-    const CatapultServicesManager = MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager"); 
+    const CatapultServicesManager = MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager");
 
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
-    const FallGuysCharacterController = TheMultiplayerGuys.class("FallGuysCharacterController");
     const MotorFunctionJump = TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
     const MPGNetMotorTasks = TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks"); // MPG - The Multiplayer Group 
 
@@ -49,31 +48,29 @@ function main() {
     // const LevelEditorTriggerZoneActiveBase = WushuLevelEditorRuntime.class("LevelEditorTriggerZoneActiveBase"); // trigger zone creative
 
     // === Methods === 
+    const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
+    const CheckAntiCheatClientServiceForError_method = MainMenuViewModel.method<boolean>("CheckAntiCheatClientServiceForError");
+    const ShowAntiCheatPopup_method = MainMenuViewModel.method("ShowAntiCheatPopup", 2);
+
     const set_fieldOfView_method = Camera.method("set_fieldOfView", 1);
-    const BuildInfo_OnEnable_method = BuildInfo.method("OnEnable");
     const get_TargetFrameRate_method = GraphicsSettings.method("get_TargetFrameRate");
     const set_TargetFrameRate_method = GraphicsSettings.method("set_TargetFrameRate", 1);
     const get_ResolutionScale_method = GraphicsSettings.method("get_ResolutionScale");
     const set_ResolutionScale_method = GraphicsSettings.method("set_ResolutionScale", 1);
     const SetShowPlayerNamesByDefault_method = PlayerInfoHUDBase.method("SetShowPlayerNamesByDefault", 1);
-    const CheckAntiCheatClientServiceForError_method = MainMenuViewModel.method<boolean>("CheckAntiCheatClientServiceForError"); 
-    const ShowAntiCheatPopup_method = MainMenuViewModel.method("ShowAntiCheatPopup", 2);
-    const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
-
-    const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
-    
-    const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
-
 
     const StartAFKManager_method = AFKManager.method("Start");
-    const ProcessMessageReceived_method = FNMMSClientRemoteService.method("ProcessMessageReceived");
-
-    const CheckCharacterControllerData_method = CharacterDataMonitor.method("CheckCharacterControllerData", 1); 
-    const CanJump_method = MotorFunctionJump.method<boolean>("CanJump");
+    const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
+    const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
     const SendMessage_method = MPGNetMotorTasks.method("SendMessage", 1);
+    const ProcessMessageReceived_method = FNMMSClientRemoteService.method("ProcessMessageReceived");
+    const BuildInfo_OnEnable_method = BuildInfo.method("OnEnable");
+
+    const CheckCharacterControllerData_method = CharacterDataMonitor.method("CheckCharacterControllerData", 1);
+    const CanJump_method = MotorFunctionJump.method<boolean>("CanJump");
 
     // === Cache === 
-    let FallGuysCharacterController_Instance: Il2Cpp.Object; 
+    let FallGuysCharacterController_Instance: Il2Cpp.Object;
     let CharacterControllerData_Instance: Il2Cpp.Object;
     let JumpMotorFunction_Instance: Il2Cpp.Object;
     let FGDebug_Instance: Il2Cpp.Object;
@@ -142,7 +139,7 @@ function main() {
 
         You can also change the platform here, but make sure it exists (otherwise you won't be able to login, mediatonic fixed this)
         Some existing platforms: ps5, pc_steam, pc_standalone (no longer used for official clients), ports3_2...
-        More can be found in the CMS and game code 
+        More can be found in the CMS and game code
 
         You can also change LoginServerHost and GatewayServerHost if you want to connect to a custom server.
         */
@@ -181,7 +178,7 @@ function main() {
         const AntiCheatErrorMessageString = errorMessage.method<Il2Cpp.String>("get_Message").invoke().content;
         if (AntiCheatErrorMessageString === "restrict_game_access" && shouldQuit === true) {
             console.log(en.debug_messages.detected_permanent_ban);
-            Menu.toast(en.messages.permanent_ban, 1); 
+            Menu.toast(en.messages.permanent_ban, 1);
         };
         return; 
     };
@@ -205,24 +202,10 @@ function main() {
 
     get_ResolutionScale_method.implementation = function () {
         GraphicsSettings_Instance = this; // often gc.choose causes crashes
-
-        // remove, causes bad resolution on some maps
-        /*
-        if (!reachedMainMenu) {
-            return this.method("get_ResolutionScale").invoke(); // return value from game config, if the menu is not loaded
-        }
-        */
-
         return Config.CustomValues.ResolutionScale;
     };
 
     set_ResolutionScale_method.implementation = function (scale) {
-        /*
-        if (!reachedMainMenu) {
-            return this.method("set_ResolutionScale", 1).invoke(scale); // return value from game config, if the menu is not loaded
-        }
-        */
-
         return this.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale); 
     };
 
@@ -451,34 +434,6 @@ function main() {
             teleportTo(finishObject);
         } else {
             Menu.toast(en.messages.no_finish, 0);
-        }
-    };
-    
-    // TODO: exclude PB_FallGuyBot (FallGuysCharacterController) (it's a placeholder)
-    const teleportToRandomPlayer = () => {
-        if (!checkTeleportCooldown()) return;
-
-        try {
-            const fallGuysCharacterControllerArray = findObjectsOfTypeAll(FallGuysCharacterController); 
-            console.log(fallGuysCharacterControllerArray, fallGuysCharacterControllerArray.length);
-            if (fallGuysCharacterControllerArray.length === 1) {
-                Menu.toast(en.messages.cant_teleport_to_yourself, 0);
-                return;
-            }
-            else if (fallGuysCharacterControllerArray.length > 1) {
-                const randomIndex = Math.floor(Math.random() * fallGuysCharacterControllerArray.length); // random
-                const randomPlayer = fallGuysCharacterControllerArray.get(randomIndex);
-
-                teleportTo(randomPlayer);
-                return;
-            }
-            else if (fallGuysCharacterControllerArray.length === 0) {
-                Menu.toast(en.messages.no_players_found, 0);
-                return;
-            };
-        } catch (error: any) {
-            console.error(error.stack);
-            Menu.toast(en.messages.cant_teleport_to_player, 0);
         }
     };
 
@@ -747,8 +702,6 @@ function main() {
             
             Menu.add(layout.button(en.functions.teleport_to_finish_or_crown, teleportToFinish));
 
-            Menu.add(layout.button(en.functions.teleport_to_random_player, teleportToRandomPlayer));
-
             Menu.add(layout.button(en.functions.teleport_to_score, teleportToScore));
 
             // === Utility Tab === 
@@ -815,15 +768,16 @@ function main() {
             info.gravity = Menu.Api.CENTER;
             Menu.add(info);
 
-            Menu.add(layout.textView(`${en.info.mod_menu_version}: ${Config.VERSION}`));
-            Menu.add(layout.textView(`${en.info.game_version}: ${Config.BuildInfo.gameVersion}`));
-            Menu.add(layout.textView(`${en.info.spoofed_game_version}: ${Config.BuildInfo.spoofedGameVersion}`));
-            Menu.add(layout.textView(`${en.info.original_signature}: ${Config.BuildInfo.originalSignature}`));
-            Menu.add(layout.textView(`${en.info.spoofed_signature}: ${Config.BuildInfo.spoofedSignature}`));
+            Menu.add(layout.textView(`${en.info.mod_menu_version} ${Config.VERSION}`));
+            Menu.add(layout.textView(`${en.info.game_version} ${Config.BuildInfo.gameVersion}`));
+            Menu.add(layout.textView(`${en.info.spoofed_game_version} ${Config.BuildInfo.spoofedGameVersion}`));
+            Menu.add(layout.textView(`${en.info.original_signature} ${Config.BuildInfo.originalSignature}`));
+            Menu.add(layout.textView(`${en.info.spoofed_signature} ${Config.BuildInfo.spoofedSignature}`));
+            Menu.add(layout.textView(`${en.info.platform} ${Config.BuildInfo.platform}`));
             Menu.add(layout.textView(`${en.info.unity_version}: ${Config.BuildInfo.unityVersion}`));
-            Menu.add(layout.textView(`${en.info.game_build_number}: ${Config.BuildInfo.buildNumber}`));
-            Menu.add(layout.textView(`${en.info.game_build_date}: ${Config.BuildInfo.buildDate}`));
-            Menu.add(layout.textView(`${en.info.package_name}: ${Il2Cpp.application.identifier}`));
+            Menu.add(layout.textView(`${en.info.game_build_number} ${Config.BuildInfo.buildNumber}`));
+            Menu.add(layout.textView(`${en.info.game_build_date} ${Config.BuildInfo.buildDate}`));
+            Menu.add(layout.textView(`${en.info.package_name} ${Il2Cpp.application.identifier}`));
 
             const author = layout.textView(en.info.author);
             author.gravity = Menu.Api.CENTER;

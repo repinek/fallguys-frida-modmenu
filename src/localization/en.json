@@ -5,9 +5,6 @@
         "display_menu": "Displaying the menu",
         "no_finish": "No Finish or Crown was found. The round probably does not have a finish or a crown.",
         "no_score": "No bubbles or buttons were found.",
-        "cant_teleport_to_yourself": "You can't teleport to yourself.",
-        "no_players_found": "No Players were found!",
-        "cant_teleport_to_player": "Can't teleport to player.",
         "not_in_the_game": "You are not in the game!",
         "server": "Server",
         "ping": "Ping"
@@ -47,7 +44,6 @@
         "hide_real_doors": "Hide Real Doors",
         "show_tiptoe_path": "Show Tip Toe Path",
         "teleport_to_finish_or_crown": "Teleport To Finish / Crown",
-        "teleport_to_random_player": "Teleport To Random Player",
         "teleport_to_score": "Teleport To Bubble / Active Button",
         "toggle_view_names": "Toggle Player Names",
         "toggle_custom_fov": "Use Custom FOV",
@@ -67,14 +63,15 @@
         "fg_state_warn": "While you using Don't send Fall Guy state you won't be able to Qualify, Grab objects and do other server required actions\nFor others your Fall Guy will stay in state before enabling this feature",
         "github_link": "GitHub Repository (Leave a star!)",
         "discord_link": "Discord Server",
-        "mod_menu_version": "Mod Menu version",
-        "game_version": "Game Version",
-        "spoofed_game_version": "Used Game Version",
-        "original_signature": "Build Signature",
-        "spoofed_signature": "Used Signature",
-        "unity_version": "Unity Version",
-        "game_build_number": "Game Build number",
-        "game_build_date": "Game Build date",
-        "package_name": "Package Name"
+        "mod_menu_version": "Mod Menu version:",
+        "game_version": "Game Version:",
+        "spoofed_game_version": "Used Game Version:",
+        "original_signature": "Build Signature:",
+        "spoofed_signature": "Used Signature:",
+        "platform": "Platform:",
+        "unity_version": "Unity Version:",
+        "game_build_number": "Game Build number:",
+        "game_build_date": "Game Build date:",
+        "package_name": "Package Name:"
     }
 }
