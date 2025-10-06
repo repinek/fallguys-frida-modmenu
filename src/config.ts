@@ -1,5 +1,5 @@
 export namespace Config {
-    export const VERSION = "2.15";
+    export const VERSION = "2.16";
     export const ICON_URL = "https://floyzi.github.io/images/obed-guys-present.png";
 
     export const SPOOF_VERSION_URL = "https://floyzi.github.io/FGTools/mobile/version.json";
@@ -43,6 +43,7 @@ export namespace Config {
         // === Visuals ===
         export let toggleCustomFov: boolean;
         export let toggleFGDebug: boolean;
+        export let toggleDisableAnalytics: boolean;
         export let toggleHideDoors: boolean;
         export let toggleShowQueuedPlayers: boolean;
     };

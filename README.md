@@ -41,6 +41,7 @@ For help, updates announcements, and additional platforms support, join our comm
 - Display FGDebug
   - Shows FPS (min/max/avg/current), Time, Ping, Dropped Packets
 - Change Resolution
+- Disable FG Analytics 
 - Show Number of Queued Players
 - Show Game Details
   - Shows RoundID, seed and Eliminated Players
@@ -48,7 +49,7 @@ For help, updates announcements, and additional platforms support, join our comm
   - Shows Server IP, Host and Ping
 - Show Build Info
 
-### Features that always work (cannot be disabled)
+### Features that always work (Always enabled)
 - Bypass Character Physics Checks
 - Remove FPS Limit
 - Anti-AFK

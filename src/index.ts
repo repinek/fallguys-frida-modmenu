@@ -51,10 +51,12 @@ function main() {
 
     const HttpNetworkHost = MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.HttpNetworkHost");
     const WebSocketNetworkHost = MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
+    const AnalyticsService = MediatonicCatapultClientSdkRuntime.class("Catapult.Analytics.AnalyticsService");
 
     // === Methods === 
     const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
     const Init_ClientOnly_method = CatapultAnalyticsService.method("Init_ClientOnly", 3);
+    const SendEventBatch_method = AnalyticsService.method("SendEventBatch");
     const CheckAntiCheatClientServiceForError_method = MainMenuViewModel.method<boolean>("CheckAntiCheatClientServiceForError");
     const ShowAntiCheatPopup_method = MainMenuViewModel.method("ShowAntiCheatPopup", 2);
 
@@ -340,8 +342,15 @@ function main() {
     SendMessage_method.implementation = function (bypassNetworkLOD) {
         if (Config.Toggles.toggleDontSendFallGuyState) {
             return;
-        }
+        };
         return this.method("SendMessage", 1).invoke(bypassNetworkLOD);
+    };
+
+    SendEventBatch_method.implementation = function () {
+        if (Config.Toggles.toggleDisableAnalytics) {
+            return;
+        };
+        return this.method("SendEventBatch").invoke();
     };
 
     //@ts-ignore, code from wiki snippets btw lol
@@ -372,7 +381,6 @@ function main() {
 
     // Physics 
     CheckCharacterControllerData_method.implementation = function (character: any) {
-    
         FallGuysCharacterController_Instance = character;
         CharacterControllerData_Instance = character.method("get_Data").invoke(); // get Data instance
         JumpMotorFunction_Instance = character.method("get_JumpMotorFunction").invoke(); // get JumpMotorFunction 
@@ -780,7 +788,7 @@ function main() {
             );
 
             Menu.add(
-                layout.toggle(en.functions.disable_ui, (state: boolean) => {
+                layout.toggle(en.functions.toggle_disable_ui, (state: boolean) => {
                     state ? UICanvas_util.disable() : UICanvas_util.enable();
                 })
             );
@@ -788,6 +796,12 @@ function main() {
             Menu.add(
                 layout.toggle(en.functions.toggle_fgdebug, (state: boolean) => {
                     state ? FGDebug.enable() : FGDebug.disable();
+                })
+            );
+
+            Menu.add(
+                layout.toggle(en.functions.toggle_disable_analytics, (state: boolean) => {
+                    Config.Toggles.toggleDisableAnalytics = state;
                 })
             );
 
