@@ -33,33 +33,6 @@ export function copyToClipboard(text: string) {
     });
 }
 
-export function pasteFromClipboard(): string | null {
-    let result: string | null = null;
-    Java.perform(() => {
-        try {
-            const context = Java.use("android.app.ActivityThread").currentApplication().getApplicationContext();
-            const clipboardManager = Java.cast(
-                context.getSystemService("clipboard"),
-                Java.use("android.content.ClipboardManager")
-            );
-
-            if (clipboardManager.hasPrimaryClip()) {
-                const clipData = clipboardManager.getPrimaryClip();
-                if (clipData != null && clipData.getItemCount() > 0) {
-                    const item = clipData.getItemAt(0);
-                    const charSeq = item.getText();
-                    if (charSeq != null) {
-                        result = charSeq.toString();
-                    }
-                }
-            }
-        } catch (error: any) {
-            console.error(`Failed to paste from clipboard: ${error.message}`);
-        }
-    });
-    return result;
-}
-
 // Thanks a lot: https://github.com/frida/frida/issues/1158#issuecomment-1227967229
 export function httpGet(targetUrl: string, onReceive: (response: string) => void = function(response: string) { /*console.log("response:", response);*/ }) {
     Java.perform(() => {

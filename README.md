@@ -52,9 +52,10 @@ For help, updates announcements, and additional platforms support, join our comm
 - Bypass Character Physics Checks
 - Remove FPS Limit
 - Anti-AFK
-- Bypass Permanent Ban (not temporary)
-- Spoofs to Latest Game Version automatically
-- Spoof Platform (edit script manually)
+- Bypass Permanent Ban (does not affect temporary bans)
+- Automatically spoof to the latest game version
+- Spoof Platform (requires manual script edit)
+- Spoof Login, Gateway and analytics server (requires manual script edit)
   
 ## 📦 Installation
 Just download and install the .apk from [Releases](https://github.com/repinek/fallguys-frida-modmenu/releases/latest) <br>
@@ -71,7 +72,8 @@ Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 In The Main Menu it will ask for permission to display over other apps, If it doesn’t ask for it, grant it manually. <br><br>
 **HyperOS, ColorOS, OneUI, HarmonyOS**, and other OEM ROMs may not work properly or at all. <br>
 **It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).** <br>
-**EMULATORS ARE NOT SUPPORTED!!** <br>
+**EMULATORS ARE NOT SUPPORTED!!** <br> <br>
+Also frida and frida-il2cpp-bridge can be unstable. 
 
 ## 🏗️ Build
 **— Install dependencies**

@@ -1,7 +1,7 @@
 import "frida-il2cpp-bridge";
 import "frida-java-menu";
 import { obsidianConfig } from "./menuConfig.js";
-import { openURL, copyToClipboard, pasteFromClipboard, httpGet } from "./utils.js";
+import { openURL, copyToClipboard, httpGet } from "./utils.js";
 import { Config } from "./config.js";
 import en from "./localization/en.json";
 
@@ -11,6 +11,7 @@ function main() {
     const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
     const MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image; // FGClient namespace
     // const WushuLevelEditorRuntime = Il2Cpp.domain.assembly("Wushu.LevelEditor.Runtime").image; // creative logic
+    const MediatonicCatapultClientSdkRuntime = Il2Cpp.domain.assembly("Mediatonic.Catapult.ClientSdk.Runtime").image; // connection
 
     // === Classes === 
     const Resources = CoreModule.class("UnityEngine.Resources");
@@ -33,7 +34,7 @@ function main() {
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const MotorFunctionJump = TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
     const MPGNetMotorTasks = TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks"); // MPG - The Multiplayer Group 
-    const PlatformServices = TheMultiplayerGuys.class("FG.Common.PlatformServices");
+    const CatapultAnalyticsService = TheMultiplayerGuys.class("FG.Common.CatapultAnalyticsService");
 
     const DebugClass = TheMultiplayerGuys.class("GvrFPS"); // FGDebug
 
@@ -48,8 +49,12 @@ function main() {
     // const FollowTheLeaderZone = TheMultiplayerGuys.class("Levels.ScoreZone.FollowTheLeader.FollowTheLeaderZone"); // leading light
     // const LevelEditorTriggerZoneActiveBase = WushuLevelEditorRuntime.class("LevelEditorTriggerZoneActiveBase"); // trigger zone creative
 
+    const HttpNetworkHost = MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.HttpNetworkHost");
+    const WebSocketNetworkHost = MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
+
     // === Methods === 
     const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
+    const Init_ClientOnly_method = CatapultAnalyticsService.method("Init_ClientOnly", 3);
     const CheckAntiCheatClientServiceForError_method = MainMenuViewModel.method<boolean>("CheckAntiCheatClientServiceForError");
     const ShowAntiCheatPopup_method = MainMenuViewModel.method("ShowAntiCheatPopup", 2);
 
@@ -161,8 +166,6 @@ function main() {
         You can also change the platform here, but make sure it exists (otherwise you won't be able to login, mediatonic fixed this)
         Some existing platforms: ps5, pc_steam, pc_standalone (no longer used for official clients), ports3_2...
         More can be found in the CMS and game code
-
-        You can also change LoginServerHost and GatewayServerHost if you want to connect to a custom server.
         */
         if (Config.USE_SPOOF && fetchedClientDetails!) {
             const newConfig = this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // create new config
@@ -174,19 +177,47 @@ function main() {
             newConfig.field("ClientVersion").value = Il2Cpp.string(fetchedClientDetails.client_version);
             newConfig.field("ClientVersionSignature").value = Il2Cpp.string(fetchedClientDetails.signature);
 
+            // Spoof platform
             if (Config.BuildInfo.PLATFORM != "android_ega") {
                 newConfig.field("Platform").value = Il2Cpp.string(Config.BuildInfo.PLATFORM);
                 console.log(en.debug_messages.login_spoofed_with_platform);
-            } else {
+            } else
                 console.log(en.debug_messages.login_spoofed);
+            
+            // Custom server
+            if (Config.USE_CUSTOM_SERVER) {
+                const loginServerHostAlloc = HttpNetworkHost.alloc();
+                const gatewayServerHostAlloc = WebSocketNetworkHost.alloc();
+
+                // Adds port to the host string if port > 0
+                loginServerHostAlloc.method(".ctor").invoke(Il2Cpp.string(Config.CUSTOM_LOGIN_URL), Config.CUSTOM_LOGIN_PORT);
+                // (string host, int port, bool isSecure) — wss if secure, ws otherwise: (isSecure ? "wss://{0}:{1}/ws" : "ws://{0}:{1}/ws");
+                gatewayServerHostAlloc.method(".ctor").invoke(Il2Cpp.string(Config.CUSTOM_GATEWAY_URL), Config.CUSTOM_GATEWAY_PORT, Config.IS_GATEWAY_SECURE);
+
+                newConfig.field("LoginServerHost").value = loginServerHostAlloc;
+                newConfig.field("GatewayServerHost").value = gatewayServerHostAlloc;
+                
+                console.log(en.debug_messages.server_spoofed);
             }
 
             return newConfig; 
         } else {
             return this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // without any changes
-        }
+        };
     };
-        
+    
+    //@ts-ignore
+    Init_ClientOnly_method.implementation = function (serverAddress: Il2Cpp.Object, gatewayConnConfig: Il2Cpp.Object, platformServiceProvider: Il2Cpp.String) {
+        if (Config.USE_CUSTOM_SERVER) {
+            // refer BuildCatapultConfig hook
+            const analyticsServerHostAlloc = WebSocketNetworkHost.alloc();
+            analyticsServerHostAlloc.method(".ctor").invoke(Il2Cpp.string(Config.CUSTOM_ANALYTICS_URL), Config.CUSTOM_ANALYTICS_PORT, Config.IS_ANALYTICS_SECURE);
+
+            return this.method("Init_ClientOnly").invoke(analyticsServerHostAlloc, gatewayConnConfig, platformServiceProvider);
+        }
+        return this.method("Init_ClientOnly").invoke(serverAddress, gatewayConnConfig, platformServiceProvider);
+    }; 
+
     // Bypass permanent ban
     // you can't bypass a temporary ban, but you can bypass a permanent one, lmao
     CheckAntiCheatClientServiceForError_method.implementation = function () {
@@ -196,8 +227,8 @@ function main() {
     //@ts-ignore should work lol
     ShowAntiCheatPopup_method.implementation = function (errorMessage: Il2Cpp.Object, shouldQuit: boolean) {
         // Called by: bool FGClient::MainMenuViewModel::_CheckRestrictedGameAccess_d__69::MoveNext
-        const AntiCheatErrorMessageString = errorMessage.method<Il2Cpp.String>("get_Message").invoke().content;
-        if (AntiCheatErrorMessageString === "restrict_game_access" && shouldQuit === true) {
+        const antiCheatErrorMessageString = errorMessage.method<Il2Cpp.String>("get_Message").invoke().content;
+        if (antiCheatErrorMessageString === "restrict_game_access" && shouldQuit === true) {
             console.log(en.debug_messages.detected_permanent_ban);
             Menu.toast(en.messages.permanent_ban, 1);
         };
@@ -609,8 +640,7 @@ function main() {
     const initMenu = () => {
         try {
             const layout = new Menu.ObsidianLayout(obsidianConfig);
-            //const composer = new Menu.Composer(en.info.name, en.info.warn, layout); 
-            const composer = new Menu.Composer("бэм бэм бэм", en.info.warn, layout); 
+            const composer = new Menu.Composer(en.info.name, en.info.warn, layout); 
             composer.icon(Config.ICON_URL, "Web");
 
             // === Movement Tab === 

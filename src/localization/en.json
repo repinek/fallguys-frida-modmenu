@@ -19,6 +19,7 @@
         "version_not_actual": "Mod menu version is outdated, redirecting...",
         "login_spoofed": "Modified signature and client version", 
         "login_spoofed_with_platform": "Modified signature, client version and platform",
+        "server_spoofed": "Modified Login, Gateway and Analytics server",
         "detected_permanent_ban": "Detected permanent ban",
         "change_resolution": "trying change resolution scale to:"
     },
