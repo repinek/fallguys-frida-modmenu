@@ -1,7 +1,7 @@
 import "frida-il2cpp-bridge";
 import "frida-java-menu";
 import { obsidianConfig } from "./menuConfig.js";
-import { openURL, copyToClipboard, httpGet } from "./utils.js";
+import { openURL, copyToClipboard, pasteFromClipboard, httpGet } from "./utils.js";
 import { Config } from "./config.js";
 import en from "./localization/en.json";
 
@@ -33,6 +33,7 @@ function main() {
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const MotorFunctionJump = TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
     const MPGNetMotorTasks = TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks"); // MPG - The Multiplayer Group 
+    const PlatformServices = TheMultiplayerGuys.class("FG.Common.PlatformServices");
 
     const DebugClass = TheMultiplayerGuys.class("GvrFPS"); // FGDebug
 
@@ -81,20 +82,40 @@ function main() {
     let UICanvas_Instance: Il2Cpp.Object;
 
     let fetchedClientDetails;
+    let fetchedModmenuVersion;
     let reachedMainMenu = false;
     let currentSceneName;
     let showPlayerNames: boolean;
     let lastTeleportTime = 0;
 
     console.log(en.debug_messages.loaded);
+    
+    if (Config.USE_SPOOF)
+    {
+        httpGet(Config.SPOOF_VERSION_URL, (response) => {
+            try {
+                fetchedClientDetails = JSON.parse(response);
+                console.log(en.debug_messages.signature_fetched, response);
+            } catch (error: any) {
+                console.log("error:", error);
+                Menu.toast(en.debug_messages.signature_not_fetched, 1)
+            }
+        });
+    }
 
     httpGet(Config.VERSION_URL, (response) => {
         try {
-            fetchedClientDetails = JSON.parse(response);
-            console.log(en.debug_messages.fetched, response);
+            fetchedModmenuVersion = JSON.parse(response);
+            console.log(en.debug_messages.version_fetched, response);
+            if (fetchedModmenuVersion.version == Il2Cpp.application.version!)
+                Menu.toast(en.debug_messages.version_actual, 1);
+            else {
+                Menu.toast(en.debug_messages.version_not_actual, 1);
+                openURL(Config.GITHUB_RELEASES_URL);
+            };
         } catch (error: any) {
             console.log("error:", error);
-            Menu.toast(en.debug_messages.not_fetched, 1)
+            Menu.toast(en.debug_messages.version_not_fetched, 1)
         }
     });
 
@@ -588,7 +609,8 @@ function main() {
     const initMenu = () => {
         try {
             const layout = new Menu.ObsidianLayout(obsidianConfig);
-            const composer = new Menu.Composer(en.info.name, en.info.warn, layout);
+            //const composer = new Menu.Composer(en.info.name, en.info.warn, layout); 
+            const composer = new Menu.Composer("бэм бэм бэм", en.info.warn, layout); 
             composer.icon(Config.ICON_URL, "Web");
 
             // === Movement Tab === 
@@ -756,12 +778,12 @@ function main() {
             Menu.add(layout.button(en.functions.show_and_copy_server_details, showServerDetails));
 
             // === Links Tab === 
-            const links = layout.textView(en.tabs.credits_tab);
+            const links = layout.textView(en.tabs.links_tab);
             links.gravity = Menu.Api.CENTER;
             Menu.add(links);
 
-            Menu.add(layout.button(en.info.github_link, () => openURL("https://github.com/repinek/fallguys-frida-modmenu")));
-            Menu.add(layout.button(en.info.discord_link, () => openURL("https://discord.gg/cNFJ73P6p3")));
+            Menu.add(layout.button(en.info.github_url, () => openURL(Config.GITHUB_URL)));
+            Menu.add(layout.button(en.info.discord_url, () => openURL(Config.DISCORD_URL)));
 
             // === Build Info Tab ===
             const info = layout.textView(en.tabs.build_info_tab);
@@ -770,11 +792,14 @@ function main() {
 
             Menu.add(layout.textView(`${en.info.mod_menu_version} ${Config.VERSION}`));
             Menu.add(layout.textView(`${en.info.game_version} ${Config.BuildInfo.gameVersion}`));
-            Menu.add(layout.textView(`${en.info.spoofed_game_version} ${Config.BuildInfo.spoofedGameVersion}`));
+            Menu.add(layout.textView(`${en.info.is_spoofed} ${Config.USE_SPOOF}`));
+            if (Config.USE_SPOOF)
+                Menu.add(layout.textView(`${en.info.spoofed_game_version} ${Config.BuildInfo.spoofedGameVersion}`));
             Menu.add(layout.textView(`${en.info.original_signature} ${Config.BuildInfo.originalSignature}`));
-            Menu.add(layout.textView(`${en.info.spoofed_signature} ${Config.BuildInfo.spoofedSignature}`));
+            if (Config.USE_SPOOF)
+                Menu.add(layout.textView(`${en.info.spoofed_signature} ${Config.BuildInfo.spoofedSignature}`));
             Menu.add(layout.textView(`${en.info.platform} ${Config.BuildInfo.PLATFORM}`));
-            Menu.add(layout.textView(`${en.info.unity_version}: ${Config.BuildInfo.unityVersion}`));
+            Menu.add(layout.textView(`${en.info.unity_version} ${Config.BuildInfo.unityVersion}`));
             Menu.add(layout.textView(`${en.info.game_build_number} ${Config.BuildInfo.buildNumber}`));
             Menu.add(layout.textView(`${en.info.game_build_date} ${Config.BuildInfo.buildDate}`));
             Menu.add(layout.textView(`${en.info.package_name} ${Il2Cpp.application.identifier}`));
