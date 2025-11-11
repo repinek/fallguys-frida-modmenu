@@ -34,9 +34,12 @@ function main() {
     const FNMMSClientRemoteService = MTFGClient.class("FGClient.FNMMSClientRemoteService");
     const CatapultServicesManager = MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager");
 
-    // const ModalMessageData = MTFGClient.class("FGClient.UI.ModalMessageData");
-    // const PopupManager = MTFGClient.class("FGClient.UI.PopupManager");
-    // const PopupInteractionType = MTFGClient.class("FGClient.UI.PopupInteractionType");
+    // refer createPopup()
+    /*
+    const ModalMessageData = MTFGClient.class("FGClient.UI.ModalMessageData");
+    const PopupManager = MTFGClient.class("FGClient.UI.PopupManager");
+    const PopupInteractionType = MTFGClient.class("FGClient.UI.PopupInteractionType");
+    */
 
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const MotorFunctionJump = TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
@@ -669,7 +672,7 @@ function main() {
             const PopupManager_Instance = PopupManager.method<Il2Cpp.Object>("get_Instance").invoke();
             const Show_method = PopupManager_Instance.method<boolean>("Show", 3);
             // const Show_method2 = Show_method.overload("PopupInteractionType", "ModalMessageData", "UIModalMessage.ModalMessageFailedToShow"); // can't overload it for some reason idk
-            const Show_method2 = Show_method.overload("FGClient.UI.PopupInteractionType", "FGClient.UI.ModalMessageData", "FGClient.UI.UIModalMessage.ModalMessageFailedToShow") // working??
+            const Show_method2 = Show_method.overload("FGClient.UI.PopupInteractionType", "FGClient.UI.ModalMessageData", "FGClient.UI.UIModalMessage.ModalMessageFailedToShow") // working!!
             const ModalMessageDataAllocated = ModalMessageData.alloc();
             const PopupInteractionTypeInfo = PopupInteractionType.field<Il2Cpp.ValueType>("Info").value; // get type from enum
             ModalMessageDataAllocated.method(".ctor").invoke(); // after that you need to set some fields in the class like title, message...
