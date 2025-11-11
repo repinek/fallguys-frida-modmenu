@@ -5,6 +5,9 @@ import { openURL, copyToClipboard, httpGet } from "./utils.js";
 import { Config } from "./config.js";
 import en from "./localization/en.json";
 
+// My code is kinda structless. Maybe I'll refactor it later, but I'm too lazy since I lost interest in this project
+// A lot of things has been done already, and I don't even know what else to do. 
+// frida and il2cpp-bridge doesn't work correctly sometimes, and also I'm too to dumb for some things I guess (?)
 function main() {
     // === Assemblies ===
     const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image; // FG.Common namespace
@@ -31,6 +34,10 @@ function main() {
     const FNMMSClientRemoteService = MTFGClient.class("FGClient.FNMMSClientRemoteService");
     const CatapultServicesManager = MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager");
 
+    // const ModalMessageData = MTFGClient.class("FGClient.UI.ModalMessageData");
+    // const PopupManager = MTFGClient.class("FGClient.UI.PopupManager");
+    // const PopupInteractionType = MTFGClient.class("FGClient.UI.PopupInteractionType");
+
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const MotorFunctionJump = TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
     const MPGNetMotorTasks = TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks"); // MPG - The Multiplayer Group 
@@ -41,7 +48,7 @@ function main() {
     const ObjectiveReachEndZone = TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone"); // finish
     const GrabToQualify = TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crown
     const SpawnableCollectable = TheMultiplayerGuys.class("Levels.ScoreZone.SpawnableCollectable"); // bubble unity
-    const COMMON_ScoringBubble = TheMultiplayerGuys.class("Levels.Progression.COMMON_ScoringBubble") // bubble creative
+    const COMMON_ScoringBubble = TheMultiplayerGuys.class("Levels.Progression.COMMON_ScoringBubble"); // bubble creative
     const ScoredButton = TheMultiplayerGuys.class("ScoredButton"); // trigger button unity
     const TipToe_Platform = TheMultiplayerGuys.class("Levels.TipToe.TipToe_Platform");
     const FakeDoorController = TheMultiplayerGuys.class("Levels.DoorDash.FakeDoorController");
@@ -644,6 +651,38 @@ function main() {
         }
     };
 
+    /*
+    Maybe some day I will finish it (no) (also it's only prototype don't blame me for bad code)
+    > Error: access violation accessing 0x10
+
+    Can't overload show_method2 for some reason also 
+    > il2cpp: couldn't find overloaded method Show(PopupInteractionType,ModalMessageData,UIModalMessage.ModalMessageFailedToShow)
+    Dump: public bool Show(PopupInteractionType popupInteractionType, ModalMessageData data, UIModalMessage.ModalMessageFailedToShow onFailedCallback) 
+
+    ok, nvm, copy full name from dnspy is solved my problem
+    System.Boolean FGClient.UI.PopupManager::Show(FGClient.UI.PopupInteractionType,FGClient.UI.ModalMessageWithOptionSelectionData,FGClient.UI.UIModalMessage/ModalMessageFailedToShow)
+    */
+
+    /*
+    const createPopup = () => {
+        try {
+            const PopupManager_Instance = PopupManager.method<Il2Cpp.Object>("get_Instance").invoke();
+            const Show_method = PopupManager_Instance.method<boolean>("Show", 3);
+            // const Show_method2 = Show_method.overload("PopupInteractionType", "ModalMessageData", "UIModalMessage.ModalMessageFailedToShow"); // can't overload it for some reason idk
+            const Show_method2 = Show_method.overload("FGClient.UI.PopupInteractionType", "FGClient.UI.ModalMessageData", "FGClient.UI.UIModalMessage.ModalMessageFailedToShow") // working??
+            const ModalMessageDataAllocated = ModalMessageData.alloc();
+            const PopupInteractionTypeInfo = PopupInteractionType.field<Il2Cpp.ValueType>("Info").value; // get type from enum
+            ModalMessageDataAllocated.method(".ctor").invoke(); // after that you need to set some fields in the class like title, message...
+            
+            // 3rd argument is UIModalMessage.ModalMessageFailedToShow onFailedCallback = null, so uhhh idk how
+            Show_method2.invoke(PopupInteractionTypeInfo, ModalMessageDataAllocated, NULL);
+        } catch (error: any) {
+            Menu.toast(error.stack, 1);
+            console.error(error.stack);
+        };
+    };
+    */
+    
 
     const initMenu = () => {
         try {
