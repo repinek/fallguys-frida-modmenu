@@ -8,6 +8,8 @@ import en from "./localization/en.json";
 // My code is kinda structless. Maybe I'll refactor it later, but I'm too lazy since I lost interest in this project
 // A lot of things has been done already, and I don't even know what else to do. 
 // frida and il2cpp-bridge doesn't work correctly sometimes, and also I'm too to dumb for some things I guess (?)
+// honourable mention: Failed to load script: the connection is closed. Thank you for using Frida!
+
 function main() {
     // === Assemblies ===
     const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image; // FG.Common namespace
@@ -34,10 +36,14 @@ function main() {
     const FNMMSClientRemoteService = MTFGClient.class("FGClient.FNMMSClientRemoteService");
     const CatapultServicesManager = MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager");
 
+    const PopupManager = MTFGClient.class("FGClient.UI.PopupManager");
+    const LocaliseOption = MTFGClient.class("FGClient.UI.UIModalMessage/LocaliseOption");
+    const ModalType = MTFGClient.class("FGClient.UI.UIModalMessage/ModalType");
+    const OkButtonType = MTFGClient.class("FGClient.UI.UIModalMessage/OKButtonType");
+    
     // refer createPopup()
     /*
     const ModalMessageData = MTFGClient.class("FGClient.UI.ModalMessageData");
-    const PopupManager = MTFGClient.class("FGClient.UI.PopupManager");
     const PopupInteractionType = MTFGClient.class("FGClient.UI.PopupInteractionType");
     */
 
@@ -62,13 +68,14 @@ function main() {
     const HttpNetworkHost = MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.HttpNetworkHost");
     const WebSocketNetworkHost = MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
     const AnalyticsService = MediatonicCatapultClientSdkRuntime.class("Catapult.Analytics.AnalyticsService");
-
+    const Show_method = PopupManager.method("Show", 3);
+    const Show_method_overload = Show_method.overload("FGClient.UI.PopupInteractionType", "FGClient.UI.ModalMessageData", "FGClient.UI.UIModalMessage.ModalMessageFailedToShow");
+            
     // === Methods === 
     const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
     const Init_ClientOnly_method = CatapultAnalyticsService.method("Init_ClientOnly", 3);
     const SendEventBatch_method = AnalyticsService.method("SendEventBatch");
     const CheckAntiCheatClientServiceForError_method = MainMenuViewModel.method<boolean>("CheckAntiCheatClientServiceForError");
-    const ShowAntiCheatPopup_method = MainMenuViewModel.method("ShowAntiCheatPopup", 2);
 
     const set_fieldOfView_method = Camera.method("set_fieldOfView", 1);
     const get_TargetFrameRate_method = GraphicsSettings.method("get_TargetFrameRate");
@@ -235,16 +242,26 @@ function main() {
     CheckAntiCheatClientServiceForError_method.implementation = function () {
         return false; // idk how it works, but it works (you can't enter the match without this hook)
     };
-    
-    //@ts-ignore should work lol
-    ShowAntiCheatPopup_method.implementation = function (errorMessage: Il2Cpp.Object, shouldQuit: boolean) {
-        // Called by: bool FGClient::MainMenuViewModel::_CheckRestrictedGameAccess_d__69::MoveNext
-        const antiCheatErrorMessageString = errorMessage.method<Il2Cpp.String>("get_Message").invoke().content;
-        if (antiCheatErrorMessageString === "restrict_game_access" && shouldQuit === true) {
-            console.log(en.debug_messages.detected_permanent_ban);
-            Menu.toast(en.messages.permanent_ban, 1);
+
+    Show_method_overload.implementation = function (PopupInteractionType, ModalMessageData, ModalMessageFailedToShow) {
+        ModalMessageData = ModalMessageData as Il2Cpp.Object;
+
+        if (ModalMessageData.field<Il2Cpp.String>("Title").value.content == "anticheat_error_title") {
+            const NotLocalised_Option = LocaliseOption.field<Il2Cpp.ValueType>("NotLocalised").value;
+            const MT_OK_Option = ModalType.field<Il2Cpp.ValueType>("MT_OK").value;
+            const Positive_Option = OkButtonType.field<Il2Cpp.ValueType>("Positive").value;
+
+            ModalMessageData.field<Il2Cpp.String>("Title").value = Il2Cpp.string(en.messages.account_banned);
+            ModalMessageData.field<Il2Cpp.String>("Message").value = Il2Cpp.string(en.messages.account_banned_desc);
+            ModalMessageData.field<Il2Cpp.ValueType>("LocaliseTitle").value = NotLocalised_Option; 
+            ModalMessageData.field<Il2Cpp.ValueType>("LocaliseMessage").value = NotLocalised_Option; 
+            ModalMessageData.field<Il2Cpp.ValueType>("ModalType").value = MT_OK_Option;
+            ModalMessageData.field<Il2Cpp.ValueType>("OkButtonType").value = Positive_Option; // for green color of the button (it's cool)
         };
-        return; 
+
+        const this_method = this.method("Show", 3); // for instance
+        const this_method_overload = this_method.overload("FGClient.UI.PopupInteractionType", "FGClient.UI.ModalMessageData", "FGClient.UI.UIModalMessage.ModalMessageFailedToShow");
+        return this_method_overload.invoke(PopupInteractionType, ModalMessageData, ModalMessageFailedToShow);
     };
 
     // Graphics 

@@ -1,13 +1,14 @@
 {   
     "messages": {
         "menu_will_appear_later": "Menu will appear once you enter the main menu",
-        "permanent_ban": "Your account permanently banned, but you can still play with mod menu. Enjoy",
         "display_menu": "Displaying the menu",
         "no_finish": "No Finish or Crown was found. The round probably does not have a finish or a crown.",
         "no_score": "No bubbles or buttons were found.",
         "not_in_the_game": "You are not in the game!",
         "server": "Server",
-        "ping": "Ping"
+        "ping": "Ping",
+        "account_banned": "Account Banned",
+        "account_banned_desc": "Your Fall Guys Account is permanently banned, but you can still play with mod menu.\nEnjoy!"
     },
     "debug_messages": {
         "loaded": "Loaded il2cpp, assemblies, classes and method pointers.",
