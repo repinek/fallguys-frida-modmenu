@@ -1,3 +1,5 @@
+import Java from "frida-java-bridge";
+
 export function openURL(link: string) {
     Java.perform(() => {
         try {

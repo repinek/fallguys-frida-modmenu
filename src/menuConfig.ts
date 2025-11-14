@@ -23,7 +23,7 @@ export const obsidianConfig: Menu.ObsidianConfig = {
         size: 50,
         alpha: 1
     },
-    strings: {
+    strings: { // TODO: move to localization
         noOverlayPermission: "Overlay permission is needed to show the menu",
         hide: "<b>_</b>",
         close: "Close",
