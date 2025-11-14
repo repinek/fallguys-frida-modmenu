@@ -81,5 +81,12 @@
         "game_build_number": "Game Build number:",
         "game_build_date": "Game Build date:",
         "package_name": "Package Name:"
+    },
+    "menu": {
+        "no_overlay_permission": "Overlay permission is needed to show the menu",
+        "hide_button": "Hide",
+        "close_button": "Close",
+        "hide_callback": "Icon hidden",
+        "kill_callback": "Menu killed"
     }
 }

@@ -9,7 +9,6 @@
     "build": "frida-compile src/index.ts -o dist/agent.js -c",
     "spawn": "frida -U gadget -l dist/agent.js"
   },
-  "keywords": [],
   "author": "repinek",
   "license": "MIT",
   "description": "Android Fall Guys cheat using FRIDA and frida-il2cpp-bridge",

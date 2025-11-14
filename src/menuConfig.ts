@@ -1,3 +1,5 @@
+import en from "./localization/en.json";
+
 export const obsidianConfig: Menu.ObsidianConfig = {
     color: {
         primaryText: "#FFFFFF",
@@ -13,7 +15,7 @@ export const obsidianConfig: Menu.ObsidianConfig = {
         closeFg: "#751616", // close
     },
     menu: {
-        width: 300,
+        width: 350,
         height: 200,
         x: 100,
         y: 100,
@@ -23,12 +25,12 @@ export const obsidianConfig: Menu.ObsidianConfig = {
         size: 50,
         alpha: 1
     },
-    strings: { // TODO: move to localization
-        noOverlayPermission: "Overlay permission is needed to show the menu",
-        hide: "<b>_</b>",
-        close: "Close",
-        hideCallback: "Icon hidden",
-        killCallback: "Menu killed"
+    strings: {
+        noOverlayPermission: en.menu.no_overlay_permission,
+        hide: en.menu.hide_button,
+        close: en.menu.close_button,
+        hideCallback: en.menu.hide_callback,
+        killCallback: en.menu.kill_callback // hold hide to kill menu
     }
 };
 
