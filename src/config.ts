@@ -1,83 +1,83 @@
 export namespace Config {
-    export const VERSION = "2.16";
-    export const ICON_URL = "https://floyzi.github.io/images/obed-guys-present.png";
+    export var VERSION = "2.16";
+    export var ICON_URL = "https://floyzi.github.io/images/obed-guys-present.png";
 
-    export const SPOOF_VERSION_URL = "https://floyzi.github.io/FGTools/mobile/version.json";
-    export const VERSION_URL = "https://repinek.github.io/fallguys-modmenu/latest_version.json";
-    export const GITHUB_URL = "https://github.com/repinek/fallguys-frida-modmenu";
-    export const GITHUB_RELEASES_URL = "https://github.com/repinek/fallguys-frida-modmenu/releases/latest";
-    export const DISCORD_URL = "https://discord.gg/cNFJ73P6p3";
+    export var SPOOF_VERSION_URL = "https://floyzi.github.io/FGTools/mobile/version.json";
+    export var VERSION_URL = "https://repinek.github.io/fallguys-modmenu/latest_version.json";
+    export var GITHUB_URL = "https://github.com/repinek/fallguys-frida-modmenu";
+    export var GITHUB_RELEASES_URL = "https://github.com/repinek/fallguys-frida-modmenu/releases/latest";
+    export var DISCORD_URL = "https://discord.gg/cNFJ73P6p3";
 
-    export const TELEPORT_COOLDOWN = 500;
+    export var TELEPORT_COOLDOWN = 500;
 
     // === Login Spoof ===
-    export const USE_SPOOF = true;
-    export let customSignature: string;
-    export let customGameVersion: string;
+    export var USE_SPOOF = true;
+    export var customSignature: string;
+    export var customGameVersion: string;
 
     // === Custom Server === 
-    export const USE_CUSTOM_SERVER = false;
-    export const CUSTOM_LOGIN_URL = "https://login.fallguys.oncatapult.com/api/v1"; 
-    export const CUSTOM_LOGIN_PORT = -1;
-    export const CUSTOM_GATEWAY_URL = "gateway.fallguys.oncatapult.com";
-    export const CUSTOM_GATEWAY_PORT = 443;
-    export const IS_GATEWAY_SECURE = true;
-    export const CUSTOM_ANALYTICS_URL = "analytics-gateway.fallguys.oncatapult.com";
-    export const CUSTOM_ANALYTICS_PORT = 443;
-    export const IS_ANALYTICS_SECURE = true;
+    export var USE_CUSTOM_SERVER = false;
+    export var CUSTOM_LOGIN_URL = "https://login.fallguys.oncatapult.com/api/v1"; 
+    export var CUSTOM_LOGIN_PORT = -1;
+    export var CUSTOM_GATEWAY_URL = "gateway.fallguys.oncatapult.com";
+    export var CUSTOM_GATEWAY_PORT = 443;
+    export var IS_GATEWAY_SECURE = true;
+    export var CUSTOM_ANALYTICS_URL = "analytics-gateway.fallguys.oncatapult.com";
+    export var CUSTOM_ANALYTICS_PORT = 443;
+    export var IS_ANALYTICS_SECURE = true;
 
     export namespace Toggles {
         // === Movement ===
-        export let toggle360Dives: boolean;
-        export let toggleAirJump: boolean;
-        export let toggleDontSendFallGuyState: boolean;
+        export var toggle360Dives: boolean;
+        export var toggleAirJump: boolean;
+        export var toggleDontSendFallGuyState: boolean;
 
-        export let toggleCustomSpeed: boolean;
-        export let toggleCustomVelocity: boolean;
-        export let toggleNegativeVelocity: boolean;
-        export let toggleNoVelocity: boolean;
+        export var toggleCustomSpeed: boolean;
+        export var toggleCustomVelocity: boolean;
+        export var toggleNegativeVelocity: boolean;
+        export var toggleNoVelocity: boolean;
 
-        export let toggleCustomJumpForce: boolean;
-        export let toggleCustomDiveForce: boolean;
+        export var toggleCustomJumpForce: boolean;
+        export var toggleCustomDiveForce: boolean;
 
         // === Visuals ===
-        export let toggleCustomFov: boolean;
-        export let toggleFGDebug: boolean;
-        export let toggleDisableAnalytics: boolean;
-        export let toggleHideDoors: boolean;
-        export let toggleShowQueuedPlayers: boolean;
+        export var toggleCustomFov: boolean;
+        export var toggleFGDebug: boolean;
+        export var toggleDisableAnalytics: boolean;
+        export var toggleHideDoors: boolean;
+        export var toggleShowQueuedPlayers: boolean;
     };
 
     export namespace CustomValues {
-        export let normalMaxSpeed = 9.5;
-        export let maxGravityVelocity = 40;
-        export let jumpForce = 17.5;
-        export let diveForce = 16.5;
-        export let ResolutionScale = 1;
-        export let FOV = 70;
+        export var normalMaxSpeed = 9.5;
+        export var maxGravityVelocity = 40;
+        export var jumpForce = 17.5;
+        export var diveForce = 16.5;
+        export var ResolutionScale = 1;
+        export var FOV = 70;
     };
 
     export namespace DefaultValues {
-        export const divePlayerSensitivity = 70;
-        export const normalMaxSpeed = 9.5;
-        export const carryMaxSpeed = 8;
-        export const grabbingMaxSpeed = 5;
-        export const maxGravityVelocity = 40;
-        export const jumpForce = 17.5;
-        export const airDiveForce = 7;
-        export const diveForce = 16.5;
-        export const diveMultiplier = diveForce / airDiveForce;
+        export var divePlayerSensitivity = 70;
+        export var normalMaxSpeed = 9.5;
+        export var carryMaxSpeed = 8;
+        export var grabbingMaxSpeed = 5;
+        export var maxGravityVelocity = 40;
+        export var jumpForce = 17.5;
+        export var airDiveForce = 7;
+        export var diveForce = 16.5;
+        export var diveMultiplier = diveForce / airDiveForce;
     };
 
     export namespace BuildInfo {
-        // uhh here's probably will const
-        export const PLATFORM = "android_ega"; // you can change it to other one here, refer BuildCatapultConfig hook
-        export let gameVersion: string;
-        export let spoofedGameVersion: string;
-        export let originalSignature: string;
-        export let spoofedSignature: string;
-        export let unityVersion: string;
-        export let buildNumber = "Local build";
-        export let buildDate = "n/a";
+        // uhh here's probably will var
+        export var PLATFORM = "android_ega"; // you can change it to other one here, refer BuildCatapultConfig hook
+        export var gameVersion: string;
+        export var spoofedGameVersion: string;
+        export var originalSignature: string;
+        export var spoofedSignature: string;
+        export var unityVersion: string;
+        export var buildNumber = "Local build";
+        export var buildDate = "n/a";
     };
 };

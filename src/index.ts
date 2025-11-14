@@ -1,5 +1,6 @@
 import "frida-il2cpp-bridge";
 import "frida-java-menu";
+import Java from "frida-java-bridge";
 import { obsidianConfig } from "./menuConfig.js";
 import { openURL, copyToClipboard, httpGet } from "./utils.js";
 import { Config } from "./config.js";

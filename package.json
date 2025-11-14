@@ -4,23 +4,24 @@
     "type": "git",
     "url": "https://github.com/repinek/fallguys-frida-modmenu"
   },
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "spawn": "frida -U gadget -l dist/agent.js",
     "build": "frida-compile src/index.ts -o dist/agent.js -c",
     "test": "frida-compile src/test.ts -o dist/agent.js -c",
     "build-apk": "fgi -i ./data/APKs/Fall_Guys_21.0.0_perm.apk -t script -l ./dist/agent.js -o ./data/APKs-modmenu/FallGuys-21.0.0-modmenu-2.12.apk --offline-mode"
-  }, 
+  },
   "keywords": [],
   "author": "repinek",
   "license": "MIT",
   "description": "Android Fall Guys cheat using FRIDA and frida-il2cpp-bridge",
   "devDependencies": {
-    "@types/frida-gum": "^18.7.1",
-    "@types/node": "^22.9.0",
-    "frida-compile": "^16.4.1",
-    "frida-il2cpp-bridge": "^0.9.1",
-    "typescript": "^5.6.3"
+    "@types/frida-gum": "^19.0.1",
+    "@types/node": "^24.10.1",
+    "frida-compile": "^19.0.4",
+    "frida-il2cpp-bridge": "^0.12.1",
+    "typescript": "^5.6.3",
+    "frida-java-bridge": "^7.0.10"
   },
   "dependencies": {
     "frida-java-menu": "github:commonuserlol/frida-java-menu"
