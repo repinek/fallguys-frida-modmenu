@@ -1,4 +1,5 @@
 import Java from "frida-java-bridge";
+// TODO: implement logger
 
 export function openURL(link: string) {
     Java.perform(() => {

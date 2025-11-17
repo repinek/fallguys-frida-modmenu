@@ -2,6 +2,7 @@ import "frida-il2cpp-bridge";
 import "frida-java-menu";
 import Java from "frida-java-bridge";
 import { openURL, copyToClipboard, httpGet } from "./utils.js";
+import { Logger } from "./logger.js";
 import { obsidianConfig } from "./menuConfig.js";
 import { modPreferences } from "./modPreferences.js";
 import { Config } from "./config.js";
