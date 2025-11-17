@@ -70,8 +70,7 @@ function main() {
     const HttpNetworkHost = MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.HttpNetworkHost");
     const WebSocketNetworkHost = MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
     const AnalyticsService = MediatonicCatapultClientSdkRuntime.class("Catapult.Analytics.AnalyticsService");
-    const Show_method = PopupManager.method("Show", 3);
-    const Show_method_overload = Show_method.overload("FGClient.UI.PopupInteractionType", "FGClient.UI.ModalMessageData", "FGClient.UI.UIModalMessage.ModalMessageFailedToShow");
+    const Show_method = PopupManager.method("Show", 3).overload(PopupInteractionType, ModalMessageData, "FGClient.UI.UIModalMessage.ModalMessageFailedToShow");
             
     // === Methods === 
     const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
@@ -248,28 +247,28 @@ function main() {
             - no AntiCheatClient Instance
             - AntiCheatClient::get_AllowOnlinePlay returned false 
               (Since you are banned AllowOnlinePlay will be set to false)
-        If true: it won't be let matchmake you and will call ShowAntiCheatPopup method (also refer show_method_overload.implementation for more about ShowAntiCheatPopup)
+        If true: it won't be let matchmake you and will call ShowAntiCheatPopup method (also refer Show_method.implementation for more about ShowAntiCheatPopup)
         So, we just return false here
         */
         return false; 
     };
 
-    Show_method_overload.implementation = function (PopupInteractionTypeValue, ModalMessageDataValue, ModalMessageFailedToShow) {
+    Show_method.implementation = function (PopupInteractionTypeValue, ModalMessageDataValue, ModalMessageFailedToShow) {
         ModalMessageDataValue = ModalMessageDataValue as Il2Cpp.Object;
 
-        if (ModalMessageData.field<Il2Cpp.String>("Title").value.content == "anticheat_error_title") {
+        if (ModalMessageDataValue.field<Il2Cpp.String>("Title").value.content == "anticheat_error_title") {
             /*
             ShowAntiCheatPopup will called by _CheckRestrictedGameAccess_d__69::MoveNext corutine
             CheckRestrictedGameAccess called by OnLoginSuccessful (When you login in)
             */ 
             const NotLocalised_Option = LocaliseOption.field<Il2Cpp.ValueType>("NotLocalised").value;
 
-            ModalMessageData.field<Il2Cpp.String>("Title").value = Il2Cpp.string(en.messages.account_banned);
-            ModalMessageData.field<Il2Cpp.String>("Message").value = Il2Cpp.string(en.messages.account_banned_desc);
-            ModalMessageData.field<Il2Cpp.ValueType>("LocaliseTitle").value = NotLocalised_Option; 
-            ModalMessageData.field<Il2Cpp.ValueType>("LocaliseMessage").value = NotLocalised_Option; 
-            ModalMessageData.field<Il2Cpp.ValueType>("ModalType").value = ModalType.field<Il2Cpp.ValueType>(ModalType_enum.MT_OK).value;
-            ModalMessageData.field<Il2Cpp.ValueType>("OkButtonType").value = OkButtonType.field<Il2Cpp.ValueType>(OkButtonType_enum.Green).value;
+            ModalMessageDataValue.field<Il2Cpp.ValueType>("LocaliseTitle").value = NotLocalised_Option; 
+            ModalMessageDataValue.field<Il2Cpp.ValueType>("LocaliseMessage").value = NotLocalised_Option;
+            ModalMessageDataValue.field<Il2Cpp.ValueType>("ModalType").value = ModalType.field<Il2Cpp.ValueType>(ModalType_enum.MT_OK).value;
+            ModalMessageDataValue.field<Il2Cpp.ValueType>("OkButtonType").value = OkButtonType.field<Il2Cpp.ValueType>(OkButtonType_enum.Green).value; 
+            ModalMessageDataValue.field<Il2Cpp.String>("Title").value = Il2Cpp.string(en.messages.account_banned);
+            ModalMessageDataValue.field<Il2Cpp.String>("Message").value = Il2Cpp.string(en.messages.account_banned_desc);
         };
 
         const this_method = this.method("Show", 3).overload(PopupInteractionType, ModalMessageData, "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"); // for instance
@@ -702,7 +701,6 @@ function main() {
         try {
             console.log("Creating popup...")
             const PopupManager_Instance = PopupManager.method<Il2Cpp.Object>("get_Instance").invoke();
-            // full class names or just Il2cpp.Class in overload
             const Show_ModalMessageData_method = PopupManager_Instance.method<boolean>("Show", 3).overload(PopupInteractionType, ModalMessageData, "FGClient.UI.UIModalMessage.ModalMessageFailedToShow");
             
             // 1 arg 
@@ -737,12 +735,13 @@ function main() {
             const composer = new Menu.Composer(en.info.name, en.info.warn, layout); 
             composer.icon(Config.ICON_URL, "Web");
 
-            Menu.add(layout.button("debug", () => {
-                    Il2Cpp.perform(() => {
-                        createPopup("Test Popup", "Message of Test Popup", ModalType_enum.MT_OK, OkButtonType_enum.Green);
-                    }, "main"); // From Java.scheduleOnMainThread you need to Il2cpp.perform main!
-                })
-            );
+            // later uncommeting
+            // Menu.add(layout.button("debug", () => {
+            //         Il2Cpp.perform(() => {
+            //             createPopup("Test Popup", "Message of Test Popup", ModalType_enum.MT_OK, OkButtonType_enum.Green);
+            //         }, "main"); // From Java.scheduleOnMainThread you need to Il2cpp.perform main!
+            //     })
+            // );
 
             // === Movement Tab === 
             const movement = layout.textView(en.tabs.movement_tab);
