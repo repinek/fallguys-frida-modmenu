@@ -1,9 +1,11 @@
 import "frida-il2cpp-bridge";
 import "frida-java-menu";
 import Java from "frida-java-bridge";
-import { obsidianConfig } from "./menuConfig.js";
 import { openURL, copyToClipboard, httpGet } from "./utils.js";
+import { obsidianConfig } from "./menuConfig.js";
+import { modPreferences } from "./modPreferences.js";
 import { Config } from "./config.js";
+
 import en from "./localization/en.json";
 
 // My code is kinda structless. Maybe I'll refactor it later, but I'm too lazy since I lost interest in this project
@@ -925,7 +927,8 @@ function main() {
             info.gravity = Menu.Api.CENTER;
             Menu.add(info);
 
-            Menu.add(layout.textView(`${en.info.mod_menu_version} ${Config.VERSION}`));
+            Menu.add(layout.textView(`${en.info.mod_menu_version} ${modPreferences.VERSION}`));
+            Menu.add(layout.textView(`${en.info.mod_menu_env} ${modPreferences.ENV}`));
             Menu.add(layout.textView(`${en.info.game_version} ${Config.BuildInfo.gameVersion}`));
             Menu.add(layout.textView(`${en.info.is_spoofed} ${Config.USE_SPOOF}`));
             if (Config.USE_SPOOF)

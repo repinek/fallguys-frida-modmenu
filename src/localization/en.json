@@ -71,6 +71,7 @@
         "github_url": "GitHub Repository (Leave a star!)",
         "discord_url": "Discord Server",
         "mod_menu_version": "Mod Menu version:",
+        "mod_menu_env": "Mod Menu environment:",
         "game_version": "Game Version:",
         "is_spoofed": "Login spoof:",
         "spoofed_game_version": "Used Game Version:",
