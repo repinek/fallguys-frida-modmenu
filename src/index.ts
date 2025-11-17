@@ -8,7 +8,7 @@ import en from "./localization/en.json";
 
 // My code is kinda structless. Maybe I'll refactor it later, but I'm too lazy since I lost interest in this project
 // A lot of things has been done already, and I don't even know what else to do. 
-// frida and il2cpp-bridge doesn't work correctly sometimes, and also I'm too to dumb for some things I guess (?)
+// frida and il2cpp-bridge doesn't work correctly sometimes, and also I'm too to dumb for some things I guess (?) upd: yes i am lol
 // honourable mention: Failed to load script: the connection is closed. Thank you for using Frida!
 
 function main() {
@@ -43,10 +43,9 @@ function main() {
     const OkButtonType = MTFGClient.class("FGClient.UI.UIModalMessage/OKButtonType");
     
     // refer createPopup()
-    /*
     const ModalMessageData = MTFGClient.class("FGClient.UI.ModalMessageData");
     const PopupInteractionType = MTFGClient.class("FGClient.UI.PopupInteractionType");
-    */
+    
 
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const MotorFunctionJump = TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
@@ -239,30 +238,40 @@ function main() {
     }; 
 
     // Bypass permanent ban
-    // you can't bypass a temporary ban, but you can bypass a permanent one, lmao
+    // Temporary bans cannot be bypassed, but permanent bans can be loool
     CheckAntiCheatClientServiceForError_method.implementation = function () {
-        return false; // idk how it works, but it works (you can't enter the match without this hook)
+        /* 
+        Called when trying to join matchmaking.
+        Returns true if: 
+            - no AntiCheatClient Instance
+            - AntiCheatClient::get_AllowOnlinePlay returned false 
+              (Since you are banned AllowOnlinePlay will be set to false)
+        If true: it won't be let matchmake you and will call ShowAntiCheatPopup method (also refer show_method_overload.implementation for more about ShowAntiCheatPopup)
+        So, we just return false here
+        */
+        return false; 
     };
 
-    Show_method_overload.implementation = function (PopupInteractionType, ModalMessageData, ModalMessageFailedToShow) {
-        ModalMessageData = ModalMessageData as Il2Cpp.Object;
+    Show_method_overload.implementation = function (PopupInteractionTypeValue, ModalMessageDataValue, ModalMessageFailedToShow) {
+        ModalMessageDataValue = ModalMessageDataValue as Il2Cpp.Object;
 
         if (ModalMessageData.field<Il2Cpp.String>("Title").value.content == "anticheat_error_title") {
+            /*
+            ShowAntiCheatPopup will called by _CheckRestrictedGameAccess_d__69::MoveNext corutine
+            CheckRestrictedGameAccess called by OnLoginSuccessful (When you login in)
+            */ 
             const NotLocalised_Option = LocaliseOption.field<Il2Cpp.ValueType>("NotLocalised").value;
-            const MT_OK_Option = ModalType.field<Il2Cpp.ValueType>("MT_OK").value;
-            const Positive_Option = OkButtonType.field<Il2Cpp.ValueType>("Positive").value;
 
             ModalMessageData.field<Il2Cpp.String>("Title").value = Il2Cpp.string(en.messages.account_banned);
             ModalMessageData.field<Il2Cpp.String>("Message").value = Il2Cpp.string(en.messages.account_banned_desc);
             ModalMessageData.field<Il2Cpp.ValueType>("LocaliseTitle").value = NotLocalised_Option; 
             ModalMessageData.field<Il2Cpp.ValueType>("LocaliseMessage").value = NotLocalised_Option; 
-            ModalMessageData.field<Il2Cpp.ValueType>("ModalType").value = MT_OK_Option;
-            ModalMessageData.field<Il2Cpp.ValueType>("OkButtonType").value = Positive_Option; // for green color of the button (it's cool)
+            ModalMessageData.field<Il2Cpp.ValueType>("ModalType").value = ModalType.field<Il2Cpp.ValueType>(ModalType_enum.MT_OK).value;
+            ModalMessageData.field<Il2Cpp.ValueType>("OkButtonType").value = OkButtonType.field<Il2Cpp.ValueType>(OkButtonType_enum.Green).value;
         };
 
-        const this_method = this.method("Show", 3); // for instance
-        const this_method_overload = this_method.overload("FGClient.UI.PopupInteractionType", "FGClient.UI.ModalMessageData", "FGClient.UI.UIModalMessage.ModalMessageFailedToShow");
-        return this_method_overload.invoke(PopupInteractionType, ModalMessageData, ModalMessageFailedToShow);
+        const this_method = this.method("Show", 3).overload(PopupInteractionType, ModalMessageData, "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"); // for instance
+        return this_method.invoke(PopupInteractionTypeValue, ModalMessageDataValue, ModalMessageFailedToShow);
     };
 
     // Graphics 
@@ -671,45 +680,67 @@ function main() {
             console.error(error.stack);
         }
     };
+    
+    enum ModalType_enum {
+        MT_OK = "MT_OK",
+        MT_OK_CANCEL = "MT_OK_CANCEL",
+        MT_BLOCKING = "MT_BLOCKING",
+        MT_WAIT_FOR_EVENT = "MT_WAIT_FOR_EVENT",
+        MT_NO_BUTTONS = "MT_NO_BUTTONS"
+    };
 
-    /*
-    Maybe some day I will finish it (no) (also it's only prototype don't blame me for bad code)
-    > Error: access violation accessing 0x10
+    enum OkButtonType_enum {
+        Blue = "Default",
+        Red = "Disruptive",
+        Green = "Positive",
+        Yellow = "CallToAction"
+    };
 
-    Can't overload show_method2 for some reason also 
-    > il2cpp: couldn't find overloaded method Show(PopupInteractionType,ModalMessageData,UIModalMessage.ModalMessageFailedToShow)
-    Dump: public bool Show(PopupInteractionType popupInteractionType, ModalMessageData data, UIModalMessage.ModalMessageFailedToShow onFailedCallback) 
-
-    ok, nvm, copy full name from dnspy is solved my problem
-    System.Boolean FGClient.UI.PopupManager::Show(FGClient.UI.PopupInteractionType,FGClient.UI.ModalMessageWithOptionSelectionData,FGClient.UI.UIModalMessage/ModalMessageFailedToShow)
-    */
-
-    /*
-    const createPopup = () => {
+    function createPopup(Title: string, Message: string, ModalTypeValue: ModalType_enum, OkButtonTypeValue: OkButtonType_enum) {
         try {
+            console.log("Creating popup...")
             const PopupManager_Instance = PopupManager.method<Il2Cpp.Object>("get_Instance").invoke();
-            const Show_method = PopupManager_Instance.method<boolean>("Show", 3);
-            // const Show_method2 = Show_method.overload("PopupInteractionType", "ModalMessageData", "UIModalMessage.ModalMessageFailedToShow"); // can't overload it for some reason idk
-            const Show_method2 = Show_method.overload("FGClient.UI.PopupInteractionType", "FGClient.UI.ModalMessageData", "FGClient.UI.UIModalMessage.ModalMessageFailedToShow") // working!!
-            const ModalMessageDataAllocated = ModalMessageData.alloc();
-            const PopupInteractionTypeInfo = PopupInteractionType.field<Il2Cpp.ValueType>("Info").value; // get type from enum
-            ModalMessageDataAllocated.method(".ctor").invoke(); // after that you need to set some fields in the class like title, message...
+            // full class names or just Il2cpp.Class in overload
+            const Show_ModalMessageData_method = PopupManager_Instance.method<boolean>("Show", 3).overload(PopupInteractionType, ModalMessageData, "FGClient.UI.UIModalMessage.ModalMessageFailedToShow");
             
-            // 3rd argument is UIModalMessage.ModalMessageFailedToShow onFailedCallback = null, so uhhh idk how
-            Show_method2.invoke(PopupInteractionTypeInfo, ModalMessageDataAllocated, NULL);
+            // 1 arg 
+            const Info_Value = PopupInteractionType.field<Il2Cpp.ValueType>("Info").value;
+
+            // 2 arg
+            const NotLocalised_Value = LocaliseOption.field<Il2Cpp.ValueType>("NotLocalised").value;
+            // Create new instance of ModalMessageData class
+            // btw, you can't create it in one line, it will return undefined (uhh?)
+            const ModalMessageData_Instance = ModalMessageData.alloc();
+            ModalMessageData_Instance.method<Il2Cpp.Object>(".ctor").invoke(); 
+
+            ModalMessageData_Instance.field<Il2Cpp.ValueType>("LocaliseTitle").value = NotLocalised_Value; 
+            ModalMessageData_Instance.field<Il2Cpp.ValueType>("LocaliseMessage").value = NotLocalised_Value;
+            ModalMessageData_Instance.field<Il2Cpp.ValueType>("ModalType").value = ModalType.field<Il2Cpp.ValueType>(ModalTypeValue).value;
+            ModalMessageData_Instance.field<Il2Cpp.ValueType>("OkButtonType").value = OkButtonType.field<Il2Cpp.ValueType>(OkButtonTypeValue).value;
+            ModalMessageData_Instance.field<Il2Cpp.String>("Title").value = Il2Cpp.string(Title);
+            ModalMessageData_Instance.field<Il2Cpp.String>("Message").value = Il2Cpp.string(Message);
+            ModalMessageData_Instance.field("OnCloseButtonPressed").value = NULL;
+                
+            // 3 arg is onFailedCallback delegate, which is default is null
+            Show_ModalMessageData_method.invoke(Info_Value, ModalMessageData_Instance, NULL);
         } catch (error: any) {
-            Menu.toast(error.stack, 1);
+            Menu.toast(error.stack, 0);
             console.error(error.stack);
         };
     };
-    */
-    
 
     const initMenu = () => {
         try {
             const layout = new Menu.ObsidianLayout(obsidianConfig);
             const composer = new Menu.Composer(en.info.name, en.info.warn, layout); 
             composer.icon(Config.ICON_URL, "Web");
+
+            Menu.add(layout.button("debug", () => {
+                    Il2Cpp.perform(() => {
+                        createPopup("Test Popup", "Message of Test Popup", ModalType_enum.MT_OK, OkButtonType_enum.Green);
+                    }, "main"); // From Java.scheduleOnMainThread you need to Il2cpp.perform main!
+                })
+            );
 
             // === Movement Tab === 
             const movement = layout.textView(en.tabs.movement_tab);

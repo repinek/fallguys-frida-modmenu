@@ -1,4 +1,18 @@
 export namespace Config {
+    /*
+    !! TODO: 
+    remove debug logs from localization 
+    custom logger
+    refactor scripts in packages like in frida-il2cpp-bridge example (i like it)
+    made localization for other languages (i18n)
+    wrapper for Il2cpp.perform main
+    add ModPreferences.ts with build type and other stuff
+    refactor vars names
+    refactor menu and some other things using createPopup
+
+    maybe:
+    refactor structure of project / script
+    */
     export var VERSION = "2.16";
     export var ICON_URL = "https://floyzi.github.io/images/obed-guys-present.png";
 
