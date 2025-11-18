@@ -1,11 +1,19 @@
 import Java from "frida-java-bridge";
-// TODO: implement logger
 
-export function openURL(link: string) {
+import { Logger } from "./logger.js";
+
+export function exitFromApp() {
+    Java.perform(() => {
+        const System = Java.use("java.lang.System");
+        System.exit(0);
+    });
+};
+
+export function openURL(targetUrl: string) {
     Java.perform(() => {
         try {
-            console.log(`Opening URL: ${link}`);
-            const uri = Java.use("android.net.Uri").parse(link);
+            Logger.debug(`Opening URL: ${targetUrl}`);
+            const uri = Java.use("android.net.Uri").parse(targetUrl);
             const intent = Java.use("android.content.Intent");
             const activity = Java.use("android.app.ActivityThread").currentApplication().getApplicationContext();
 
@@ -13,10 +21,10 @@ export function openURL(link: string) {
             openIntent.addFlags(0x10000000); // FLAG_ACTIVITY_NEW_TASK
             activity.startActivity(openIntent);
         } catch (error: any) {
-            Menu.toast(`Failed to open URL: ${error.message}`, 1);
-        }
+            Logger.errorToast(error);
+        };
     });
-}
+};
 
 export function copyToClipboard(text: string) {
     Java.perform(() => {
@@ -31,47 +39,68 @@ export function copyToClipboard(text: string) {
                 .newPlainText(javaString.$new("label"), javaString.$new(text));
             clipboardManager.setPrimaryClip(clipData);
         } catch (error: any) {
-            console.error(`Failed to copy to clipboard: ${error.message}`);
-        }
+            Logger.errorToast(error);
+        };
     });
-}
+};
+
+function onHttpGetResponseReceive(response: string | null) {
+    Logger.debug("HTTP GET response:", response);
+};
 
 // Thanks a lot: https://github.com/frida/frida/issues/1158#issuecomment-1227967229
-export function httpGet(targetUrl: string, onReceive: (response: string) => void = function(response: string) { /*console.log("response:", response);*/ }) {
+export function httpGet(
+    targetUrl: string,
+    onReceive: (response: string | null) => void = function(response: string | null) {}
+    ) {
     Java.perform(() => {
-        const HttpURLConnection = Java.use("java.net.HttpURLConnection");
-        const URL = Java.use("java.net.URL");
-        const BufferedReader = Java.use("java.io.BufferedReader");
-        const InputStreamReader = Java.use("java.io.InputStreamReader");
-        const StringBuilder = Java.use("java.lang.StringBuilder");
+        try {
+            Logger.debug(`HTTP GET: ${targetUrl}`);
+            const HttpURLConnection = Java.use("java.net.HttpURLConnection");
+            const URL = Java.use("java.net.URL");
+            const BufferedReader = Java.use("java.io.BufferedReader");
+            const InputStreamReader = Java.use("java.io.InputStreamReader");
+            const StringBuilder = Java.use("java.lang.StringBuilder");
 
-        const url = URL.$new(targetUrl);
-        const conn = Java.cast(url.openConnection(), HttpURLConnection);
-        conn.setRequestMethod("GET");
-        conn.setConnectTimeout(5000);
-        conn.setReadTimeout(5000);
-        conn.setDoInput(true)
-        conn.connect();
-        const code = conn.getResponseCode();
+            const url = URL.$new(targetUrl);
+            const connection = Java.cast(url.openConnection(), HttpURLConnection);
 
-        var response = null;
-        if (code === 200) {
-            const inputStream = conn.getInputStream();
-            const buffer = BufferedReader.$new(InputStreamReader.$new(inputStream));
-            const sb = StringBuilder.$new();
-            let line: string | null;
-            while ((line = buffer.readLine()) != null) {
-                sb.append(line);
-            }
-            response = sb.toString();
-            inputStream.close();
-            buffer.close();
-        } else {
-            response = "error: " + code;
-        }
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            connection.setDoInput(true)
+            connection.connect();
 
-        conn.disconnect();
-        onReceive(response);
-        return response;
+            const responseCode = connection.getResponseCode();
+            let response: string | null = null;
+
+            if (responseCode === 200) {
+                const inputStream = connection.getInputStream();
+                const buffer = BufferedReader.$new(InputStreamReader.$new(inputStream));
+                const sb = StringBuilder.$new();
+
+                let line: string | null;
+                while ((line = buffer.readLine()) != null) {
+                    sb.append(line);
+                };
+
+                response = sb.toString();
+                
+                inputStream.close();
+                buffer.close();
+            } else {
+                response = null;
+            };
+
+            connection.disconnect();
+            Logger.debug("HTTP GET response:", response);
+            onReceive(response);
+            return response;
+
+        } catch (error: any) {
+            Logger.errorToast(error, "HTTP GET");
+            onReceive(null)
+            return null
+        };
     });
-}
+};

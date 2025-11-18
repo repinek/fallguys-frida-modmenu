@@ -1,6 +1,6 @@
 import en from "./localization/en.json";
 
-export const obsidianConfig: Menu.ObsidianConfig = {
+export const ObsidianConfig: Menu.ObsidianConfig = {
     color: {
         primaryText: "#FFFFFF",
         secondaryText: "#FFFFFF",
