@@ -1,5 +1,21 @@
 export namespace ModPreferences {
     export var VERSION = "2.24"; // Don't forget update after changes!
-    export var ENV = "staging"; // dev, staging, release
+    export var ENV = "dev"; // dev, staging, release
     export var FOR_GAME_VERSION = "21.0.0";
 };
+
+/*
+!! TODO: 
+[x] remove debug logs from localization 
+[x] custom logger
+refactor scripts in package.json like in frida-il2cpp-bridge example (i like it)
+made localization for other languages (i18n)
+wrapper for Il2cpp.perform main
+refactor vars names
+refactor menu and some other things using createPopup
+refer changeResolutionScale()
+show_method not overloading, just inflate
+ 
+maybe:
+refactor structure of project / script (all script in one file :cry:)
+*/

@@ -50,14 +50,20 @@ export namespace Logger {
 
     export function warnToast(error: any, message: string = "") {
         Logger.warn(`${message} ${error.stack}`);
-        Menu.toast(`${message} ${error.stack}`, 1);
+        Menu.toast(`${message} ${error.message}`, 1);
     };
     /**
-     *  Error log and showing toast.
-     *  message="desc" -> "desc Error: {stack}" 
-     * */
+     * Error log and showing toast for 3.5s 
+     * 
+     * Behavior: 
+     * - console: {message} {error.stack}
+     * - toast: {message} {error.message} 
+     * 
+     * @param error The error object
+     * @param message "desc" -> "desc Error: {stack}" 
+     */
     export function errorToast(error: any, message: string = "") {
         Logger.error(`${message} ${error.stack}`);
-        Menu.toast(`${message} ${error.stack}`, 1);
+        Menu.toast(`${message} ${error.message}`, 1);
     };
 };

@@ -2,6 +2,13 @@ import Java from "frida-java-bridge";
 
 import { Logger } from "./logger.js";
 
+export function exitFromApp() {
+    Java.perform(() => {
+        const System = Java.use("java.lang.System");
+        System.exit(0);
+    });
+};
+
 export function openURL(targetUrl: string) {
     Java.perform(() => {
         try {

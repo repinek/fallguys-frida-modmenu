@@ -2,7 +2,7 @@ import "frida-il2cpp-bridge";
 import "frida-java-menu";
 import Java from "frida-java-bridge";
 
-import { openURL, copyToClipboard, httpGet } from "./utils.js";
+import { exitFromApp, openURL, copyToClipboard, httpGet } from "./utils.js";
 import { Logger } from "./logger.js";
 import { ObsidianConfig } from "./menuConfig.js";
 import { ModPreferences } from "./modPreferences.js";
@@ -16,7 +16,7 @@ import en from "./localization/en.json";
 // honourable mention: Failed to load script: the connection is closed. Thank you for using Frida!
 
 function main() {
-    Logger.infoGreen(`Fall Guys Frida Mod Menu (${ModPreferences.ENV}, ${ModPreferences.VERSION}), Game Version: {${Il2Cpp.application.version!}}`);
+    Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
     // === Assemblies ===
     const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image; // FG.Common namespace
     const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
@@ -109,63 +109,60 @@ function main() {
     let Camera_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in set_fieldOfView
     let UICanvas_Instance: Il2Cpp.Object;
 
-    let fetchedClientDetails;
-    let fetchedModmenuVersion;
     let reachedMainMenu = false;
     let currentSceneName;
     let showPlayerNames: boolean;
     let lastTeleportTime = 0;
 
     Logger.debug("Loaded il2cpp, assemblies, classes and method pointers.");
-    
-    // chatgpt vibecoding TODO: refactor 
-    if (Config.USE_SPOOF) {
-        httpGet(Config.SPOOF_VERSION_URL, (response) => {
+
+    // === Fetching Data ===
+    let fetchedClientDetails;
+    let fetchedModmenuVersion;
+
+    // complicated a little
+    // response should be like: {"script_version":"0.0"}
+    if (ModPreferences.ENV !== "release") {
+        Logger.debug("Skipping mod menu version check in dev/staging");
+    } else {
+        httpGet(Config.VERSION_URL, (response) => {
             if (!response) {
-                Menu.toast(en.debug_messages.signature_not_fetched, 1);
+                Logger.warn("Actual mod menu version can't be fetched");
+                Menu.toast(en.toasts.mod_menu_version_not_fetched, 1);
                 return;
-            }
-            try {
-                fetchedClientDetails = JSON.parse(response);
-                Logger.debug(en.debug_messages.signature_fetched, response);
-            } catch (error: any) {
-                Logger.errorToast(error, "Failed to parse spoof signature: ");
-                Menu.toast(en.debug_messages.signature_not_fetched, 1);
-            }
-        });
-    }
-    
-    if (Config.USE_SPOOF) {
-        httpGet(Config.SPOOF_VERSION_URL, (response) => {
-            if (!response) {
-                Logger.warnToast("Actual server signature can't be fetched, spoof won't be working.")
             };
-            
+            try {
+                fetchedModmenuVersion = JSON.parse(response);
+                if (fetchedModmenuVersion.version == ModPreferences.VERSION) {
+                    Logger.info("Mod menu is up to date");
+                    Menu.toast(en.toasts.mod_menu_version_actual, 1);
+                } else {
+                    Logger.info("Mod menu version is outdated, redirecting to download page...");
+                    Menu.toast(en.toasts.mod_menu_version_not_fetched, 1);
+                    openURL(Config.GITHUB_RELEASES_URL);
+                };
+            } catch (error: any) {
+                Logger.errorToast(error, "Parse mod menu version");
+            };
         });
     };
-    httpGet(Config.VERSION_URL, (response) => {
-        if (!response) {
-            Menu.toast(en.debug_messages.version_not_fetched, 1);
-            return;
-        }
 
-        try {
-            fetchedModmenuVersion = JSON.parse(response);
-            Logger.debug(en.debug_messages.version_fetched, response);
-
-            if (fetchedModmenuVersion.version == Il2Cpp.application.version!) {
-                Menu.toast(en.debug_messages.version_actual, 1);
-            } else {
-                Menu.toast(en.debug_messages.version_not_actual, 1);
-                openURL(Config.GITHUB_RELEASES_URL);
-            }
-            
-        } catch (error: any) {
-            Logger.errorToast(error, "Failed to parse modmenu version: ");
-            Menu.toast(en.debug_messages.version_not_fetched, 1);
-        }
-    });
-
+    // response should be like: {"client_version":"0.0.0","signature":"ABC123"}
+    if (Config.USE_SPOOF) {
+        httpGet(Config.SPOOF_VERSION_URL, (response) => {
+            if (!response) {
+                Logger.warn("Actual server signature can't be fetched, spoof won't be working");
+                Menu.toast(en.toasts.signature_not_fetched, 1);
+                return;
+            } 
+            try {
+                fetchedClientDetails = JSON.parse(response);
+            } catch (error: any) {
+                Logger.errorToast(error, "Parse spoof signature");
+            };
+        });
+    };
+    
 
     Menu.toast(en.messages.menu_will_appear_later, 1);
 
@@ -224,9 +221,9 @@ function main() {
             // Spoof platform
             if (Config.BuildInfo.PLATFORM != "android_ega") {
                 newConfig.field("Platform").value = Il2Cpp.string(Config.BuildInfo.PLATFORM);
-                console.log(en.debug_messages.login_spoofed_with_platform);
+                Logger.debug("Modified signature, client version and platform");
             } else
-                console.log(en.debug_messages.login_spoofed);
+                Logger.debug("Modified signature and client version");
             
             // Custom server
             if (Config.USE_CUSTOM_SERVER) {
@@ -241,9 +238,8 @@ function main() {
                 newConfig.field("LoginServerHost").value = loginServerHostAlloc;
                 newConfig.field("GatewayServerHost").value = gatewayServerHostAlloc;
                 
-                console.log(en.debug_messages.server_spoofed);
-            }
-
+                Logger.debug("Modified Login and Gatewat server hosts")
+            };
             return newConfig; 
         } else {
             return this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // without any changes
@@ -254,9 +250,11 @@ function main() {
     Init_ClientOnly_method.implementation = function (serverAddress: Il2Cpp.Object, gatewayConnConfig: Il2Cpp.Object, platformServiceProvider: Il2Cpp.String) {
         Logger.hook("Init_ClientOnly called with args:", serverAddress, gatewayConnConfig, platformServiceProvider);
         if (Config.USE_CUSTOM_SERVER) {
-            // refer BuildCatapultConfig hook
+            // refer BuildCatapultConfig_method.implementation
             const analyticsServerHostAlloc = WebSocketNetworkHost.alloc();
             analyticsServerHostAlloc.method(".ctor").invoke(Il2Cpp.string(Config.CUSTOM_ANALYTICS_URL), Config.CUSTOM_ANALYTICS_PORT, Config.IS_ANALYTICS_SECURE);
+
+            Logger.debug("Modified Analytics server host");
 
             return this.method("Init_ClientOnly").invoke(analyticsServerHostAlloc, gatewayConnConfig, platformServiceProvider);
         }
@@ -279,8 +277,9 @@ function main() {
         return false; 
     };
 
+    // TODO: I guess I need to disable this hook after fake popup
     Show_method.implementation = function (PopupInteractionTypeValue, ModalMessageDataValue, ModalMessageFailedToShow) {
-        Logger.hook("CheckAntiCheatClientServiceForError called w");
+        Logger.hook("Show called with args:", PopupInteractionTypeValue, ModalMessageDataValue, ModalMessageFailedToShow);
         ModalMessageDataValue = ModalMessageDataValue as Il2Cpp.Object;
 
         if (ModalMessageDataValue.field<Il2Cpp.String>("Title").value.content == "anticheat_error_title") {
@@ -304,7 +303,6 @@ function main() {
 
     // Graphics 
     set_fieldOfView_method.implementation = function (value) {
-        Logger.hook("set_fieldOfView called with args:", value);
         Camera_Instance = this;
         if (Config.Toggles.toggleCustomFov) {
             value = Config.CustomValues.FOV;
@@ -412,7 +410,6 @@ function main() {
     };
 
     SendMessage_method.implementation = function (bypassNetworkLOD) {
-        Logger.hook("SendMessage called with args:", bypassNetworkLOD);
         if (Config.Toggles.toggleDontSendFallGuyState) {
             return;
         };
@@ -420,7 +417,6 @@ function main() {
     };
 
     SendEventBatch_method.implementation = function () {
-        Logger.hook("SendEventBatch called");
         if (Config.Toggles.toggleDisableAnalytics) {
             return;
         };
@@ -431,7 +427,7 @@ function main() {
     ProcessMessageReceived_method.implementation = function (jsonMessage: Il2Cpp.String) {
         if (Config.Toggles.toggleShowQueuedPlayers) {
             const json = JSON.parse(jsonMessage.content!); // .content because it's Il2cpp.String
-            Logger.debug("ProcessMessageReceived jsonMessage:", json.contet);
+            Logger.debug("ProcessMessageReceived jsonMessage:", json);
             if (json.payload) {
                 if (json.payload.state == "Queued") { // if in queue 
                     Menu.toast(`Queued Players: ${json.payload.queuedPlayers.toString()}`, 0);
@@ -511,8 +507,7 @@ function main() {
                 const gameObject = FGDebug_Instance.method<Il2Cpp.Object>("get_gameObject").invoke();
                 gameObject.method("SetActive").invoke(true);
             } catch (error: any) {
-                Menu.toast(error.stack, 1);
-                console.error(error.stack);
+                Logger.errorToast(error)
             }
         },
         disable() {
@@ -624,8 +619,7 @@ function main() {
             */
     
         } catch (error: any) {
-            console.error(error.stack);
-            Menu.toast(error.stack, 0);
+            Logger.errorToast(error);
         }
         Menu.toast(en.messages.no_score, 0);
     };
@@ -647,16 +641,15 @@ function main() {
     
     const changeResolutionScale = () => {
         try {
-            console.log(en.debug_messages.change_resolution, Config.CustomValues.ResolutionScale);
+            Logger.debug("Changing resolution scale to:", Config.CustomValues.ResolutionScale);
             GraphicsSettings_Instance.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale);
             /*
             i wanted to make this value changeable in the game, but unfortunately 
             calling ResolutionScaling::UpdateResolutionScaleStatus() just crashes the game for now.
             */
         } catch (error: any) {
-            Menu.toast(error.stack, 1); 
-            console.error(error.stack);
-        }
+            Logger.errorToast(error);
+        };
     };
 
     const showServerDetails = () => {
@@ -669,16 +662,14 @@ function main() {
                 const hostPortNo = networkManager.method<number>("get_HostPortNo").invoke();
                 const rtt = gameConnection.method<number>("CurrentRtt").invoke(); 
 
-                console.log(`Server: ${hostIPAddr}:${hostPortNo}\nPing: ${rtt}ms`);
                 Menu.toast(`Server: ${hostIPAddr}:${hostPortNo}. Ping: ${rtt}ms`, 0); // little secret, you can ddos these servers, and it's not too hard.
                 copyToClipboard(`${hostIPAddr}:${hostPortNo}`);
             } else {
                 Menu.toast(en.messages.not_in_the_game, 0);
-            }
+            };
         } catch (error: any) {
-            Menu.toast(en.messages.not_in_the_game, 0);
-            console.error(error.stack);
-        }
+            Logger.errorToast(error);
+        };
     };
 
     const showGameDetails = () => {
@@ -691,15 +682,13 @@ function main() {
                 // const initialNumParticipants = ClientGameManager_Instance.field<number>("_initialNumParticipants").value;
                 // const allPlayers = ClientGameManager_Instance.method<Il2Cpp.Array<Il2Cpp.Object>>("get_AllPlayers").invoke();
 
-                console.log(`RoundID: ${roundID}, Seed: ${seed}, Eliminated: ${eliminatedPlayerCount}`);
                 Menu.toast(`RoundID: ${roundID}, Seed: ${seed}, Eliminated: ${eliminatedPlayerCount}`, 0);
             } else {
                 Menu.toast(en.messages.not_in_the_game, 0);
-            }
+            };
         } catch (error: any) {
-            Menu.toast(en.messages.not_in_the_game, 0);
-            console.error(error.stack);
-        }
+            Logger.errorToast(error);
+        };
     };
 
     const showTipToePath = () => {
@@ -710,12 +699,11 @@ function main() {
                 if (tiptoeStatus) { // if fake
                     const tiptoeObject = tiptoe.method<Il2Cpp.Object>("get_gameObject").invoke();
                     tiptoeObject.method("SetActive").invoke(false);
-                }
-            }
+                };
+            };
         } catch (error: any) {
-            Menu.toast(error.stack, 0);
-            console.error(error.stack);
-        }
+            Logger.errorToast(error);
+        };
     };
     
     enum ModalType_enum {
@@ -760,8 +748,7 @@ function main() {
             // 3 arg is onFailedCallback delegate, which is default is null
             Show_ModalMessageData_method.invoke(Info_Value, ModalMessageData_Instance, NULL);
         } catch (error: any) {
-            Menu.toast(error.stack, 0);
-            console.error(error.stack);
+            Logger.errorToast(error);
         };
     };
 
@@ -773,7 +760,16 @@ function main() {
 
             if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
                 Menu.add(
-                    layout.button("debug", () => {
+                    layout.button("Exit", () => {
+                        Menu.toast("Hold for exit", 0)
+                    },
+                    () => {
+                        exitFromApp();
+                    })
+                );
+
+                Menu.add(
+                    layout.button("Debug", () => {
                         Il2Cpp.perform(() => {
                             createPopup("Test Popup", "Message of Test Popup", ModalType_enum.MT_OK, OkButtonType_enum.Green);
                         }, "main"); // From Java.scheduleOnMainThread you need to Il2cpp.perform main!
@@ -994,10 +990,14 @@ function main() {
             });
 
         } catch (error: any) {
-            Menu.toast(error.stack, 1);
-            console.error(error.stack);
+            Logger.errorToast(error);
         }
     };
 }
 
+try {
+    throw new Error("123");
+} catch (error: any) {
+    Logger.errorToast(error, "this error")
+}
 Il2Cpp.perform(main);
