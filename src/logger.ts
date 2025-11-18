@@ -36,10 +36,9 @@ export namespace Logger {
     };
 
     export function hook(...args: any[]) {
-        if (ModPreferences.ENV !== "dev") return;
+        if (ModPreferences.ENV === "release") return;
         console.debug(`${getTime()} ${GRAY}[HOOK]`, ...args, RESET);
     };
-
 
     export function warn(...args: any[]) {
         console.warn(`${getTime()} ${YELLOW}[WARN]${RESET}`, ...args);
