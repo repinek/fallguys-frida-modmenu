@@ -995,9 +995,4 @@ function main() {
     };
 }
 
-try {
-    throw new Error("123");
-} catch (error: any) {
-    Logger.errorToast(error, "this error")
-}
 Il2Cpp.perform(main);
