@@ -1,13 +1,11 @@
 export namespace ModPreferences {
-    export var VERSION = "2.24"; // Don't forget update after changes!
-    export var ENV = "dev"; // dev, staging, release
+    export var VERSION = "2.26"; // Don't forget update after changes!
+    export var ENV = "release"; // dev, staging, release
     export var FOR_GAME_VERSION = "21.0.0";
 };
 
 /*
 !! TODO: 
-[x] remove debug logs from localization 
-[x] custom logger
 refactor scripts in package.json like in frida-il2cpp-bridge example (i like it)
 made localization for other languages (i18n)
 wrapper for Il2cpp.perform main

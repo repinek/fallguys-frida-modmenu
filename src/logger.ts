@@ -2,6 +2,7 @@ import "frida-java-menu";
 
 import { ModPreferences } from "./modPreferences.js";
 
+// Maybe log it into logcat too (but not so useful I guess)
 export namespace Logger {
 
     const RESET = '\x1b[0m';
@@ -52,6 +53,7 @@ export namespace Logger {
         Logger.warn(`${message} ${error.stack}`);
         Menu.toast(`${message} ${error.message}`, 1);
     };
+
     /**
      * Error log and showing toast for 3.5s 
      * 
