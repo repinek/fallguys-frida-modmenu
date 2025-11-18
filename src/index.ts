@@ -1,10 +1,11 @@
 import "frida-il2cpp-bridge";
 import "frida-java-menu";
 import Java from "frida-java-bridge";
+
 import { openURL, copyToClipboard, httpGet } from "./utils.js";
 import { Logger } from "./logger.js";
-import { obsidianConfig } from "./menuConfig.js";
-import { modPreferences } from "./modPreferences.js";
+import { ObsidianConfig } from "./menuConfig.js";
+import { ModPreferences } from "./modPreferences.js";
 import { Config } from "./config.js";
 
 import en from "./localization/en.json";
@@ -15,6 +16,7 @@ import en from "./localization/en.json";
 // honourable mention: Failed to load script: the connection is closed. Thank you for using Frida!
 
 function main() {
+    Logger.infoGreen(`Fall Guys Frida Mod Menu (${ModPreferences.ENV}, ${ModPreferences.VERSION}), Game Version: {${Il2Cpp.application.version!}}`);
     // === Assemblies ===
     const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image; // FG.Common namespace
     const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
@@ -114,36 +116,56 @@ function main() {
     let showPlayerNames: boolean;
     let lastTeleportTime = 0;
 
-    console.log(en.debug_messages.loaded);
+    Logger.debug("Loaded il2cpp, assemblies, classes and method pointers.");
     
-    if (Config.USE_SPOOF)
-    {
+    // chatgpt vibecoding TODO: refactor 
+    if (Config.USE_SPOOF) {
         httpGet(Config.SPOOF_VERSION_URL, (response) => {
+            if (!response) {
+                Menu.toast(en.debug_messages.signature_not_fetched, 1);
+                return;
+            }
             try {
                 fetchedClientDetails = JSON.parse(response);
-                console.log(en.debug_messages.signature_fetched, response);
+                Logger.debug(en.debug_messages.signature_fetched, response);
             } catch (error: any) {
-                console.log("error:", error);
-                Menu.toast(en.debug_messages.signature_not_fetched, 1)
+                Logger.errorToast(error, "Failed to parse spoof signature: ");
+                Menu.toast(en.debug_messages.signature_not_fetched, 1);
             }
         });
     }
-
+    
+    if (Config.USE_SPOOF) {
+        httpGet(Config.SPOOF_VERSION_URL, (response) => {
+            if (!response) {
+                Logger.warnToast("Actual server signature can't be fetched, spoof won't be working.")
+            };
+            
+        });
+    };
     httpGet(Config.VERSION_URL, (response) => {
+        if (!response) {
+            Menu.toast(en.debug_messages.version_not_fetched, 1);
+            return;
+        }
+
         try {
             fetchedModmenuVersion = JSON.parse(response);
-            console.log(en.debug_messages.version_fetched, response);
-            if (fetchedModmenuVersion.version == Il2Cpp.application.version!)
+            Logger.debug(en.debug_messages.version_fetched, response);
+
+            if (fetchedModmenuVersion.version == Il2Cpp.application.version!) {
                 Menu.toast(en.debug_messages.version_actual, 1);
-            else {
+            } else {
                 Menu.toast(en.debug_messages.version_not_actual, 1);
                 openURL(Config.GITHUB_RELEASES_URL);
-            };
+            }
+            
         } catch (error: any) {
-            console.log("error:", error);
-            Menu.toast(en.debug_messages.version_not_fetched, 1)
+            Logger.errorToast(error, "Failed to parse modmenu version: ");
+            Menu.toast(en.debug_messages.version_not_fetched, 1);
         }
     });
+
 
     Menu.toast(en.messages.menu_will_appear_later, 1);
 
@@ -188,6 +210,7 @@ function main() {
         Some existing platforms: ps5, pc_steam, pc_standalone (no longer used for official clients), ports3_2...
         More can be found in the CMS and game code
         */
+        Logger.hook("BuildCatapultConfig called.");
         if (Config.USE_SPOOF && fetchedClientDetails!) {
             const newConfig = this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // create new config
 
@@ -229,6 +252,7 @@ function main() {
     
     //@ts-ignore
     Init_ClientOnly_method.implementation = function (serverAddress: Il2Cpp.Object, gatewayConnConfig: Il2Cpp.Object, platformServiceProvider: Il2Cpp.String) {
+        Logger.hook("Init_ClientOnly called with args:", serverAddress, gatewayConnConfig, platformServiceProvider);
         if (Config.USE_CUSTOM_SERVER) {
             // refer BuildCatapultConfig hook
             const analyticsServerHostAlloc = WebSocketNetworkHost.alloc();
@@ -251,10 +275,12 @@ function main() {
         If true: it won't be let matchmake you and will call ShowAntiCheatPopup method (also refer Show_method.implementation for more about ShowAntiCheatPopup)
         So, we just return false here
         */
+        Logger.hook("CheckAntiCheatClientServiceForError called");
         return false; 
     };
 
     Show_method.implementation = function (PopupInteractionTypeValue, ModalMessageDataValue, ModalMessageFailedToShow) {
+        Logger.hook("CheckAntiCheatClientServiceForError called w");
         ModalMessageDataValue = ModalMessageDataValue as Il2Cpp.Object;
 
         if (ModalMessageDataValue.field<Il2Cpp.String>("Title").value.content == "anticheat_error_title") {
@@ -278,6 +304,7 @@ function main() {
 
     // Graphics 
     set_fieldOfView_method.implementation = function (value) {
+        Logger.hook("set_fieldOfView called with args:", value);
         Camera_Instance = this;
         if (Config.Toggles.toggleCustomFov) {
             value = Config.CustomValues.FOV;
@@ -286,34 +313,40 @@ function main() {
     };
 
     get_TargetFrameRate_method.implementation = function () {
+        Logger.hook("get_TargetFrameRate called");
         return 1337; // litterally unlimited, because it's linked to the screen refresh rate
     };
 
     set_TargetFrameRate_method.implementation = function (fps) {
+        Logger.hook("set_TargetFrameRate called with args:", fps);
         return this.method("set_TargetFrameRate", 1).invoke(1337);
     };
 
     get_ResolutionScale_method.implementation = function () {
+        Logger.hook("get_ResolutionScale called");
         GraphicsSettings_Instance = this; // often gc.choose causes crashes
         return Config.CustomValues.ResolutionScale;
     };
 
     set_ResolutionScale_method.implementation = function (scale) {
+        Logger.hook("set_ResolutionScale called with args:", scale);
         return this.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale); 
     };
 
     SetShowPlayerNamesByDefault_method.implementation = function (value) {
+        Logger.hook("SetShowPlayerNamesByDefault called with args:", value);
         showPlayerNames = value as boolean;
         return this.method("SetShowPlayerNamesByDefault", 1).invoke(value);
     };
 
     // Utils 
     StartAFKManager_method.implementation = function () {
+        Logger.hook("StartAFKManager called");
         return; // anti-afk
     };
 
     OnMainMenuDisplayed_method.implementation = function (event) {
-        console.log("OnMainMenuDisplayed Called!");
+        Logger.hook("OnMainMenuDisplayed Called!");
 
         if (!reachedMainMenu) {
             /*
@@ -335,7 +368,7 @@ function main() {
     };
 
     GameLevelLoaded_method.implementation = function (ugcLevelHash) {
-        console.log("GameLevelLoaded called!");
+        Logger.hook("GameLevelLoaded called with args:", ugcLevelHash);
 
         ClientGameManager_Instance = this;
         GlobalGameStateClient_Instance = GlobalGameStateClient.method<Il2Cpp.Object>("get_Instance").invoke();
@@ -379,6 +412,7 @@ function main() {
     };
 
     SendMessage_method.implementation = function (bypassNetworkLOD) {
+        Logger.hook("SendMessage called with args:", bypassNetworkLOD);
         if (Config.Toggles.toggleDontSendFallGuyState) {
             return;
         };
@@ -386,6 +420,7 @@ function main() {
     };
 
     SendEventBatch_method.implementation = function () {
+        Logger.hook("SendEventBatch called");
         if (Config.Toggles.toggleDisableAnalytics) {
             return;
         };
@@ -395,9 +430,8 @@ function main() {
     //@ts-ignore, code from wiki snippets btw lol
     ProcessMessageReceived_method.implementation = function (jsonMessage: Il2Cpp.String) {
         if (Config.Toggles.toggleShowQueuedPlayers) {
-            console.log(jsonMessage.content);
             const json = JSON.parse(jsonMessage.content!); // .content because it's Il2cpp.String
-            
+            Logger.debug("ProcessMessageReceived jsonMessage:", json.contet);
             if (json.payload) {
                 if (json.payload.state == "Queued") { // if in queue 
                     Menu.toast(`Queued Players: ${json.payload.queuedPlayers.toString()}`, 0);
@@ -409,6 +443,7 @@ function main() {
     };
 
     BuildInfo_OnEnable_method.implementation = function () {
+        Logger.hook("BuildInfo OnEnable called");
         Config.BuildInfo.gameVersion = Il2Cpp.application.version!;
         Config.BuildInfo.unityVersion = Il2Cpp.unityVersion;
         Config.BuildInfo.buildNumber = this.field<Il2Cpp.String>("buildNumber").value.content!;
@@ -700,7 +735,7 @@ function main() {
 
     function createPopup(Title: string, Message: string, ModalTypeValue: ModalType_enum, OkButtonTypeValue: OkButtonType_enum) {
         try {
-            console.log("Creating popup...")
+            Logger.debug("Creating popup...")
             const PopupManager_Instance = PopupManager.method<Il2Cpp.Object>("get_Instance").invoke();
             const Show_ModalMessageData_method = PopupManager_Instance.method<boolean>("Show", 3).overload(PopupInteractionType, ModalMessageData, "FGClient.UI.UIModalMessage.ModalMessageFailedToShow");
             
@@ -732,17 +767,19 @@ function main() {
 
     const initMenu = () => {
         try {
-            const layout = new Menu.ObsidianLayout(obsidianConfig);
+            const layout = new Menu.ObsidianLayout(ObsidianConfig);
             const composer = new Menu.Composer(en.info.name, en.info.warn, layout); 
             composer.icon(Config.ICON_URL, "Web");
 
-            // later uncommeting
-            // Menu.add(layout.button("debug", () => {
-            //         Il2Cpp.perform(() => {
-            //             createPopup("Test Popup", "Message of Test Popup", ModalType_enum.MT_OK, OkButtonType_enum.Green);
-            //         }, "main"); // From Java.scheduleOnMainThread you need to Il2cpp.perform main!
-            //     })
-            // );
+            if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
+                Menu.add(
+                    layout.button("debug", () => {
+                        Il2Cpp.perform(() => {
+                            createPopup("Test Popup", "Message of Test Popup", ModalType_enum.MT_OK, OkButtonType_enum.Green);
+                        }, "main"); // From Java.scheduleOnMainThread you need to Il2cpp.perform main!
+                    })
+                );
+            };
 
             // === Movement Tab === 
             const movement = layout.textView(en.tabs.movement_tab);
@@ -927,8 +964,8 @@ function main() {
             info.gravity = Menu.Api.CENTER;
             Menu.add(info);
 
-            Menu.add(layout.textView(`${en.info.mod_menu_version} ${modPreferences.VERSION}`));
-            Menu.add(layout.textView(`${en.info.mod_menu_env} ${modPreferences.ENV}`));
+            Menu.add(layout.textView(`${en.info.mod_menu_version} ${ModPreferences.VERSION}`));
+            Menu.add(layout.textView(`${en.info.mod_menu_env} ${ModPreferences.ENV}`));
             Menu.add(layout.textView(`${en.info.game_version} ${Config.BuildInfo.gameVersion}`));
             Menu.add(layout.textView(`${en.info.is_spoofed} ${Config.USE_SPOOF}`));
             if (Config.USE_SPOOF)
