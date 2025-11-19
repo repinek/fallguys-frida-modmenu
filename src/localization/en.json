@@ -1,4 +1,4 @@
-{   
+{
     "messages": {
         "menu_will_appear_later": "Menu will appear once you enter the main menu",
         "display_menu": "Displaying the menu",
@@ -30,7 +30,7 @@
         "toggle_freeze_player": "Freeze Player",
         "toggle_dont_send_fallguy_state": "Don't send Fall Guy state",
         "toggle_custom_speed": "Use Custom Speed",
-        "custom_speed": "Custom Speed: {0} / 100", 
+        "custom_speed": "Custom Speed: {0} / 100",
         "toggle_custom_velocity": "Enable Custom Velocity",
         "vertical_gravity_velocity": "Vertical Gravity Velocity: {0} / 100",
         "toggle_negative_velocity": "Negative Velocity",
