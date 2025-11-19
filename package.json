@@ -1,5 +1,8 @@
 {
   "name": "fallguys-frida-modmenu",
+  "description": "Android Fall Guys cheat using FRIDA and frida-il2cpp-bridge",
+  "author": "repinek",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/repinek/fallguys-frida-modmenu"
@@ -7,24 +10,36 @@
   "main": "src/index.js",
   "scripts": {
     "build": "frida-compile src/index.ts -o dist/agent.js -c",
-    "build:no_c": "frida-compile src/index.ts -o dist/agent.js",
-    "spawn": "frida -U gadget -l dist/agent.js"
+    "build:dev": "frida-compile src/index.ts -o dist/agent.js",
+    "watch": "frida-compile src/index.ts -o dist/agent.js -w",
+    "spawn": "frida -U gadget -l dist/agent.js --runtime=v8",
+    "lint": "eslint src/**/*.ts",
+    "prettier": "prettier --write \"src/**\""
   },
-  "author": "repinek",
-  "license": "MIT",
-  "description": "Android Fall Guys cheat using FRIDA and frida-il2cpp-bridge",
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@types/frida-gum": "^19.0.1",
     "@types/node": "^24.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.47.0",
+    "@typescript-eslint/parser": "^8.47.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
     "frida-compile": "^19.0.4",
     "frida-il2cpp-bridge": "^0.12.1",
+    "frida-java-bridge": "^7.0.10",
+    "globals": "^16.5.0",
+    "jiti": "^2.6.1",
+    "prettier": "^3.6.2",
     "typescript": "^5.6.3",
-    "frida-java-bridge": "^7.0.10"
+    "typescript-eslint": "^8.47.0"
   },
   "dependencies": {
     "frida-java-menu": "github:commonuserlol/frida-java-menu"
   },
   "prettier": {
+    "tabWidth": 4,
+    "arrowParens": "avoid",
+    "trailingComma": "none",
     "printWidth": 160
   }
 }
