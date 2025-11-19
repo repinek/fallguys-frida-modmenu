@@ -12,7 +12,7 @@ export const Config = {
     // === Login Spoof ===
     USE_SPOOF: true,
 
-    // === Custom Server === 
+    // === Custom Server ===
     // refer to BuildCatapultConfig_method.implementation
     USE_CUSTOM_SERVER: false,
     CUSTOM_LOGIN_URL: "https://login.fallguys.oncatapult.com/api/v1",
@@ -43,7 +43,7 @@ export const Config = {
         toggleFGDebug: false,
         toggleDisableAnalytics: false,
         toggleHideDoors: false,
-        toggleShowQueuedPlayers: false,
+        toggleShowQueuedPlayers: false
     },
 
     CustomValues: {
@@ -52,7 +52,7 @@ export const Config = {
         jumpForce: 17.5,
         diveForce: 16.5,
         ResolutionScale: 1,
-        FOV: 70,
+        FOV: 70
     },
 
     DefaultValues: {
@@ -64,7 +64,7 @@ export const Config = {
         jumpForce: 17.5,
         airDiveForce: 7,
         diveForce: 16.5,
-        diveMultiplier: 16.5 / 7, // diveForce / airDiveForce
+        diveMultiplier: 16.5 / 7 // diveForce / airDiveForce
     },
 
     BuildInfo: {
@@ -75,6 +75,6 @@ export const Config = {
         spoofedSignature: "" as string,
         unityVersion: "" as string,
         buildNumber: "Local build",
-        buildDate: "n/a",
+        buildDate: "n/a"
     }
 };

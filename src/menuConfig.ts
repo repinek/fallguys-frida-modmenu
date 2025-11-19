@@ -9,17 +9,17 @@ export const ObsidianConfig: Menu.ObsidianConfig = {
         collapseBg: "#3B3B3B",
         categoryBg: "#296368",
         menu: "#0D0D0D", // back
-        tabFocusedBg: "#454545", 
-        tabUnfocusedBg: "#3E3E3E", 
+        tabFocusedBg: "#454545",
+        tabUnfocusedBg: "#3E3E3E",
         hideFg: "#55514F", // hide
-        closeFg: "#751616", // close
+        closeFg: "#751616" // close
     },
     menu: {
         width: 350,
         height: 200,
         x: 100,
         y: 100,
-        cornerRadius: 45 
+        cornerRadius: 45
     },
     icon: {
         size: 50,
@@ -33,4 +33,3 @@ export const ObsidianConfig: Menu.ObsidianConfig = {
         killCallback: en.menu.kill_callback // hold hide to kill menu
     }
 };
-

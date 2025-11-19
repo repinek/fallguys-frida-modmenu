@@ -14,7 +14,7 @@
     "watch": "frida-compile src/index.ts -o dist/agent.js -w",
     "spawn": "frida -U gadget -l dist/agent.js --runtime=v8",
     "lint": "eslint src/**/*.ts",
-    "format": "prettier --write src/**/*.ts"
+    "prettier": "prettier --write src/**/*.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -23,6 +23,7 @@
     "@typescript-eslint/eslint-plugin": "^8.47.0",
     "@typescript-eslint/parser": "^8.47.0",
     "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
     "frida-compile": "^19.0.4",
     "frida-il2cpp-bridge": "^0.12.1",
     "frida-java-bridge": "^7.0.10",
@@ -39,6 +40,6 @@
     "tabWidth": 4,
     "arrowParens": "avoid",
     "trailingComma": "none",
-    "printWidth": 120
+    "printWidth": 160
   }
 }

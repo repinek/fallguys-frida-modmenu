@@ -7,7 +7,7 @@ export function exitFromApp() {
         const System = Java.use("java.lang.System");
         System.exit(0);
     });
-};
+}
 
 export function openURL(targetUrl: string) {
     Java.perform(() => {
@@ -22,33 +22,26 @@ export function openURL(targetUrl: string) {
             activity.startActivity(openIntent);
         } catch (error: any) {
             Logger.errorToast(error);
-        };
+        }
     });
-};
+}
 
 export function copyToClipboard(text: string) {
     Java.perform(() => {
         try {
             const context = Java.use("android.app.ActivityThread").currentApplication().getApplicationContext();
-            const clipboardManager = Java.cast(
-                context.getSystemService("clipboard"),
-                Java.use("android.content.ClipboardManager")
-            );
+            const clipboardManager = Java.cast(context.getSystemService("clipboard"), Java.use("android.content.ClipboardManager"));
             const javaString = Java.use("java.lang.String");
-            const clipData = Java.use("android.content.ClipData")
-                .newPlainText(javaString.$new("label"), javaString.$new(text));
+            const clipData = Java.use("android.content.ClipData").newPlainText(javaString.$new("label"), javaString.$new(text));
             clipboardManager.setPrimaryClip(clipData);
         } catch (error: any) {
             Logger.errorToast(error);
-        };
+        }
     });
-};
+}
 
 // Thanks a lot: https://github.com/frida/frida/issues/1158#issuecomment-1227967229
-export function httpGet(
-    targetUrl: string,
-    onReceive: (response: string | null) => void = function(response: string | null) {}
-    ) {
+export function httpGet(targetUrl: string, onReceive: (response: string | null) => void = () => {}) {
     Java.perform(() => {
         try {
             Logger.debug(`HTTP GET: ${targetUrl}`);
@@ -64,7 +57,7 @@ export function httpGet(
             connection.setRequestMethod("GET");
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
-            connection.setDoInput(true)
+            connection.setDoInput(true);
             connection.connect();
 
             const responseCode = connection.getResponseCode();
@@ -78,25 +71,24 @@ export function httpGet(
                 let line: string | null;
                 while ((line = buffer.readLine()) != null) {
                     sb.append(line);
-                };
+                }
 
                 response = sb.toString();
-                
+
                 inputStream.close();
                 buffer.close();
             } else {
                 response = null;
-            };
+            }
 
             connection.disconnect();
             Logger.debug("HTTP GET response:", response);
             onReceive(response);
             return response;
-
         } catch (error: any) {
             Logger.errorToast(error, "HTTP GET");
-            onReceive(null)
-            return null
-        };
+            onReceive(null);
+            return null;
+        }
     });
-};
+}

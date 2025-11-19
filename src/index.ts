@@ -26,7 +26,7 @@ function main() {
     // const WushuLevelEditorRuntime = Il2Cpp.domain.assembly("Wushu.LevelEditor.Runtime").image; // creative logic
     const MediatonicCatapultClientSdkRuntime = Il2Cpp.domain.assembly("Mediatonic.Catapult.ClientSdk.Runtime").image; // connection
 
-    // === Classes === 
+    // === Classes ===
     const Resources = CoreModule.class("UnityEngine.Resources");
     const Vector3class = CoreModule.class("UnityEngine.Vector3");
     const SceneManager = CoreModule.class("UnityEngine.SceneManagement.SceneManager");
@@ -48,15 +48,14 @@ function main() {
     const LocaliseOption = MTFGClient.class("FGClient.UI.UIModalMessage/LocaliseOption");
     const ModalType = MTFGClient.class("FGClient.UI.UIModalMessage/ModalType");
     const OkButtonType = MTFGClient.class("FGClient.UI.UIModalMessage/OKButtonType");
-    
+
     // refer createPopup()
     const ModalMessageData = MTFGClient.class("FGClient.UI.ModalMessageData");
     const PopupInteractionType = MTFGClient.class("FGClient.UI.PopupInteractionType");
-    
 
     const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const MotorFunctionJump = TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
-    const MPGNetMotorTasks = TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks"); // MPG - The Multiplayer Group 
+    const MPGNetMotorTasks = TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks"); // MPG - The Multiplayer Group
     const CatapultAnalyticsService = TheMultiplayerGuys.class("FG.Common.CatapultAnalyticsService");
 
     const DebugClass = TheMultiplayerGuys.class("GvrFPS"); // FGDebug
@@ -76,8 +75,8 @@ function main() {
     const WebSocketNetworkHost = MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
     const AnalyticsService = MediatonicCatapultClientSdkRuntime.class("Catapult.Analytics.AnalyticsService");
     const Show_method = PopupManager.method("Show", 3).overload(PopupInteractionType, ModalMessageData, "FGClient.UI.UIModalMessage.ModalMessageFailedToShow");
-            
-    // === Methods === 
+
+    // === Methods ===
     const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
     const Init_ClientOnly_method = CatapultAnalyticsService.method("Init_ClientOnly", 3);
     const SendEventBatch_method = AnalyticsService.method("SendEventBatch");
@@ -100,7 +99,7 @@ function main() {
     const CheckCharacterControllerData_method = CharacterDataMonitor.method("CheckCharacterControllerData", 1);
     const CanJump_method = MotorFunctionJump.method<boolean>("CanJump");
 
-    // === Cache === 
+    // === Cache ===
     let FallGuysCharacterController_Instance: Il2Cpp.Object;
     let CharacterControllerData_Instance: Il2Cpp.Object;
     let JumpMotorFunction_Instance: Il2Cpp.Object;
@@ -127,12 +126,12 @@ function main() {
     if (ModPreferences.ENV !== "release") {
         Logger.debug("Skipping mod menu version check in dev/staging");
     } else {
-        httpGet(Config.MOD_MENU_VERSION_URL, (response) => {
+        httpGet(Config.MOD_MENU_VERSION_URL, response => {
             if (!response) {
                 Logger.warn("Actual mod menu version can't be fetched");
                 Menu.toast(en.toasts.mod_menu_version_not_fetched, 1);
                 return;
-            };
+            }
             try {
                 fetchedModmenuVersion = JSON.parse(response);
                 if (fetchedModmenuVersion.script_version == ModPreferences.VERSION) {
@@ -142,49 +141,46 @@ function main() {
                     Logger.warn("Mod menu version is outdated, redirecting to download page...");
                     Menu.toast(en.toasts.mod_menu_version_not_fetched, 1);
                     openURL(Config.GITHUB_RELEASES_URL);
-                };
+                }
             } catch (error: any) {
                 Logger.errorToast(error, "Parse mod menu version");
-            };
+            }
         });
-    };
+    }
 
     // response should be like: {"client_version":"0.0.0","signature":"ABC123"}
     if (Config.USE_SPOOF) {
-        httpGet(Config.SPOOF_VERSION_URL, (response) => {
+        httpGet(Config.SPOOF_VERSION_URL, response => {
             if (!response) {
                 Logger.warn("Actual server signature can't be fetched, spoof won't be working");
                 Menu.toast(en.toasts.signature_not_fetched, 1);
                 return;
-            } 
+            }
             try {
                 fetchedClientDetails = JSON.parse(response);
             } catch (error: any) {
                 Logger.errorToast(error, "Parse spoof signature");
-            };
+            }
         });
-    };
-    
+    }
 
     Menu.toast(en.messages.menu_will_appear_later, 1);
 
-    // === Helpers === 
+    // === Helpers ===
     const findObjectsOfTypeAll = (klass: Il2Cpp.Class) => {
         return Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
     };
 
     const teleportTo = (target: Il2Cpp.Object) => {
-    const objectVector3Pos = target
-        .method<Il2Cpp.Object>("get_transform")
-        .invoke()
-        .method<Il2Cpp.Object>("get_position")
-        .invoke();
+        // prettier-ignore
+        const objectVector3Pos = target
+        .method<Il2Cpp.Object>("get_transform").invoke()
+        .method<Il2Cpp.Object>("get_position").invoke();
 
-    FallGuysCharacterController_Instance
-        .method<Il2Cpp.Object>("get_transform")
-        .invoke()
-        .method<Il2Cpp.Object>("set_position")
-        .invoke(objectVector3Pos);
+        // prettier-ignore
+        FallGuysCharacterController_Instance
+        .method<Il2Cpp.Object>("get_transform").invoke().
+        method<Il2Cpp.Object>("set_position").invoke(objectVector3Pos);
     };
 
     const checkTeleportCooldown = () => {
@@ -193,7 +189,7 @@ function main() {
         if (currentTime - lastTeleportTime < Config.TELEPORT_COOLDOWN) {
             Menu.toast(`Please wait ${((Config.TELEPORT_COOLDOWN - (currentTime - lastTeleportTime)) / 1000).toFixed(1)} seconds before teleporting again!`, 0);
             return false;
-        };
+        }
         lastTeleportTime = currentTime;
         return true;
     };
@@ -224,9 +220,8 @@ function main() {
             if (Config.BuildInfo.PLATFORM != "android_ega") {
                 newConfig.field("Platform").value = Il2Cpp.string(Config.BuildInfo.PLATFORM);
                 Logger.debug("Modified signature, client version and platform");
-            } else
-                Logger.debug("Modified signature and client version");
-            
+            } else Logger.debug("Modified signature and client version");
+
             // Custom server
             if (Config.USE_CUSTOM_SERVER) {
                 const loginServerHostAlloc = HttpNetworkHost.alloc();
@@ -239,29 +234,31 @@ function main() {
 
                 newConfig.field("LoginServerHost").value = loginServerHostAlloc;
                 newConfig.field("GatewayServerHost").value = gatewayServerHostAlloc;
-                
-                Logger.debug("Modified Login and Gatewat server hosts")
-            };
-            return newConfig; 
+
+                Logger.debug("Modified Login and Gatewat server hosts");
+            }
+            return newConfig;
         } else {
             return this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // without any changes
-        };
+        }
     };
-    
+
     //@ts-ignore
     Init_ClientOnly_method.implementation = function (serverAddress: Il2Cpp.Object, gatewayConnConfig: Il2Cpp.Object, platformServiceProvider: Il2Cpp.String) {
         Logger.hook("Init_ClientOnly called with args:", serverAddress, gatewayConnConfig, platformServiceProvider);
         if (Config.USE_CUSTOM_SERVER) {
             // refer BuildCatapultConfig_method.implementation
             const analyticsServerHostAlloc = WebSocketNetworkHost.alloc();
-            analyticsServerHostAlloc.method(".ctor").invoke(Il2Cpp.string(Config.CUSTOM_ANALYTICS_URL), Config.CUSTOM_ANALYTICS_PORT, Config.IS_ANALYTICS_SECURE);
+            analyticsServerHostAlloc
+                .method(".ctor")
+                .invoke(Il2Cpp.string(Config.CUSTOM_ANALYTICS_URL), Config.CUSTOM_ANALYTICS_PORT, Config.IS_ANALYTICS_SECURE);
 
             Logger.debug("Modified Analytics server host");
 
             return this.method("Init_ClientOnly").invoke(analyticsServerHostAlloc, gatewayConnConfig, platformServiceProvider);
         }
         return this.method("Init_ClientOnly").invoke(serverAddress, gatewayConnConfig, platformServiceProvider);
-    }; 
+    };
 
     // Bypass permanent ban
     // Temporary bans cannot be bypassed, but permanent bans can be loool
@@ -276,7 +273,7 @@ function main() {
         So, we just return false here
         */
         Logger.hook("CheckAntiCheatClientServiceForError called");
-        return false; 
+        return false;
     };
 
     // TODO: I guess I need to disable this hook after fake popup
@@ -288,27 +285,27 @@ function main() {
             /*
             ShowAntiCheatPopup will called by _CheckRestrictedGameAccess_d__69::MoveNext corutine
             CheckRestrictedGameAccess called by OnLoginSuccessful (When you login in)
-            */ 
+            */
             const NotLocalised_Option = LocaliseOption.field<Il2Cpp.ValueType>("NotLocalised").value;
 
-            ModalMessageDataValue.field<Il2Cpp.ValueType>("LocaliseTitle").value = NotLocalised_Option; 
+            ModalMessageDataValue.field<Il2Cpp.ValueType>("LocaliseTitle").value = NotLocalised_Option;
             ModalMessageDataValue.field<Il2Cpp.ValueType>("LocaliseMessage").value = NotLocalised_Option;
             ModalMessageDataValue.field<Il2Cpp.ValueType>("ModalType").value = ModalType.field<Il2Cpp.ValueType>(ModalType_enum.MT_OK).value;
-            ModalMessageDataValue.field<Il2Cpp.ValueType>("OkButtonType").value = OkButtonType.field<Il2Cpp.ValueType>(OkButtonType_enum.Green).value; 
+            ModalMessageDataValue.field<Il2Cpp.ValueType>("OkButtonType").value = OkButtonType.field<Il2Cpp.ValueType>(OkButtonType_enum.Green).value;
             ModalMessageDataValue.field<Il2Cpp.String>("Title").value = Il2Cpp.string(en.messages.account_banned);
             ModalMessageDataValue.field<Il2Cpp.String>("Message").value = Il2Cpp.string(en.messages.account_banned_desc);
-        };
+        }
 
         const this_method = this.method("Show", 3).overload(PopupInteractionType, ModalMessageData, "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"); // for instance
         return this_method.invoke(PopupInteractionTypeValue, ModalMessageDataValue, ModalMessageFailedToShow);
     };
 
-    // Graphics 
+    // Graphics
     set_fieldOfView_method.implementation = function (value) {
         Camera_Instance = this;
         if (Config.Toggles.toggleCustomFov) {
             value = Config.CustomValues.FOV;
-        } 
+        }
         return this.method("set_fieldOfView", 1).invoke(value);
     };
 
@@ -330,7 +327,7 @@ function main() {
 
     set_ResolutionScale_method.implementation = function (scale) {
         Logger.hook("set_ResolutionScale called with args:", scale);
-        return this.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale); 
+        return this.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale);
     };
 
     SetShowPlayerNamesByDefault_method.implementation = function (value) {
@@ -339,7 +336,7 @@ function main() {
         return this.method("SetShowPlayerNamesByDefault", 1).invoke(value);
     };
 
-    // Utils 
+    // Utils
     StartAFKManager_method.implementation = function () {
         Logger.hook("StartAFKManager called");
         return; // anti-afk
@@ -379,11 +376,11 @@ function main() {
         if (Config.Toggles.toggleHideDoors) {
             const manipulateObjects = (
                 type: Il2Cpp.Class, // class of object
-                field: string, // getter method name like get_IsFakeDoor 
-                expectedValue: boolean,
+                field: string, // getter method name like get_IsFakeDoor
+                expectedValue: boolean
             ) => {
                 const objectsArray = findObjectsOfTypeAll(type);
-        
+
                 for (const obj of objectsArray) {
                     const value = obj.method<boolean>(field).invoke();
                     if (value === expectedValue) {
@@ -391,20 +388,20 @@ function main() {
                         gameObject.method("SetActive").invoke(false);
                     }
                 }
-            };  
+            };
 
             switch (true) {
-            case currentSceneName?.includes("FallGuy_DoorDash"):
-                manipulateObjects(FakeDoorController, "get_IsFakeDoor", false);
-                break;
-        
-            case currentSceneName?.includes("FallGuy_Crown_Maze_Topdown"):
-                manipulateObjects(CrownMazeDoor, "get_IsBreakable", true);
-                break;
-        
-            case currentSceneName?.includes("Fraggle"): // creative codename
-                manipulateObjects(FakeDoorController, "get_IsFakeDoor", false);
-                break;
+                case currentSceneName?.includes("FallGuy_DoorDash"):
+                    manipulateObjects(FakeDoorController, "get_IsFakeDoor", false);
+                    break;
+
+                case currentSceneName?.includes("FallGuy_Crown_Maze_Topdown"):
+                    manipulateObjects(CrownMazeDoor, "get_IsBreakable", true);
+                    break;
+
+                case currentSceneName?.includes("Fraggle"): // creative codename
+                    manipulateObjects(FakeDoorController, "get_IsFakeDoor", false);
+                    break;
             }
         }
 
@@ -414,14 +411,14 @@ function main() {
     SendMessage_method.implementation = function (bypassNetworkLOD) {
         if (Config.Toggles.toggleDontSendFallGuyState) {
             return;
-        };
+        }
         return this.method("SendMessage", 1).invoke(bypassNetworkLOD);
     };
 
     SendEventBatch_method.implementation = function () {
         if (Config.Toggles.toggleDisableAnalytics) {
             return;
-        };
+        }
         return this.method("SendEventBatch").invoke();
     };
 
@@ -431,11 +428,11 @@ function main() {
             Logger.debug("ProcessMessageReceived jsonMessage:", jsonMessage.content!);
             const json = JSON.parse(jsonMessage.content!); // .content because it's Il2cpp.String
             if (json.payload) {
-                if (json.payload.state == "Queued") { // if in queue 
+                if (json.payload.state == "Queued") {
                     Menu.toast(`Queued Players: ${json.payload.queuedPlayers.toString()}`, 0);
-                };
-            };
-        };
+                }
+            }
+        }
         return this.method("ProcessMessageReceived", 1).invoke(jsonMessage);
     };
 
@@ -450,43 +447,55 @@ function main() {
         return this.method("OnEnable").invoke();
     };
 
-    // Physics 
+    // Physics
     CheckCharacterControllerData_method.implementation = function (character: any) {
         FallGuysCharacterController_Instance = character;
         CharacterControllerData_Instance = character.method("get_Data").invoke(); // get Data instance
-        JumpMotorFunction_Instance = character.method("get_JumpMotorFunction").invoke(); // get JumpMotorFunction 
-    
-        CharacterControllerData_Instance.field("divePlayerSensitivity").value = Config.Toggles.toggle360Dives ? 69420 : Config.DefaultValues.divePlayerSensitivity;
+        JumpMotorFunction_Instance = character.method("get_JumpMotorFunction").invoke(); // get JumpMotorFunction
 
-        CharacterControllerData_Instance.field("normalMaxSpeed").value = Config.Toggles.toggleCustomSpeed ? Config.CustomValues.normalMaxSpeed : Config.DefaultValues.normalMaxSpeed;
-        CharacterControllerData_Instance.field("carryMaxSpeed").value = Config.Toggles.toggleCustomSpeed ? Config.CustomValues.normalMaxSpeed : Config.DefaultValues.carryMaxSpeed;
-        CharacterControllerData_Instance.field("grabbingMaxSpeed").value = Config.Toggles.toggleCustomSpeed ? Config.CustomValues.normalMaxSpeed : Config.DefaultValues.grabbingMaxSpeed;
+        CharacterControllerData_Instance.field("divePlayerSensitivity").value = Config.Toggles.toggle360Dives
+            ? 69420
+            : Config.DefaultValues.divePlayerSensitivity;
+
+        CharacterControllerData_Instance.field("normalMaxSpeed").value = Config.Toggles.toggleCustomSpeed
+            ? Config.CustomValues.normalMaxSpeed
+            : Config.DefaultValues.normalMaxSpeed;
+        CharacterControllerData_Instance.field("carryMaxSpeed").value = Config.Toggles.toggleCustomSpeed
+            ? Config.CustomValues.normalMaxSpeed
+            : Config.DefaultValues.carryMaxSpeed;
+        CharacterControllerData_Instance.field("grabbingMaxSpeed").value = Config.Toggles.toggleCustomSpeed
+            ? Config.CustomValues.normalMaxSpeed
+            : Config.DefaultValues.grabbingMaxSpeed;
 
         CharacterControllerData_Instance.field("maxGravityVelocity").value = Config.Toggles.toggleCustomVelocity
-            ? Config.Toggles.toggleNoVelocity 
+            ? Config.Toggles.toggleNoVelocity
                 ? 0 // if enable no velocity
                 : Config.Toggles.toggleNegativeVelocity
                   ? -Config.CustomValues.maxGravityVelocity // if enable negative velocity
                   : Config.CustomValues.maxGravityVelocity
             : Config.DefaultValues.maxGravityVelocity;
-        
-        CharacterControllerData_Instance.field("diveForce").value = Config.Toggles.toggleCustomDiveForce ? Config.CustomValues.diveForce : Config.DefaultValues.diveForce;
-        CharacterControllerData_Instance.field("airDiveForce").value = Config.Toggles.toggleCustomDiveForce ? Config.CustomValues.diveForce / Config.DefaultValues.diveMultiplier : Config.DefaultValues.airDiveForce;
+
+        CharacterControllerData_Instance.field("diveForce").value = Config.Toggles.toggleCustomDiveForce
+            ? Config.CustomValues.diveForce
+            : Config.DefaultValues.diveForce;
+        CharacterControllerData_Instance.field("airDiveForce").value = Config.Toggles.toggleCustomDiveForce
+            ? Config.CustomValues.diveForce / Config.DefaultValues.diveMultiplier
+            : Config.DefaultValues.airDiveForce;
 
         const jumpForce = JumpMotorFunction_Instance.field<Il2Cpp.Object>("_jumpForce").value;
         jumpForce.field("y").value = Config.Toggles.toggleCustomJumpForce ? Config.CustomValues.jumpForce : Config.DefaultValues.jumpForce;
-    
+
         return true;
     };
 
     CanJump_method.implementation = function () {
         if (Config.Toggles.toggleAirJump) {
             return true;
-        };
+        }
         return this.method<boolean>("CanJump").invoke();
     };
 
-    // === Functions === 
+    // === Functions ===
     const FGDebug = {
         enable() {
             Config.Toggles.toggleFGDebug = true;
@@ -501,6 +510,7 @@ function main() {
                 const localScale = Vector3class.alloc().unbox();
                 localScale.method(".ctor", 3).invoke(0.4, 0.4, 0.4); // new scale (original is 0.6, too big)
 
+                // prettier-ignore
                 FGDebug_Instance
                 .method<Il2Cpp.Object>("get_transform").invoke()
                 .method<Il2Cpp.Object>("set_localScale").invoke(localScale);
@@ -508,7 +518,7 @@ function main() {
                 const gameObject = FGDebug_Instance.method<Il2Cpp.Object>("get_gameObject").invoke();
                 gameObject.method("SetActive").invoke(true);
             } catch (error: any) {
-                Logger.errorToast(error)
+                Logger.errorToast(error);
             }
         },
         disable() {
@@ -518,7 +528,7 @@ function main() {
                 const gameObject = FGDebug_Instance.method<Il2Cpp.Object>("get_gameObject").invoke();
                 gameObject.method("SetActive").invoke(false);
             }
-        },
+        }
     };
 
     const UICanvas_util = {
@@ -545,20 +555,20 @@ function main() {
 
     const teleportToFinish = () => {
         if (!checkTeleportCooldown()) return;
-        
+
         let endZoneObject: Il2Cpp.Object | null;
         let crownObject: Il2Cpp.Object | null;
-    
+
         const endZoneArray = findObjectsOfTypeAll(ObjectiveReachEndZone);
         if (endZoneArray.length > 0) {
             endZoneObject = endZoneArray.get(0);
         }
-    
+
         const crownArray = findObjectsOfTypeAll(GrabToQualify);
         if (crownArray.length > 0) {
             crownObject = crownArray.get(0);
         }
-    
+
         const finishObject = endZoneObject! ?? crownObject!;
         if (finishObject) {
             teleportTo(finishObject);
@@ -569,15 +579,15 @@ function main() {
 
     const teleportToScore = () => {
         if (!checkTeleportCooldown()) return;
-        
+
         try {
             const unityBubblesArray = findObjectsOfTypeAll(SpawnableCollectable);
             const creativeBubblesArray = findObjectsOfTypeAll(COMMON_ScoringBubble);
             const scoredButtonArray = findObjectsOfTypeAll(ScoredButton);
             // I'm too lazy to add these sorry
             // const creativeScoreZonesArray = findObjectsOfTypeAll(LevelEditorTriggerZoneActiveBase);
-            // const FollowTheLeaderZonesArray = findObjectsOfTypeAll(FollowTheLeaderZone) 
-    
+            // const FollowTheLeaderZonesArray = findObjectsOfTypeAll(FollowTheLeaderZone)
+
             // Rest of the function remains the same...
             for (const bubble of unityBubblesArray) {
                 if (bubble.method<boolean>("get_Spawned").invoke()) {
@@ -585,24 +595,24 @@ function main() {
                     return;
                 }
             }
-    
+
             for (const bubble of creativeBubblesArray) {
                 if (bubble.field<number>("_pointsAwarded").value > 0) {
-                    let bubbleHandle = bubble.field<Il2Cpp.Object>("_bubbleHandle").value;
+                    const bubbleHandle = bubble.field<Il2Cpp.Object>("_bubbleHandle").value;
                     if (bubbleHandle.field<boolean>("_spawned").value) {
                         teleportTo(bubble);
                         return;
                     }
                 }
             }
-    
+
             for (const button of scoredButtonArray) {
                 if (button.field<boolean>("_isAnActiveTarget").value) {
                     teleportTo(button);
                     return;
                 }
             }
-            
+
             /*
             for (const scoreZone of creativeScoreZonesArray) {
                 if (scoreZone.field<boolean>("_useForPointScoring").value) {
@@ -618,7 +628,6 @@ function main() {
                 return;
             }
             */
-    
         } catch (error: any) {
             Logger.errorToast(error);
         }
@@ -630,16 +639,16 @@ function main() {
             if (FallGuysCharacterController_Instance) {
                 const characterRigidBody = FallGuysCharacterController_Instance.method<Il2Cpp.Object>("get_RigidBody").invoke();
                 characterRigidBody.method("set_isKinematic").invoke(true);
-            };
+            }
         },
         disable() {
             if (FallGuysCharacterController_Instance) {
                 const characterRigidBody = FallGuysCharacterController_Instance.method<Il2Cpp.Object>("get_RigidBody").invoke();
                 characterRigidBody.method("set_isKinematic").invoke(false);
-            };
+            }
         }
     };
-    
+
     const changeResolutionScale = () => {
         try {
             Logger.debug("Changing resolution scale to:", Config.CustomValues.ResolutionScale);
@@ -650,7 +659,7 @@ function main() {
             */
         } catch (error: any) {
             Logger.errorToast(error);
-        };
+        }
     };
 
     const showServerDetails = () => {
@@ -661,16 +670,16 @@ function main() {
 
                 const hostIPAddr = networkManager.method<Il2Cpp.String>("get_HostIPAddr").invoke().content;
                 const hostPortNo = networkManager.method<number>("get_HostPortNo").invoke();
-                const rtt = gameConnection.method<number>("CurrentRtt").invoke(); 
+                const rtt = gameConnection.method<number>("CurrentRtt").invoke();
 
                 Menu.toast(`Server: ${hostIPAddr}:${hostPortNo}. Ping: ${rtt}ms`, 0); // little secret, you can ddos these servers, and it's not too hard.
                 copyToClipboard(`${hostIPAddr}:${hostPortNo}`);
             } else {
                 Menu.toast(en.messages.not_in_the_game, 0);
-            };
+            }
         } catch (error: any) {
             Logger.errorToast(error);
-        };
+        }
     };
 
     const showGameDetails = () => {
@@ -686,49 +695,53 @@ function main() {
                 Menu.toast(`RoundID: ${roundID}, Seed: ${seed}, Eliminated: ${eliminatedPlayerCount}`, 0);
             } else {
                 Menu.toast(en.messages.not_in_the_game, 0);
-            };
+            }
         } catch (error: any) {
             Logger.errorToast(error);
-        };
+        }
     };
 
     const showTipToePath = () => {
         try {
             const tiptoePlatformArray = findObjectsOfTypeAll(TipToe_Platform);
             for (const tiptoe of tiptoePlatformArray) {
-                const tiptoeStatus = tiptoe.method<boolean>("get_IsFakePlatform").invoke();
-                if (tiptoeStatus) { // if fake
+                const isTiptoeFake = tiptoe.method<boolean>("get_IsFakePlatform").invoke();
+                if (isTiptoeFake) {
                     const tiptoeObject = tiptoe.method<Il2Cpp.Object>("get_gameObject").invoke();
                     tiptoeObject.method("SetActive").invoke(false);
-                };
-            };
+                }
+            }
         } catch (error: any) {
             Logger.errorToast(error);
-        };
+        }
     };
-    
+
     enum ModalType_enum {
         MT_OK = "MT_OK",
         MT_OK_CANCEL = "MT_OK_CANCEL",
         MT_BLOCKING = "MT_BLOCKING",
         MT_WAIT_FOR_EVENT = "MT_WAIT_FOR_EVENT",
         MT_NO_BUTTONS = "MT_NO_BUTTONS"
-    };
+    }
 
     enum OkButtonType_enum {
         Blue = "Default",
         Red = "Disruptive",
         Green = "Positive",
         Yellow = "CallToAction"
-    };
+    }
 
     function createPopup(Title: string, Message: string, ModalTypeValue: ModalType_enum, OkButtonTypeValue: OkButtonType_enum) {
         try {
-            Logger.debug("Creating popup...")
+            Logger.debug("Creating popup...");
             const PopupManager_Instance = PopupManager.method<Il2Cpp.Object>("get_Instance").invoke();
-            const Show_ModalMessageData_method = PopupManager_Instance.method<boolean>("Show", 3).overload(PopupInteractionType, ModalMessageData, "FGClient.UI.UIModalMessage.ModalMessageFailedToShow");
-            
-            // 1 arg 
+            const Show_ModalMessageData_method = PopupManager_Instance.method<boolean>("Show", 3).overload(
+                PopupInteractionType,
+                ModalMessageData,
+                "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"
+            );
+
+            // 1 arg
             const Info_Value = PopupInteractionType.field<Il2Cpp.ValueType>("Info").value;
 
             // 2 arg
@@ -736,31 +749,32 @@ function main() {
             // Create new instance of ModalMessageData class
             // btw, you can't create it in one line, it will return undefined (uhh?)
             const ModalMessageData_Instance = ModalMessageData.alloc();
-            ModalMessageData_Instance.method<Il2Cpp.Object>(".ctor").invoke(); 
+            ModalMessageData_Instance.method<Il2Cpp.Object>(".ctor").invoke();
 
-            ModalMessageData_Instance.field<Il2Cpp.ValueType>("LocaliseTitle").value = NotLocalised_Value; 
+            ModalMessageData_Instance.field<Il2Cpp.ValueType>("LocaliseTitle").value = NotLocalised_Value;
             ModalMessageData_Instance.field<Il2Cpp.ValueType>("LocaliseMessage").value = NotLocalised_Value;
             ModalMessageData_Instance.field<Il2Cpp.ValueType>("ModalType").value = ModalType.field<Il2Cpp.ValueType>(ModalTypeValue).value;
             ModalMessageData_Instance.field<Il2Cpp.ValueType>("OkButtonType").value = OkButtonType.field<Il2Cpp.ValueType>(OkButtonTypeValue).value;
             ModalMessageData_Instance.field<Il2Cpp.String>("Title").value = Il2Cpp.string(Title);
             ModalMessageData_Instance.field<Il2Cpp.String>("Message").value = Il2Cpp.string(Message);
             ModalMessageData_Instance.field("OnCloseButtonPressed").value = NULL;
-                
+
             // 3 arg is onFailedCallback delegate, which is default is null
             Show_ModalMessageData_method.invoke(Info_Value, ModalMessageData_Instance, NULL);
         } catch (error: any) {
             Logger.errorToast(error);
-        };
-    };
+        }
+    }
 
     const initMenu = () => {
         try {
             const layout = new Menu.ObsidianLayout(ObsidianConfig);
-            const composer = new Menu.Composer(en.info.name, en.info.warn, layout); 
+            const composer = new Menu.Composer(en.info.name, en.info.warn, layout);
             composer.icon(Config.MOD_MENU_ICON_URL, "Web");
 
             if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
                 Menu.add(
+                    // prettier-ignore
                     layout.button("Exit", () => {
                         Menu.toast("Hold for exit", 0)
                     },
@@ -776,9 +790,9 @@ function main() {
                         }, "main"); // From Java.scheduleOnMainThread you need to Il2cpp.perform main!
                     })
                 );
-            };
+            }
 
-            // === Movement Tab === 
+            // === Movement Tab ===
             const movement = layout.textView(en.tabs.movement_tab);
             movement.gravity = Menu.Api.CENTER;
             Menu.add(movement);
@@ -795,18 +809,14 @@ function main() {
                 })
             );
 
-            Menu.add(
-                layout.toggle(en.functions.toggle_freeze_player, (state: boolean) => {
-                    state ? freezePlayer.enable() : freezePlayer.disable();
-                })
-            );
+            Menu.add(layout.toggle(en.functions.toggle_freeze_player, (state: boolean) => (state ? freezePlayer.enable() : freezePlayer.disable())));
 
             Menu.add(
                 layout.toggle(en.functions.toggle_dont_send_fallguy_state, (state: boolean) => {
                     Config.Toggles.toggleDontSendFallGuyState = state;
                 })
             );
-            
+
             Menu.add(layout.textView(en.info.fg_state_warn));
 
             Menu.add(
@@ -819,7 +829,7 @@ function main() {
                 layout.seekbar(en.functions.custom_speed, 100, 1, (value: number) => {
                     Config.CustomValues.normalMaxSpeed = value;
                 })
-            ); 
+            );
 
             Menu.add(
                 layout.toggle(en.functions.toggle_custom_velocity, (state: boolean) => {
@@ -869,7 +879,7 @@ function main() {
                 })
             );
 
-            // === Round Tab === 
+            // === Round Tab ===
             const round_tab = layout.textView(en.tabs.round_tab);
             round_tab.gravity = Menu.Api.CENTER;
             Menu.add(round_tab);
@@ -882,23 +892,25 @@ function main() {
 
             Menu.add(layout.button(en.functions.show_tiptoe_path, showTipToePath));
 
-            // === Teleports Tab === 
+            // === Teleports Tab ===
             const teleports = layout.textView(en.tabs.teleports_tab);
             teleports.gravity = Menu.Api.CENTER;
             Menu.add(teleports);
-            
+
             Menu.add(layout.button(en.functions.teleport_to_finish_or_crown, teleportToFinish));
 
             Menu.add(layout.button(en.functions.teleport_to_score, teleportToScore));
 
-            // === Utility Tab === 
+            // === Utility Tab ===
             const utility = layout.textView(en.tabs.utility_tab);
             utility.gravity = Menu.Api.CENTER;
             Menu.add(utility);
 
-            Menu.add(layout.button(en.functions.toggle_view_names, () => {
-                SetShowPlayerNamesByDefault_method.invoke(!showPlayerNames);
-            }));
+            Menu.add(
+                layout.button(en.functions.toggle_view_names, () => {
+                    SetShowPlayerNamesByDefault_method.invoke(!showPlayerNames);
+                })
+            );
 
             Menu.add(
                 layout.toggle(en.functions.toggle_custom_fov, (state: boolean) => {
@@ -910,21 +922,13 @@ function main() {
                 layout.seekbar(en.functions.custom_fov, 180, 1, (value: number) => {
                     if (Config.Toggles.toggleCustomFov) {
                         changeFov(value);
-                    };
+                    }
                 })
             );
 
-            Menu.add(
-                layout.toggle(en.functions.toggle_disable_ui, (state: boolean) => {
-                    state ? UICanvas_util.disable() : UICanvas_util.enable();
-                })
-            );
+            Menu.add(layout.toggle(en.functions.toggle_disable_ui, (state: boolean) => (state ? UICanvas_util.disable() : UICanvas_util.enable())));
 
-            Menu.add(
-                layout.toggle(en.functions.toggle_fgdebug, (state: boolean) => {
-                    state ? FGDebug.enable() : FGDebug.disable();
-                })
-            );
+            Menu.add(layout.toggle(en.functions.toggle_fgdebug, (state: boolean) => (state ? FGDebug.enable() : FGDebug.disable())));
 
             Menu.add(
                 layout.toggle(en.functions.toggle_disable_analytics, (state: boolean) => {
@@ -941,14 +945,14 @@ function main() {
             Menu.add(
                 layout.seekbar(en.functions.custom_resolution, 100, 1, (value: number) => {
                     Config.CustomValues.ResolutionScale = value / 100;
-                    changeResolutionScale(); 
+                    changeResolutionScale();
                 })
             );
 
             Menu.add(layout.button(en.functions.show_game_details, showGameDetails));
             Menu.add(layout.button(en.functions.show_and_copy_server_details, showServerDetails));
 
-            // === Links Tab === 
+            // === Links Tab ===
             const links = layout.textView(en.tabs.links_tab);
             links.gravity = Menu.Api.CENTER;
             Menu.add(links);
@@ -965,11 +969,9 @@ function main() {
             Menu.add(layout.textView(`${en.info.mod_menu_env} ${ModPreferences.ENV}`));
             Menu.add(layout.textView(`${en.info.game_version} ${Config.BuildInfo.gameVersion}`));
             Menu.add(layout.textView(`${en.info.is_spoofed} ${Config.USE_SPOOF}`));
-            if (Config.USE_SPOOF)
-                Menu.add(layout.textView(`${en.info.spoofed_game_version} ${Config.BuildInfo.spoofedGameVersion}`));
+            if (Config.USE_SPOOF) Menu.add(layout.textView(`${en.info.spoofed_game_version} ${Config.BuildInfo.spoofedGameVersion}`));
             Menu.add(layout.textView(`${en.info.original_signature} ${Config.BuildInfo.originalSignature}`));
-            if (Config.USE_SPOOF)
-                Menu.add(layout.textView(`${en.info.spoofed_signature} ${Config.BuildInfo.spoofedSignature}`));
+            if (Config.USE_SPOOF) Menu.add(layout.textView(`${en.info.spoofed_signature} ${Config.BuildInfo.spoofedSignature}`));
             Menu.add(layout.textView(`${en.info.platform} ${Config.BuildInfo.PLATFORM}`));
             Menu.add(layout.textView(`${en.info.unity_version} ${Config.BuildInfo.unityVersion}`));
             Menu.add(layout.textView(`${en.info.game_build_number} ${Config.BuildInfo.buildNumber}`));
@@ -979,7 +981,7 @@ function main() {
             const author = layout.textView(en.info.author);
             author.gravity = Menu.Api.CENTER;
             Menu.add(author);
-            
+
             const specialThanks = layout.textView(en.info.special_thanks);
             specialThanks.gravity = Menu.Api.CENTER;
             Menu.add(specialThanks);
@@ -989,7 +991,6 @@ function main() {
                     composer.show();
                 }, 2000);
             });
-
         } catch (error: any) {
             Logger.errorToast(error);
         }
