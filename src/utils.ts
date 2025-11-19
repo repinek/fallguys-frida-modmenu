@@ -44,10 +44,6 @@ export function copyToClipboard(text: string) {
     });
 };
 
-function onHttpGetResponseReceive(response: string | null) {
-    Logger.debug("HTTP GET response:", response);
-};
-
 // Thanks a lot: https://github.com/frida/frida/issues/1158#issuecomment-1227967229
 export function httpGet(
     targetUrl: string,

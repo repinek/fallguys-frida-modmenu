@@ -139,7 +139,7 @@ function main() {
                     Logger.info("Mod menu is up to date");
                     Menu.toast(en.toasts.mod_menu_version_actual, 1);
                 } else {
-                    Logger.info("Mod menu version is outdated, redirecting to download page...");
+                    Logger.warn("Mod menu version is outdated, redirecting to download page...");
                     Menu.toast(en.toasts.mod_menu_version_not_fetched, 1);
                     openURL(Config.GITHUB_RELEASES_URL);
                 };
