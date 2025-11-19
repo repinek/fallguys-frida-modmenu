@@ -1,7 +1,7 @@
-export namespace ModPreferences {
-    export var VERSION = "2.26"; // Don't forget update after changes!
-    export var ENV = "release"; // dev, staging, release
-    export var FOR_GAME_VERSION = "21.0.0";
+export const ModPreferences = {
+    VERSION: "2.26", // Don't forget update after changes!
+    ENV: "release", // dev, staging, release
+    FOR_GAME_VERSION: "21.0.0"
 };
 
 /*

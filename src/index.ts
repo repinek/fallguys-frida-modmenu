@@ -10,10 +10,12 @@ import { Config } from "./config.js";
 
 import en from "./localization/en.json";
 
-// My code is kinda structless. Maybe I'll refactor it later, but I'm too lazy since I lost interest in this project
-// A lot of things has been done already, and I don't even know what else to do. 
-// frida and il2cpp-bridge doesn't work correctly sometimes, and also I'm too to dumb for some things I guess (?) upd: yes i am lol
-// honourable mention: Failed to load script: the connection is closed. Thank you for using Frida!
+/*
+My code is kinda structless. Maybe I'll refactor it later, but I'm too lazy since I lost interest in this project
+A lot of things has been done already, and I don't even know what else to do. 
+frida and il2cpp-bridge doesn't work correctly sometimes, and also I'm too to dumb for some things I guess (?) upd: yes i am lol
+honourable mention: Failed to load script: the connection is closed. Thank you for using Frida!
+*/
 
 function main() {
     Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
@@ -125,7 +127,7 @@ function main() {
     if (ModPreferences.ENV !== "release") {
         Logger.debug("Skipping mod menu version check in dev/staging");
     } else {
-        httpGet(Config.VERSION_URL, (response) => {
+        httpGet(Config.MOD_MENU_VERSION_URL, (response) => {
             if (!response) {
                 Logger.warn("Actual mod menu version can't be fetched");
                 Menu.toast(en.toasts.mod_menu_version_not_fetched, 1);
@@ -133,7 +135,7 @@ function main() {
             };
             try {
                 fetchedModmenuVersion = JSON.parse(response);
-                if (fetchedModmenuVersion.version == ModPreferences.VERSION) {
+                if (fetchedModmenuVersion.script_version == ModPreferences.VERSION) {
                     Logger.info("Mod menu is up to date");
                     Menu.toast(en.toasts.mod_menu_version_actual, 1);
                 } else {
@@ -207,7 +209,7 @@ function main() {
         Some existing platforms: ps5, pc_steam, pc_standalone (no longer used for official clients), ports3_2...
         More can be found in the CMS and game code
         */
-        Logger.hook("BuildCatapultConfig called.");
+        Logger.hook("BuildCatapultConfig called");
         if (Config.USE_SPOOF && fetchedClientDetails!) {
             const newConfig = this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // create new config
 
@@ -426,20 +428,19 @@ function main() {
     //@ts-ignore, code from wiki snippets btw lol
     ProcessMessageReceived_method.implementation = function (jsonMessage: Il2Cpp.String) {
         if (Config.Toggles.toggleShowQueuedPlayers) {
+            Logger.debug("ProcessMessageReceived jsonMessage:", jsonMessage.content!);
             const json = JSON.parse(jsonMessage.content!); // .content because it's Il2cpp.String
-            Logger.debug("ProcessMessageReceived jsonMessage:", json);
             if (json.payload) {
                 if (json.payload.state == "Queued") { // if in queue 
                     Menu.toast(`Queued Players: ${json.payload.queuedPlayers.toString()}`, 0);
-                }
-            }
-        }
-
+                };
+            };
+        };
         return this.method("ProcessMessageReceived", 1).invoke(jsonMessage);
     };
 
     BuildInfo_OnEnable_method.implementation = function () {
-        Logger.hook("BuildInfo OnEnable called");
+        Logger.hook("BuildInfo::OnEnable called");
         Config.BuildInfo.gameVersion = Il2Cpp.application.version!;
         Config.BuildInfo.unityVersion = Il2Cpp.unityVersion;
         Config.BuildInfo.buildNumber = this.field<Il2Cpp.String>("buildNumber").value.content!;
@@ -481,7 +482,7 @@ function main() {
     CanJump_method.implementation = function () {
         if (Config.Toggles.toggleAirJump) {
             return true;
-        }
+        };
         return this.method<boolean>("CanJump").invoke();
     };
 
@@ -756,7 +757,7 @@ function main() {
         try {
             const layout = new Menu.ObsidianLayout(ObsidianConfig);
             const composer = new Menu.Composer(en.info.name, en.info.warn, layout); 
-            composer.icon(Config.ICON_URL, "Web");
+            composer.icon(Config.MOD_MENU_ICON_URL, "Web");
 
             if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
                 Menu.add(
@@ -953,7 +954,7 @@ function main() {
             Menu.add(links);
 
             Menu.add(layout.button(en.info.github_url, () => openURL(Config.GITHUB_URL)));
-            Menu.add(layout.button(en.info.discord_url, () => openURL(Config.DISCORD_URL)));
+            Menu.add(layout.button(en.info.discord_url, () => openURL(Config.DISCORD_INVITE_URL)));
 
             // === Build Info Tab ===
             const info = layout.textView(en.tabs.build_info_tab);

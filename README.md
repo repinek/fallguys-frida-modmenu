@@ -117,7 +117,7 @@ Script will be saved at the path: ./dist/agent.js
 <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 ```
 3. Download frida-gadget for frida version from requirements.txt: [arm64](https://github.com/frida/frida/releases/download/17.5.1/frida-gadget-17.5.1-android-arm64.so.xz) (you need frida-gadget-FRIDA_VERSION-android-arm64.so.xz)
-4. Install [frida-gadget injector](https://github.com/commonuserlol/fgi) (You can use any other way to inject frida-gadget to your APK)
+4. Install [frida-gadget injector](https://github.com/commonuserlol/fgi?tab=readme-ov-file#installing) (You can use any other way to inject frida-gadget to your APK)
 5. Extract .so file and copy downloaded frida gadget to C:\Users\YOURUSER\\.fgi\arm64.so (rename it to arm64.so as well)
 6. Inject frida-gadget
 ###### short command:

@@ -2,7 +2,7 @@ import "frida-java-menu";
 
 import { ModPreferences } from "./modPreferences.js";
 
-// Maybe log it into logcat too (but not so useful I guess)
+// Maybe log it into logcat too (but it's useless I guess)
 export namespace Logger {
 
     const RESET = '\x1b[0m';
@@ -20,7 +20,7 @@ export namespace Logger {
         const mm = date.getMinutes().toString().padStart(2, "0");
         const ss = date.getSeconds().toString().padStart(2, "0");
         return `${GRAY}[${hh}:${mm}:${ss}]${RESET}`;
-    }
+    };
 
     export function info(...args: any[]) {
         console.log(`${getTime()} ${BLUE}[INFO]${RESET}`, ...args);
