@@ -25,8 +25,6 @@
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "frida-compile": "^19.0.4",
-    "frida-il2cpp-bridge": "^0.12.1",
-    "frida-java-bridge": "^7.0.10",
     "globals": "^16.5.0",
     "jiti": "^2.6.1",
     "prettier": "^3.6.2",
@@ -34,6 +32,8 @@
     "typescript-eslint": "^8.47.0"
   },
   "dependencies": {
+    "frida-il2cpp-bridge": "^0.12.1",
+    "frida-java-bridge": "^7.0.10",
     "frida-java-menu": "github:commonuserlol/frida-java-menu"
   },
   "prettier": {

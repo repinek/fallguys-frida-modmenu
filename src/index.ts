@@ -1,6 +1,6 @@
 import "frida-il2cpp-bridge";
-import "frida-java-menu";
 import Java from "frida-java-bridge";
+import "frida-java-menu";
 
 import { exitFromApp, openURL, copyToClipboard, httpGet } from "./utils.js";
 import { Logger } from "./logger.js";

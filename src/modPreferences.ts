@@ -6,7 +6,6 @@ export const ModPreferences = {
 
 /*
 !! TODO: 
-refactor scripts in package.json like in frida-il2cpp-bridge example (i like it)
 made localization for other languages (i18n)
 wrapper for Il2cpp.perform main
 refactor vars names
