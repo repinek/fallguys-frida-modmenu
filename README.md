@@ -81,6 +81,15 @@ Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 *Also frida or frida-il2cpp-bridge can be unstable.*
 
 ## 🏗️ Build
+
+⚠️ Important Notice (Frida 17 Update)
+
+Due to recent changes after updating dependencies to latest Frida, building an APK using frida-gadget in script mode (-t script) currently does not work correctly: the injected script does not load, because the menu not updated for bridges (or I have no idea why)
+
+If you need to build a working APK right now, use the commit before the Frida update: [latest commit with 16 Frida](https://github.com/repinek/fallguys-frida-modmenu/commit/94c92d4b80d95e25fafeb1bbff7e94edc01f1ee6)
+
+Using frida-gadget in listen mode works without issues.
+
 1. Clone the repository:
 ```
 git clone https://github.com/repinek/fallguys-frida-modmenu
