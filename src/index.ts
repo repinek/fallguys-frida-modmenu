@@ -3,10 +3,11 @@ import Java from "frida-java-bridge";
 import "frida-java-menu";
 
 import { exitFromApp, openURL, copyToClipboard, httpGet } from "./utils.js";
-import { Logger } from "./logger.js";
-import { ObsidianConfig } from "./menuConfig.js";
 import { ModPreferences } from "./modPreferences.js";
+import { ObsidianConfig } from "./menuConfig.js";
 import { Config } from "./config.js";
+import { Logger } from "./logger.js";
+import { I18n } from "./i18n.js";
 
 import en from "./localization/en.json";
 
@@ -19,6 +20,7 @@ honourable mention: Failed to load script: the connection is closed. Thank you f
 
 function main() {
     Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
+    I18n.init();
     // === Assemblies ===
     const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image; // FG.Common namespace
     const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
@@ -790,6 +792,7 @@ function main() {
                         }, "main"); // From Java.scheduleOnMainThread you need to Il2cpp.perform main!
                     })
                 );
+                Menu.add(layout.textView(I18n.t("hi.hi")));
             }
 
             // === Movement Tab ===

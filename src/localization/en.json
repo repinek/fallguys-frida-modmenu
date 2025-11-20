@@ -1,4 +1,7 @@
 {
+    "hi": {
+        "hi": "hello from i18n"
+    },
     "messages": {
         "menu_will_appear_later": "Menu will appear once you enter the main menu",
         "display_menu": "Displaying the menu",

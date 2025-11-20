@@ -8,6 +8,13 @@ export function exitFromApp() {
         System.exit(0);
     });
 }
+/** Use with Java.perform */
+export function getSystemLocale() {
+    const Locale = Java.use("java.util.Locale");
+    const lang = Locale.getDefault().getLanguage().toLowerCase();
+    Logger.debug("System Locale:", lang);
+    return lang;
+}
 
 export function openURL(targetUrl: string) {
     Java.perform(() => {
