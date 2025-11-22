@@ -16,16 +16,18 @@ export class I18n {
     public static init() {
         let targetLocale = "en";
 
-        if (Menu.sharedPreferences.contains("locale")) {
-            const savedLocale = Menu.sharedPreferences.getString("locale");
-            if (this.isLocaleSupported(savedLocale)) {
-                targetLocale = savedLocale;
-                Logger.debug(`[I18n] Loaded locale from config: ${targetLocale}`);
+        // Current thread is not attached to the Java VM; please move this code inside a Java.perform() callback
+        // IM SO FUCKING STUPID OMG
+        Java.perform(() => {
+            if (Menu.sharedPreferences.contains("locale")) {
+                const savedLocale = Menu.sharedPreferences.getString("locale");
+                if (this.isLocaleSupported(savedLocale)) {
+                    targetLocale = savedLocale;
+                    Logger.debug(`[I18n] Loaded locale from config: ${targetLocale}`);
+                } else {
+                    Logger.warn(`[I18n] Locale ${savedLocale} from config is not supported`);
+                }
             } else {
-                Logger.warn(`[I18n] Locale ${savedLocale} from config is not supported`);
-            }
-        } else {
-            Java.perform(() => {
                 const systemLang = getSystemLocale();
 
                 if (this.isLocaleSupported(systemLang)) targetLocale = systemLang;
@@ -33,8 +35,8 @@ export class I18n {
 
                 Menu.sharedPreferences.putString("locale", targetLocale);
                 Logger.debug("[I18n] Saved system locale to config:", targetLocale);
-            });
-        }
+            }
+        });
 
         this.currentLocale = targetLocale;
     }

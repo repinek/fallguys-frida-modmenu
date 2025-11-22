@@ -6,7 +6,7 @@ import { ModPreferences } from "./modPreferences.js";
 import { ObsidianConfig } from "./menuConfig.js";
 import { Config } from "./config.js";
 import { Logger } from "./logger.js";
-// import { I18n } from "./i18n.js";
+import { I18n } from "./i18n.js";
 
 import en from "./localization/en.json";
 
@@ -19,7 +19,8 @@ honourable mention: Failed to load script: the connection is closed. Thank you f
 
 function main() {
     Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
-    // I18n.init();
+    I18n.init();
+    Menu.toast(I18n.t("hi.hi"), 1);
     // === Assemblies ===
     const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image; // FG.Common namespace
     const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
@@ -75,7 +76,11 @@ function main() {
     const HttpNetworkHost = MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.HttpNetworkHost");
     const WebSocketNetworkHost = MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
     const AnalyticsService = MediatonicCatapultClientSdkRuntime.class("Catapult.Analytics.AnalyticsService");
-    const Show_method = PopupManager.method("Show", 3).overload("FGClient.UI.PopupInteractionType", "FGClient.UI.ModalMessageData", "FGClient.UI.UIModalMessage.ModalMessageFailedToShow");
+    const Show_method = PopupManager.method("Show", 3).overload(
+        "FGClient.UI.PopupInteractionType",
+        "FGClient.UI.ModalMessageData",
+        "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"
+    );
 
     // === Methods ===
     const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
@@ -297,7 +302,11 @@ function main() {
             ModalMessageDataValue.field<Il2Cpp.String>("Message").value = Il2Cpp.string(en.messages.account_banned_desc);
         }
 
-        const this_method = this.method("Show", 3).overload("FGClient.UI.PopupInteractionType", "FGClient.UI.ModalMessageData", "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"); // for instance
+        const this_method = this.method("Show", 3).overload(
+            "FGClient.UI.PopupInteractionType",
+            "FGClient.UI.ModalMessageData",
+            "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"
+        ); // for instance
         return this_method.invoke(PopupInteractionTypeValue, ModalMessageDataValue, ModalMessageFailedToShow);
     };
 
@@ -737,7 +746,7 @@ function main() {
             Logger.debug("Creating popup...");
             const PopupManager_Instance = PopupManager.method<Il2Cpp.Object>("get_Instance").invoke();
             const Show_ModalMessageData_method = PopupManager_Instance.method<boolean>("Show", 3).overload(
-                "FGClient.UI.PopupInteractionType", 
+                "FGClient.UI.PopupInteractionType",
                 "FGClient.UI.ModalMessageData",
                 "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"
             );
@@ -791,7 +800,7 @@ function main() {
                         }, "main"); // From Java.scheduleOnMainThread you need to Il2cpp.perform main!
                     })
                 );
-                // Menu.add(layout.textView(I18n.t("hi.hi")));
+                Menu.add(layout.textView(I18n.t("hi.hi")));
             }
 
             // === Movement Tab ===

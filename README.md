@@ -83,9 +83,7 @@ Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 - Frida 17 works in listen mode, but not in the script for some reason.
 
 **Q:** Are emulators supported?  
-**A:** No. Emulators are not supported because they cannot properly handle the Java required for the menu.
-
-
+**A:** No. Emulators are not supported because they cannot handle the Java required for the menu.  
 
 **HyperOS, ColorOS, OneUI, HarmonyOS**, and other **OEM ROMs** may not work properly or at all.   
 **It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).**    
