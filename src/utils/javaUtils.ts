@@ -2,10 +2,12 @@ import { Logger } from "./logger.js";
 
 export function exitFromApp() {
     Java.perform(() => {
+        Logger.debug("Exiting from app");
         const System = Java.use("java.lang.System");
         System.exit(0);
     });
 }
+
 /** Use with Java.perform */
 export function getSystemLocale() {
     const Locale = Java.use("java.util.Locale");
@@ -26,7 +28,7 @@ export function openURL(targetUrl: string) {
             openIntent.addFlags(0x10000000); // FLAG_ACTIVITY_NEW_TASK
             activity.startActivity(openIntent);
         } catch (error: any) {
-            Logger.errorToast(error);
+            Logger.errorThrow(error);
         }
     });
 }
@@ -34,13 +36,15 @@ export function openURL(targetUrl: string) {
 export function copyToClipboard(text: string) {
     Java.perform(() => {
         try {
+            const javaString = Java.use("java.lang.String");
+            const ClipData = Java.use("android.content.ClipData");
             const context = Java.use("android.app.ActivityThread").currentApplication().getApplicationContext();
             const clipboardManager = Java.cast(context.getSystemService("clipboard"), Java.use("android.content.ClipboardManager"));
-            const javaString = Java.use("java.lang.String");
-            const clipData = Java.use("android.content.ClipData").newPlainText(javaString.$new("label"), javaString.$new(text));
+
+            const clipData = ClipData.newPlainText(javaString.$new("label"), javaString.$new(text));
             clipboardManager.setPrimaryClip(clipData);
         } catch (error: any) {
-            Logger.errorToast(error);
+            Logger.errorThrow(error);
         }
     });
 }
@@ -91,7 +95,7 @@ export function httpGet(targetUrl: string, onReceive: (response: string | null) 
             onReceive(response);
             return response;
         } catch (error: any) {
-            Logger.errorToast(error, "HTTP GET");
+            Logger.errorThrow(error, "HTTP GET");
             onReceive(null);
             return null;
         }

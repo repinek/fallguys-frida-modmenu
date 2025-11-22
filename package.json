@@ -12,7 +12,7 @@
     "build": "frida-compile src/index.ts -o dist/agent.js -c",
     "build:dev": "frida-compile src/index.ts -o dist/agent.js",
     "watch": "frida-compile src/index.ts -o dist/agent.js -w",
-    "spawn": "frida -U gadget -l dist/agent.js --runtime=v8",
+    "spawn": "frida -U gadget -l dist/agent.js",
     "lint": "eslint \"src/**\"",
     "prettier": "prettier --write \"src/**\""
   },

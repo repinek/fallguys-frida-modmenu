@@ -1,4 +1,4 @@
-import { ModPreferences } from "./data/modPreferences.js";
+import { ModPreferences } from "../data/modPreferences.js";
 
 // Maybe log it into logcat too (but it's useless I guess)
 export class Logger {
@@ -44,7 +44,7 @@ export class Logger {
         console.error(`${this.getTime()} ${this.RED}[ERROR]${this.RESET}`, ...args);
     }
 
-    public static warnToast(error: any, message: string = "") {
+    public static warnThrow(error: any, message: string = "") {
         this.warn(`${message} ${error.stack}`);
         Menu.toast(`${message} ${error.message}`, 1);
     }
@@ -59,7 +59,7 @@ export class Logger {
      * @param error The error object
      * @param message "desc" -> "desc Error: {stack}"
      */
-    public static errorToast(error: any, message: string = "") {
+    public static errorThrow(error: any, message: string = "") {
         this.error(`${message} ${error.stack}`);
         Menu.toast(`${message} ${error.message}`, 1);
     }

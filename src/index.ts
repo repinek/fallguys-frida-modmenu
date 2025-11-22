@@ -1,11 +1,12 @@
 import "frida-il2cpp-bridge";
 import "frida-java-menu";
 
-import { exitFromApp, openURL, copyToClipboard, httpGet } from "./utils.js";
+import * as unityUtils from "./utils/unityUtils.js";
+import * as javaUtils from "./utils/javaUtils.js";
 import { ModPreferences } from "./data/modPreferences.js";
 import { ObsidianConfig } from "./data/menuConfig.js";
 import { Config } from "./data/config.js";
-import { Logger } from "./logger.js";
+import { Logger } from "./utils/logger.js";
 import { I18n } from "./i18n/i18n.js";
 
 import en from "./i18n/localization/en.json";
@@ -118,7 +119,6 @@ function main() {
     let reachedMainMenu = false;
     let currentSceneName;
     let showPlayerNames: boolean;
-    let lastTeleportTime = 0;
 
     Logger.debug("Loaded il2cpp, assemblies, classes and method pointers.");
 
@@ -131,7 +131,7 @@ function main() {
     if (ModPreferences.ENV !== "release") {
         Logger.debug("Skipping mod menu version check in dev/staging");
     } else {
-        httpGet(Config.MOD_MENU_VERSION_URL, response => {
+        javaUtils.httpGet(Config.MOD_MENU_VERSION_URL, response => {
             if (!response) {
                 Logger.warn("Actual mod menu version can't be fetched");
                 Menu.toast(en.toasts.mod_menu_version_not_fetched, 1);
@@ -145,17 +145,17 @@ function main() {
                 } else {
                     Logger.warn("Mod menu version is outdated, redirecting to download page...");
                     Menu.toast(en.toasts.mod_menu_version_not_fetched, 1);
-                    openURL(Config.GITHUB_RELEASES_URL);
+                    javaUtils.openURL(Config.GITHUB_RELEASES_URL);
                 }
             } catch (error: any) {
-                Logger.errorToast(error, "Parse mod menu version");
+                Logger.errorThrow(error, "Parse mod menu version");
             }
         });
     }
 
     // response should be like: {"client_version":"0.0.0","signature":"ABC123"}
     if (Config.USE_SPOOF) {
-        httpGet(Config.SPOOF_VERSION_URL, response => {
+        javaUtils.httpGet(Config.SPOOF_VERSION_URL, response => {
             if (!response) {
                 Logger.warn("Actual server signature can't be fetched, spoof won't be working");
                 Menu.toast(en.toasts.signature_not_fetched, 1);
@@ -164,7 +164,7 @@ function main() {
             try {
                 fetchedClientDetails = JSON.parse(response);
             } catch (error: any) {
-                Logger.errorToast(error, "Parse spoof signature");
+                Logger.errorThrow(error, "Parse spoof signature");
             }
         });
     }
@@ -174,29 +174,6 @@ function main() {
     // === Helpers ===
     const findObjectsOfTypeAll = (klass: Il2Cpp.Class) => {
         return Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
-    };
-
-    const teleportTo = (target: Il2Cpp.Object) => {
-        // prettier-ignore
-        const objectVector3Pos = target
-        .method<Il2Cpp.Object>("get_transform").invoke()
-        .method<Il2Cpp.Object>("get_position").invoke();
-
-        // prettier-ignore
-        FallGuysCharacterController_Instance
-        .method<Il2Cpp.Object>("get_transform").invoke().
-        method<Il2Cpp.Object>("set_position").invoke(objectVector3Pos);
-    };
-
-    const checkTeleportCooldown = () => {
-        // Check if enough time has passed since the last teleport
-        const currentTime = Date.now();
-        if (currentTime - lastTeleportTime < Config.TELEPORT_COOLDOWN) {
-            Menu.toast(`Please wait ${((Config.TELEPORT_COOLDOWN - (currentTime - lastTeleportTime)) / 1000).toFixed(1)} seconds before teleporting again!`, 0);
-            return false;
-        }
-        lastTeleportTime = currentTime;
-        return true;
     };
 
     // === Hooks ===
@@ -527,7 +504,7 @@ function main() {
                 const gameObject = FGDebug_Instance.method<Il2Cpp.Object>("get_gameObject").invoke();
                 gameObject.method("SetActive").invoke(true);
             } catch (error: any) {
-                Logger.errorToast(error);
+                Logger.errorThrow(error);
             }
         },
         disable() {
@@ -563,7 +540,7 @@ function main() {
     };
 
     const teleportToFinish = () => {
-        if (!checkTeleportCooldown()) return;
+        if (!unityUtils.TeleportManager.checkCooldown()) return;
 
         let endZoneObject: Il2Cpp.Object | null;
         let crownObject: Il2Cpp.Object | null;
@@ -580,14 +557,14 @@ function main() {
 
         const finishObject = endZoneObject! ?? crownObject!;
         if (finishObject) {
-            teleportTo(finishObject);
+            unityUtils.teleportTo(FallGuysCharacterController_Instance, finishObject);
         } else {
             Menu.toast(en.messages.no_finish, 0);
         }
     };
 
     const teleportToScore = () => {
-        if (!checkTeleportCooldown()) return;
+        if (!unityUtils.TeleportManager.checkCooldown()) return;
 
         try {
             const unityBubblesArray = findObjectsOfTypeAll(SpawnableCollectable);
@@ -600,7 +577,7 @@ function main() {
             // Rest of the function remains the same...
             for (const bubble of unityBubblesArray) {
                 if (bubble.method<boolean>("get_Spawned").invoke()) {
-                    teleportTo(bubble);
+                    unityUtils.teleportTo(FallGuysCharacterController_Instance, bubble);
                     return;
                 }
             }
@@ -609,7 +586,7 @@ function main() {
                 if (bubble.field<number>("_pointsAwarded").value > 0) {
                     const bubbleHandle = bubble.field<Il2Cpp.Object>("_bubbleHandle").value;
                     if (bubbleHandle.field<boolean>("_spawned").value) {
-                        teleportTo(bubble);
+                        unityUtils.teleportTo(FallGuysCharacterController_Instance, bubble);
                         return;
                     }
                 }
@@ -617,7 +594,7 @@ function main() {
 
             for (const button of scoredButtonArray) {
                 if (button.field<boolean>("_isAnActiveTarget").value) {
-                    teleportTo(button);
+                    unityUtils.teleportTo(FallGuysCharacterController_Instance, button);
                     return;
                 }
             }
@@ -638,7 +615,7 @@ function main() {
             }
             */
         } catch (error: any) {
-            Logger.errorToast(error);
+            Logger.errorThrow(error);
         }
         Menu.toast(en.messages.no_score, 0);
     };
@@ -667,7 +644,7 @@ function main() {
             calling ResolutionScaling::UpdateResolutionScaleStatus() just crashes the game for now.
             */
         } catch (error: any) {
-            Logger.errorToast(error);
+            Logger.errorThrow(error);
         }
     };
 
@@ -682,12 +659,12 @@ function main() {
                 const rtt = gameConnection.method<number>("CurrentRtt").invoke();
 
                 Menu.toast(`Server: ${hostIPAddr}:${hostPortNo}. Ping: ${rtt}ms`, 0); // little secret, you can ddos these servers, and it's not too hard.
-                copyToClipboard(`${hostIPAddr}:${hostPortNo}`);
+                javaUtils.copyToClipboard(`${hostIPAddr}:${hostPortNo}`);
             } else {
                 Menu.toast(en.messages.not_in_the_game, 0);
             }
         } catch (error: any) {
-            Logger.errorToast(error);
+            Logger.errorThrow(error);
         }
     };
 
@@ -706,7 +683,7 @@ function main() {
                 Menu.toast(en.messages.not_in_the_game, 0);
             }
         } catch (error: any) {
-            Logger.errorToast(error);
+            Logger.errorThrow(error);
         }
     };
 
@@ -721,7 +698,7 @@ function main() {
                 }
             }
         } catch (error: any) {
-            Logger.errorToast(error);
+            Logger.errorThrow(error);
         }
     };
 
@@ -771,7 +748,7 @@ function main() {
             // 3 arg is onFailedCallback delegate, which is default is null
             Show_ModalMessageData_method.invoke(Info_Value, ModalMessageData_Instance, NULL);
         } catch (error: any) {
-            Logger.errorToast(error);
+            Logger.errorThrow(error);
         }
     }
 
@@ -788,7 +765,7 @@ function main() {
                         Menu.toast("Hold for exit", 0)
                     },
                     () => {
-                        exitFromApp();
+                        javaUtils.exitFromApp();
                     })
                 );
 
@@ -967,8 +944,8 @@ function main() {
             links.gravity = Menu.Api.CENTER;
             Menu.add(links);
 
-            Menu.add(layout.button(en.info.github_url, () => openURL(Config.GITHUB_URL)));
-            Menu.add(layout.button(en.info.discord_url, () => openURL(Config.DISCORD_INVITE_URL)));
+            Menu.add(layout.button(en.info.github_url, () => javaUtils.openURL(Config.GITHUB_URL)));
+            Menu.add(layout.button(en.info.discord_url, () => javaUtils.openURL(Config.DISCORD_INVITE_URL)));
 
             // === Build Info Tab ===
             const info = layout.textView(en.tabs.build_info_tab);
@@ -1001,7 +978,7 @@ function main() {
                 }, 2000);
             });
         } catch (error: any) {
-            Logger.errorToast(error);
+            Logger.errorThrow(error);
         }
     };
 }
