@@ -2,13 +2,13 @@ import "frida-il2cpp-bridge";
 import "frida-java-menu";
 
 import { exitFromApp, openURL, copyToClipboard, httpGet } from "./utils.js";
-import { ModPreferences } from "./modPreferences.js";
-import { ObsidianConfig } from "./menuConfig.js";
-import { Config } from "./config.js";
+import { ModPreferences } from "./data/modPreferences.js";
+import { ObsidianConfig } from "./data/menuConfig.js";
+import { Config } from "./data/config.js";
 import { Logger } from "./logger.js";
-import { I18n } from "./i18n.js";
+import { I18n } from "./i18n/i18n.js";
 
-import en from "./localization/en.json";
+import en from "./i18n/localization/en.json";
 
 /*
 My code is kinda structless. Maybe I'll refactor it later, but I'm too lazy since I lost interest in this project
@@ -20,7 +20,6 @@ honourable mention: Failed to load script: the connection is closed. Thank you f
 function main() {
     Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
     I18n.init();
-    Menu.toast(I18n.t("hi.hi"), 1);
     // === Assemblies ===
     const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image; // FG.Common namespace
     const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;

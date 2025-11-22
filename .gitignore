@@ -1,5 +1,5 @@
-node_modules/
-data/
-dump/
-dist/
-src/tests/
+/node_modules/
+/data/
+/dump/
+/dist/
+/src/tests/

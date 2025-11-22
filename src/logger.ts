@@ -1,6 +1,4 @@
-import "frida-java-menu";
-
-import { ModPreferences } from "./modPreferences.js";
+import { ModPreferences } from "./data/modPreferences.js";
 
 // Maybe log it into logcat too (but it's useless I guess)
 export class Logger {

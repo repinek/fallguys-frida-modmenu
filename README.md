@@ -79,8 +79,8 @@ Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 **A:** No. This project uses Frida 16.7.19, whick is not support 16 Android 
 
 **Q:** Why frida 16.7.19 is used instead 17.1.4 with Android 16 support?  
-**A:** Frida-gadget 17+ currently has a issue with outdated packages using bridges (like frida-java-menu in this project) in script mode. 
-- Frida 17 works in listen mode, but not in the script for some reason.
+**A:** Since frida-java-menu builded on 16.7.19, It can't be loaded on 17+. Current thread is not attached to the Java VM; please move this code inside a Java.perform() callback
+- Frida 17 works in listen mode, but not in the script, because java already loaded (?)
 
 **Q:** Are emulators supported?  
 **A:** No. Emulators are not supported because they cannot handle the Java required for the menu.  

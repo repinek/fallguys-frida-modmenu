@@ -1,4 +1,4 @@
-import en from "./localization/en.json";
+import { I18n } from "../i18n/i18n.js";
 
 export const ObsidianConfig: Menu.ObsidianConfig = {
     color: {
@@ -26,10 +26,10 @@ export const ObsidianConfig: Menu.ObsidianConfig = {
         alpha: 1
     },
     strings: {
-        noOverlayPermission: en.menu.no_overlay_permission,
-        hide: en.menu.hide_button,
-        close: en.menu.close_button,
-        hideCallback: en.menu.hide_callback,
-        killCallback: en.menu.kill_callback // hold hide to kill menu
+        noOverlayPermission: I18n.t("menu.no_overlay_permission"),
+        hide: I18n.t("menu.hide_button"),
+        close: I18n.t("menu.close_button"),
+        hideCallback: I18n.t("menu.hide_callback"),
+        killCallback: I18n.t("menu.kill_callback") // hold hide to kill menu
     }
 };
