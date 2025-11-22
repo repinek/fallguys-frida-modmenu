@@ -1,12 +1,23 @@
 {
   "name": "fallguys-frida-modmenu",
   "description": "Android Fall Guys cheat using FRIDA and frida-il2cpp-bridge",
-  "author": "repinek",
-  "license": "MIT",
+  "keywords": [
+    "frida",
+    "il2cpp",
+    "unity",
+    "fallguys",
+    "modmenu"
+  ],
+  "homepage": "https://github.com/repinek/fallguys-frida-modmenu#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/repinek/fallguys-frida-modmenu"
+    "url": "https://github.com/repinek/fallguys-frida-modmenu.git"
   },
+  "bugs": {
+    "url": "https://github.com/repinek/fallguys-frida-modmenu/issues"
+  },
+  "license": "MIT",
+  "author": "repinek",
   "main": "src/index.js",
   "scripts": {
     "build": "frida-compile src/index.ts -o dist/agent.js -c",
@@ -32,7 +43,7 @@
     "typescript-eslint": "^8.47.0"
   },
   "dependencies": {
-    "frida-il2cpp-bridge": "^0.9.1",
+    "frida-il2cpp-bridge": "^0.11.0",
     "frida-java-menu": "github:commonuserlol/frida-java-menu"
   },
   "prettier": {
