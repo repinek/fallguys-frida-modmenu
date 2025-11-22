@@ -69,20 +69,22 @@ Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 ## 🛠️ Troubleshooting
 > This project is for **educational and research purposes only**. I won't be providing support.
 
-**Q:** How do I know if the menu is loaded?
+**Q:** How do I know if the menu is loaded?  
 **A:** You will see a toast notification when you open Fall Guys.
 
-**Q:** Menu doesn't appear  
-**A:** In The Main Menu it will ask for permission to display over other apps, If it doesn’t ask for it, grant it manually.   
+**Q:** The menu doesn't appear.  
+**A:** Ensure you granted the "Display over other apps" permission. The game should ask for it on the first launch. If not, grant it manually.
 
-**Q:** Is emulator supported?
-**A:** Emulators are not supported.  
+**Q:** Is Android 16 supported?  
+**A:** No. This project uses Frida 16.7.19, whick is not support 16 Android 
 
-**Q:** Is Android 16 supported? 
-**A:** No, since modmenu is using Frida 16.7.19 to build
+**Q:** Why frida 16.7.19 is used instead 17.1.4 with Android 16 support?  
+**A:** Frida-gadget 17+ currently has a issue with outdated packages using bridges (like frida-java-menu in this project) in script mode. 
+- Frida 17 works in listen mode, but not in the script for some reason.
 
-**Q:** Why frida 16.7.19 is using to build? Why not 17+?
-**A:** ...
+**Q:** Are emulators supported?  
+**A:** No. Emulators are not supported because they cannot properly handle the Java required for the menu.
+
 
 
 **HyperOS, ColorOS, OneUI, HarmonyOS**, and other **OEM ROMs** may not work properly or at all.   
