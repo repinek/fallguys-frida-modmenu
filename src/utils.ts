@@ -1,5 +1,3 @@
-import Java from "frida-java-bridge";
-
 import { Logger } from "./logger.js";
 
 export function exitFromApp() {

@@ -1,5 +1,3 @@
-import Java from "frida-java-bridge";
-
 import { getSystemLocale } from "./utils.js";
 import { Logger } from "./logger.js";
 

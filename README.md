@@ -69,11 +69,21 @@ Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 ## 🛠️ Troubleshooting
 > This project is for **educational and research purposes only**. I won't be providing support.
 
+**Q:** How do I know if the menu is loaded?
+**A:** You will see a toast notification when you open Fall Guys.
+
 **Q:** Menu doesn't appear  
 **A:** In The Main Menu it will ask for permission to display over other apps, If it doesn’t ask for it, grant it manually.   
 
-**Q:** Emulator crashes  
+**Q:** Is emulator supported?
 **A:** Emulators are not supported.  
+
+**Q:** Is Android 16 supported? 
+**A:** No, since modmenu is using Frida 16.7.19 to build
+
+**Q:** Why frida 16.7.19 is using to build? Why not 17+?
+**A:** ...
+
 
 **HyperOS, ColorOS, OneUI, HarmonyOS**, and other **OEM ROMs** may not work properly or at all.   
 **It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).**    
@@ -81,14 +91,6 @@ Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 *Also frida or frida-il2cpp-bridge can be unstable.*
 
 ## 🏗️ Build
-
-⚠️ Important Notice (Frida 17 Update)
-
-Due to recent changes after updating dependencies to latest Frida, building an APK using frida-gadget in script mode (-t script) currently does not work correctly: the injected script does not load, because the menu not updated for bridges (or I have no idea why)
-
-If you need to build a working APK right now, use the commit before the Frida update: [latest commit with 16 Frida](https://github.com/repinek/fallguys-frida-modmenu/commit/94c92d4b80d95e25fafeb1bbff7e94edc01f1ee6)
-
-Using frida-gadget in listen mode works without issues.
 
 1. Clone the repository:
 ```
@@ -125,7 +127,7 @@ Script will be saved at the path: ./dist/agent.js
 ```
 <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 ```
-3. Download frida-gadget for frida version from requirements.txt: [arm64](https://github.com/frida/frida/releases/download/17.5.1/frida-gadget-17.5.1-android-arm64.so.xz) (you need frida-gadget-FRIDA_VERSION-android-arm64.so.xz)
+3. Download frida-gadget for frida version from requirements.txt: [arm64](https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm64.so.xz) (you need frida-gadget-FRIDA_VERSION-android-arm64.so.xz)
 4. Install [frida-gadget injector](https://github.com/commonuserlol/fgi?tab=readme-ov-file#installing) (You can use any other way to inject frida-gadget to your APK)
 5. Extract .so file and copy downloaded frida gadget to C:\Users\YOURUSER\\.fgi\arm64.so (rename it to arm64.so as well)
 6. Inject frida-gadget
