@@ -1,13 +1,15 @@
 import "frida-il2cpp-bridge";
 import "frida-java-menu";
 
-import * as unityUtils from "./utils/unityUtils.js";
+import { UnityUtils, TeleportManager } from "./utils/unityUtils.js";
 import * as javaUtils from "./utils/javaUtils.js";
 import { ModPreferences } from "./data/modPreferences.js";
 import { ObsidianConfig } from "./data/menuConfig.js";
 import { Config } from "./data/config.js";
 import { Logger } from "./utils/logger.js";
 import { I18n } from "./i18n/i18n.js";
+
+import { AssemblyHelper } from "./core/assemblyHelper.js";
 
 import en from "./i18n/localization/en.json";
 
@@ -21,61 +23,56 @@ honourable mention: Failed to load script: the connection is closed. Thank you f
 function main() {
     Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
     I18n.init();
-    // === Assemblies ===
-    const TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image; // FG.Common namespace
-    const CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
-    const MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image; // FGClient namespace
-    // const WushuLevelEditorRuntime = Il2Cpp.domain.assembly("Wushu.LevelEditor.Runtime").image; // creative logic
-    const MediatonicCatapultClientSdkRuntime = Il2Cpp.domain.assembly("Mediatonic.Catapult.ClientSdk.Runtime").image; // connection
+
+    AssemblyHelper.init();
 
     // === Classes ===
-    const Resources = CoreModule.class("UnityEngine.Resources");
-    const Vector3class = CoreModule.class("UnityEngine.Vector3");
-    const SceneManager = CoreModule.class("UnityEngine.SceneManagement.SceneManager");
-    const Camera = CoreModule.class("UnityEngine.Camera");
+    const Vector3class = AssemblyHelper.CoreModule.class("UnityEngine.Vector3");
+    const SceneManager = AssemblyHelper.CoreModule.class("UnityEngine.SceneManagement.SceneManager");
+    const Camera = AssemblyHelper.CoreModule.class("UnityEngine.Camera");
 
-    const BuildInfo = TheMultiplayerGuys.class("FG.Common.BuildInfo");
-    const GraphicsSettings = MTFGClient.class("FGClient.GraphicsSettings");
-    const PlayerInfoHUDBase = MTFGClient.class("FGClient.PlayerInfoHUDBase"); // ShowNames field storing here
-    const UICanvas = MTFGClient.class("FGClient.UI.Core.UICanvas");
-    const MainMenuViewModel = MTFGClient.class("FGClient.MainMenuViewModel");
-    const LobbyService = MTFGClient.class("FGClient.CatapultServices.LobbyService");
-    const GlobalGameStateClient = MTFGClient.class("FGClient.GlobalGameStateClient");
-    const ClientGameManager = MTFGClient.class("FGClient.ClientGameManager");
-    const AFKManager = MTFGClient.class("FGClient.AFKManager");
-    const FNMMSClientRemoteService = MTFGClient.class("FGClient.FNMMSClientRemoteService");
-    const CatapultServicesManager = MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager");
+    const BuildInfo = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.BuildInfo");
+    const GraphicsSettings = AssemblyHelper.MTFGClient.class("FGClient.GraphicsSettings");
+    const PlayerInfoHUDBase = AssemblyHelper.MTFGClient.class("FGClient.PlayerInfoHUDBase"); // ShowNames field storing here
+    const UICanvas = AssemblyHelper.MTFGClient.class("FGClient.UI.Core.UICanvas");
+    const MainMenuViewModel = AssemblyHelper.MTFGClient.class("FGClient.MainMenuViewModel");
+    const LobbyService = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.LobbyService");
+    const GlobalGameStateClient = AssemblyHelper.MTFGClient.class("FGClient.GlobalGameStateClient");
+    const ClientGameManager = AssemblyHelper.MTFGClient.class("FGClient.ClientGameManager");
+    const AFKManager = AssemblyHelper.MTFGClient.class("FGClient.AFKManager");
+    const FNMMSClientRemoteService = AssemblyHelper.MTFGClient.class("FGClient.FNMMSClientRemoteService");
+    const CatapultServicesManager = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager");
 
-    const PopupManager = MTFGClient.class("FGClient.UI.PopupManager");
-    const LocaliseOption = MTFGClient.class("FGClient.UI.UIModalMessage/LocaliseOption");
-    const ModalType = MTFGClient.class("FGClient.UI.UIModalMessage/ModalType");
-    const OkButtonType = MTFGClient.class("FGClient.UI.UIModalMessage/OKButtonType");
+    const PopupManager = AssemblyHelper.MTFGClient.class("FGClient.UI.PopupManager");
+    const LocaliseOption = AssemblyHelper.MTFGClient.class("FGClient.UI.UIModalMessage/LocaliseOption");
+    const ModalType = AssemblyHelper.MTFGClient.class("FGClient.UI.UIModalMessage/ModalType");
+    const OkButtonType = AssemblyHelper.MTFGClient.class("FGClient.UI.UIModalMessage/OKButtonType");
 
     // refer createPopup()
-    const ModalMessageData = MTFGClient.class("FGClient.UI.ModalMessageData");
-    const PopupInteractionType = MTFGClient.class("FGClient.UI.PopupInteractionType");
+    const ModalMessageData = AssemblyHelper.MTFGClient.class("FGClient.UI.ModalMessageData");
+    const PopupInteractionType = AssemblyHelper.MTFGClient.class("FGClient.UI.PopupInteractionType");
 
-    const CharacterDataMonitor = TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
-    const MotorFunctionJump = TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
-    const MPGNetMotorTasks = TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks"); // MPG - The Multiplayer Group
-    const CatapultAnalyticsService = TheMultiplayerGuys.class("FG.Common.CatapultAnalyticsService");
+    const CharacterDataMonitor = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
+    const MotorFunctionJump = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
+    const MPGNetMotorTasks = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks"); // MPG - The Multiplayer Group
+    const CatapultAnalyticsService = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.CatapultAnalyticsService");
 
-    const DebugClass = TheMultiplayerGuys.class("GvrFPS"); // FGDebug
+    const DebugClass = AssemblyHelper.TheMultiplayerGuys.class("GvrFPS"); // FGDebug
 
-    const ObjectiveReachEndZone = TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone"); // finish
-    const GrabToQualify = TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crown
-    const SpawnableCollectable = TheMultiplayerGuys.class("Levels.ScoreZone.SpawnableCollectable"); // bubble unity
-    const COMMON_ScoringBubble = TheMultiplayerGuys.class("Levels.Progression.COMMON_ScoringBubble"); // bubble creative
-    const ScoredButton = TheMultiplayerGuys.class("ScoredButton"); // trigger button unity
-    const TipToe_Platform = TheMultiplayerGuys.class("Levels.TipToe.TipToe_Platform");
-    const FakeDoorController = TheMultiplayerGuys.class("Levels.DoorDash.FakeDoorController");
-    const CrownMazeDoor = TheMultiplayerGuys.class("Levels.CrownMaze.CrownMazeDoor");
-    // const FollowTheLeaderZone = TheMultiplayerGuys.class("Levels.ScoreZone.FollowTheLeader.FollowTheLeaderZone"); // leading light
+    const ObjectiveReachEndZone = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone"); // finish
+    const GrabToQualify = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crown
+    const SpawnableCollectable = AssemblyHelper.TheMultiplayerGuys.class("Levels.ScoreZone.SpawnableCollectable"); // bubble unity
+    const COMMON_ScoringBubble = AssemblyHelper.TheMultiplayerGuys.class("Levels.Progression.COMMON_ScoringBubble"); // bubble creative
+    const ScoredButton = AssemblyHelper.TheMultiplayerGuys.class("ScoredButton"); // trigger button unity
+    const TipToe_Platform = AssemblyHelper.TheMultiplayerGuys.class("Levels.TipToe.TipToe_Platform");
+    const FakeDoorController = AssemblyHelper.TheMultiplayerGuys.class("Levels.DoorDash.FakeDoorController");
+    const CrownMazeDoor = AssemblyHelper.TheMultiplayerGuys.class("Levels.CrownMaze.CrownMazeDoor");
+    // const FollowTheLeaderZone = AssemblyHelper.TheMultiplayerGuys.class("Levels.ScoreZone.FollowTheLeader.FollowTheLeaderZone"); // leading light
     // const LevelEditorTriggerZoneActiveBase = WushuLevelEditorRuntime.class("LevelEditorTriggerZoneActiveBase"); // trigger zone creative
 
-    const HttpNetworkHost = MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.HttpNetworkHost");
-    const WebSocketNetworkHost = MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
-    const AnalyticsService = MediatonicCatapultClientSdkRuntime.class("Catapult.Analytics.AnalyticsService");
+    const HttpNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.HttpNetworkHost");
+    const WebSocketNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
+    const AnalyticsService = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Analytics.AnalyticsService");
     const Show_method = PopupManager.method("Show", 3).overload(
         "FGClient.UI.PopupInteractionType",
         "FGClient.UI.ModalMessageData",
@@ -172,9 +169,6 @@ function main() {
     Menu.toast(en.messages.menu_will_appear_later, 1);
 
     // === Helpers ===
-    const findObjectsOfTypeAll = (klass: Il2Cpp.Class) => {
-        return Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
-    };
 
     // === Hooks ===
     // Spoofs
@@ -365,7 +359,7 @@ function main() {
                 field: string, // getter method name like get_IsFakeDoor
                 expectedValue: boolean
             ) => {
-                const objectsArray = findObjectsOfTypeAll(type);
+                const objectsArray = UnityUtils.findObjectsOfTypeAll(type);
 
                 for (const obj of objectsArray) {
                     const value = obj.method<boolean>(field).invoke();
@@ -491,7 +485,7 @@ function main() {
             }
 
             try {
-                FGDebug_Instance = findObjectsOfTypeAll(DebugClass).get(0); // find object with debug class
+                FGDebug_Instance = UnityUtils.findObjectsOfTypeAll(DebugClass).get(0); // find object with debug class
 
                 const localScale = Vector3class.alloc().unbox();
                 localScale.method(".ctor", 3).invoke(0.4, 0.4, 0.4); // new scale (original is 0.6, too big)
@@ -509,7 +503,7 @@ function main() {
         },
         disable() {
             Config.Toggles.toggleFGDebug = false;
-            FGDebug_Instance = findObjectsOfTypeAll(DebugClass).get(0);
+            FGDebug_Instance = UnityUtils.findObjectsOfTypeAll(DebugClass).get(0);
             if (FGDebug_Instance) {
                 const gameObject = FGDebug_Instance.method<Il2Cpp.Object>("get_gameObject").invoke();
                 gameObject.method("SetActive").invoke(false);
@@ -519,13 +513,13 @@ function main() {
 
     const UICanvas_util = {
         enable() {
-            UICanvas_Instance = findObjectsOfTypeAll(UICanvas).get(0);
+            UICanvas_Instance = UnityUtils.findObjectsOfTypeAll(UICanvas).get(0);
             if (UICanvas_Instance) {
                 UICanvas_Instance.method("SetEnabled").invoke(true);
             }
         },
         disable() {
-            UICanvas_Instance = findObjectsOfTypeAll(UICanvas).get(0);
+            UICanvas_Instance = UnityUtils.findObjectsOfTypeAll(UICanvas).get(0);
             if (UICanvas_Instance) {
                 UICanvas_Instance.method("SetEnabled").invoke(false);
             }
@@ -540,44 +534,44 @@ function main() {
     };
 
     const teleportToFinish = () => {
-        if (!unityUtils.TeleportManager.checkCooldown()) return;
+        if (!TeleportManager.checkCooldown()) return;
 
         let endZoneObject: Il2Cpp.Object | null;
         let crownObject: Il2Cpp.Object | null;
 
-        const endZoneArray = findObjectsOfTypeAll(ObjectiveReachEndZone);
+        const endZoneArray = UnityUtils.findObjectsOfTypeAll(ObjectiveReachEndZone);
         if (endZoneArray.length > 0) {
             endZoneObject = endZoneArray.get(0);
         }
 
-        const crownArray = findObjectsOfTypeAll(GrabToQualify);
+        const crownArray = UnityUtils.findObjectsOfTypeAll(GrabToQualify);
         if (crownArray.length > 0) {
             crownObject = crownArray.get(0);
         }
 
         const finishObject = endZoneObject! ?? crownObject!;
         if (finishObject) {
-            unityUtils.teleportTo(FallGuysCharacterController_Instance, finishObject);
+            TeleportManager.teleportTo(FallGuysCharacterController_Instance, finishObject);
         } else {
             Menu.toast(en.messages.no_finish, 0);
         }
     };
 
     const teleportToScore = () => {
-        if (!unityUtils.TeleportManager.checkCooldown()) return;
+        if (!TeleportManager.checkCooldown()) return;
 
         try {
-            const unityBubblesArray = findObjectsOfTypeAll(SpawnableCollectable);
-            const creativeBubblesArray = findObjectsOfTypeAll(COMMON_ScoringBubble);
-            const scoredButtonArray = findObjectsOfTypeAll(ScoredButton);
+            const unityBubblesArray = UnityUtils.findObjectsOfTypeAll(SpawnableCollectable);
+            const creativeBubblesArray = UnityUtils.findObjectsOfTypeAll(COMMON_ScoringBubble);
+            const scoredButtonArray = UnityUtils.findObjectsOfTypeAll(ScoredButton);
             // I'm too lazy to add these sorry
-            // const creativeScoreZonesArray = findObjectsOfTypeAll(LevelEditorTriggerZoneActiveBase);
-            // const FollowTheLeaderZonesArray = findObjectsOfTypeAll(FollowTheLeaderZone)
+            // const creativeScoreZonesArray = UnityUtils.findObjectsOfTypeAll(LevelEditorTriggerZoneActiveBase);
+            // const FollowTheLeaderZonesArray = UnityUtils.findObjectsOfTypeAll(FollowTheLeaderZone)
 
             // Rest of the function remains the same...
             for (const bubble of unityBubblesArray) {
                 if (bubble.method<boolean>("get_Spawned").invoke()) {
-                    unityUtils.teleportTo(FallGuysCharacterController_Instance, bubble);
+                    TeleportManager.teleportTo(FallGuysCharacterController_Instance, bubble);
                     return;
                 }
             }
@@ -586,7 +580,7 @@ function main() {
                 if (bubble.field<number>("_pointsAwarded").value > 0) {
                     const bubbleHandle = bubble.field<Il2Cpp.Object>("_bubbleHandle").value;
                     if (bubbleHandle.field<boolean>("_spawned").value) {
-                        unityUtils.teleportTo(FallGuysCharacterController_Instance, bubble);
+                        TeleportManager.teleportTo(FallGuysCharacterController_Instance, bubble);
                         return;
                     }
                 }
@@ -594,7 +588,7 @@ function main() {
 
             for (const button of scoredButtonArray) {
                 if (button.field<boolean>("_isAnActiveTarget").value) {
-                    unityUtils.teleportTo(FallGuysCharacterController_Instance, button);
+                    TeleportManager.teleportTo(FallGuysCharacterController_Instance, button);
                     return;
                 }
             }
@@ -689,7 +683,7 @@ function main() {
 
     const showTipToePath = () => {
         try {
-            const tiptoePlatformArray = findObjectsOfTypeAll(TipToe_Platform);
+            const tiptoePlatformArray = UnityUtils.findObjectsOfTypeAll(TipToe_Platform);
             for (const tiptoe of tiptoePlatformArray) {
                 const isTiptoeFake = tiptoe.method<boolean>("get_IsFakePlatform").invoke();
                 if (isTiptoeFake) {

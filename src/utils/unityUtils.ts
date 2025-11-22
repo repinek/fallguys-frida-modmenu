@@ -1,28 +1,30 @@
-import "frida-il2cpp-bridge";
-
+import { AssemblyHelper } from "../core/assemblyHelper.js";
 import { Logger } from "./logger.js";
 import { Config } from "../data/config.js";
 
-// TODO: move findobjectstypeof here
-export function teleportTo(playerInstance: Il2Cpp.Object, targetInstance: Il2Cpp.Object): void {
-    try {
-        // prettier-ignore
-        const targetPos = targetInstance
-        .method<Il2Cpp.Object>("get_transform").invoke()
-        .method<Il2Cpp.Object>("get_position").invoke();
+export class UnityUtils {
+    private static Resources: Il2Cpp.Class;
 
-        // prettier-ignore
-        playerInstance
-        .method<Il2Cpp.Object>("get_transform").invoke()
-        .method<Il2Cpp.Object>("set_position").invoke(targetPos);
-    } catch (error: any) {
-        Logger.errorThrow(error, "Teleport");
+    public static init() {
+        this.Resources = AssemblyHelper.CoreModule.class("UnityEngine.Resources");
+        Logger.debug("[UnityUtils] Initialized");
+    }
+
+    /** Wrapper over `UnityEngine.Resources.FindObjectsOfTypeAll` */
+    public static findObjectsOfTypeAll(klass: Il2Cpp.Class): Il2Cpp.Array<Il2Cpp.Object> {
+        return this.Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
     }
 }
 
 export class TeleportManager {
     private static lastTeleportTime = 0;
 
+    /**
+     * Behavior:
+     * - if false: Shows toast with time you need to wait
+     *
+     * @returns `true` if allowed, `false` if on cooldown
+     */
     public static checkCooldown(): boolean {
         const currentTime = Date.now();
         const diff = currentTime - this.lastTeleportTime;
@@ -35,5 +37,27 @@ export class TeleportManager {
 
         this.lastTeleportTime = currentTime;
         return true;
+    }
+
+    /**
+     * Teleports the player to the target object's position.
+     *
+     * @param playerInstance The Player Object
+     * @param targetInstance The destination Object
+     */
+    public static teleportTo(playerInstance: Il2Cpp.Object, targetInstance: Il2Cpp.Object): void {
+        try {
+            // prettier-ignore
+            const targetPos = targetInstance
+            .method<Il2Cpp.Object>("get_transform").invoke()
+            .method<Il2Cpp.Object>("get_position").invoke();
+
+            // prettier-ignore
+            playerInstance
+            .method<Il2Cpp.Object>("get_transform").invoke()
+            .method<Il2Cpp.Object>("set_position").invoke(targetPos);
+        } catch (error: any) {
+            Logger.errorThrow(error, "Teleport");
+        }
     }
 }

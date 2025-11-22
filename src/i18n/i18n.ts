@@ -45,17 +45,17 @@ export class I18n {
         return this.supportedLocales.includes(locale);
     }
 
+    private static resolveKey(obj: any, path: string): string | undefined {
+        return path.split(".").reduce((prev, curr) => {
+            return prev ? prev[curr] : undefined;
+        }, obj);
+    }
+
     public static t(key: string): string {
         const value = this.resolveKey(TRANSLATIONS[this.currentLocale], key);
 
         if (!value) return key;
 
         return value;
-    }
-
-    private static resolveKey(obj: any, path: string): string | undefined {
-        return path.split(".").reduce((prev, curr) => {
-            return prev ? prev[curr] : undefined;
-        }, obj);
     }
 }
