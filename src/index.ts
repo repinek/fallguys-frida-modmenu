@@ -9,7 +9,7 @@ import { ObsidianConfig } from "./data/menuConfig.js";
 import { Config } from "./data/config.js";
 
 import { GraphicsModule } from "./modules/graphics.js";
-import { ModalType_enum, OkButtonType_enum, PopupModule } from "./modules/popup.js";
+import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./modules/popup.js";
 
 import { I18n } from "./i18n/i18n.js";
 import en from "./i18n/localization/en.json";
@@ -46,7 +46,6 @@ function main() {
     const LobbyService = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.LobbyService");
     const GlobalGameStateClient = AssemblyHelper.MTFGClient.class("FGClient.GlobalGameStateClient");
     const ClientGameManager = AssemblyHelper.MTFGClient.class("FGClient.ClientGameManager");
-    const AFKManager = AssemblyHelper.MTFGClient.class("FGClient.AFKManager");
     const FNMMSClientRemoteService = AssemblyHelper.MTFGClient.class("FGClient.FNMMSClientRemoteService");
     const CatapultServicesManager = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager");
 
@@ -77,7 +76,6 @@ function main() {
     const Init_ClientOnly_method = CatapultAnalyticsService.method("Init_ClientOnly", 3);
     const SendEventBatch_method = AnalyticsService.method("SendEventBatch");
 
-    const StartAFKManager_method = AFKManager.method("Start");
     const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
     const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
     const SendMessage_method = MPGNetMotorTasks.method("SendMessage", 1);
@@ -217,13 +215,8 @@ function main() {
         }
         return this.method("Init_ClientOnly").invoke(serverAddress, gatewayConnConfig, platformServiceProvider);
     };
-
+    
     // Utils
-    StartAFKManager_method.implementation = function () {
-        Logger.hook("StartAFKManager called");
-        return; // anti-afk
-    };
-
     OnMainMenuDisplayed_method.implementation = function (event) {
         Logger.hook("OnMainMenuDisplayed Called!");
 
@@ -378,7 +371,6 @@ function main() {
     };
 
     // === Functions ===
-    // TODO: broken
     const FGDebug = {
         enable() {
             Config.Toggles.toggleFGDebug = true;
@@ -586,7 +578,7 @@ function main() {
             composer.icon(Config.MOD_MENU_ICON_URL, "Web");
 
             const graphicsModule = ModuleManager.get(GraphicsModule);
-            const popupModule = ModuleManager.get(PopupModule);
+            const popupModule = ModuleManager.get(PopupManagerModule);
 
             if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
                 Menu.add(

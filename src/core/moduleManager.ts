@@ -1,17 +1,19 @@
 import { BaseModule } from "./baseModule.js";
 
+import { AntiAFKModule } from "../modules/antiAfk.js";
 import { BanBypassModule } from "../modules/banBypass.js";
 import { GraphicsModule } from "../modules/graphics.js";
-import { PopupModule } from "../modules/popup.js";
+import { PopupManagerModule } from "../modules/popup.js";
 
 import { Logger } from "../utils/logger.js";
 
 export class ModuleManager {
     // prettier-ignore
     private static modules: BaseModule[] = [
+        new AntiAFKModule(),
         new BanBypassModule(),
         new GraphicsModule(),
-        new PopupModule()
+        new PopupManagerModule()
     ];
 
     /** Initializes all modules by calling init() in module */

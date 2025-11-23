@@ -4,7 +4,7 @@ import { Config } from "../data/config.js";
 import { Logger } from "../utils/logger.js";
 
 export class GraphicsModule extends BaseModule {
-    public name = "GraphicsModule";
+    public name = "Graphics Module";
 
     // Classes and Instances
     private GraphicsSettings!: Il2Cpp.Class;

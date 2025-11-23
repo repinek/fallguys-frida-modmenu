@@ -4,7 +4,7 @@ import { BaseModule } from "../core/baseModule.js";
 
 import { I18n } from "../i18n/i18n.js";
 
-import { ModalType_enum, OkButtonType_enum, PopupModule } from "./popup.js";
+import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./popup.js";
 import { Logger } from "../utils/logger.js";
 
 /*
@@ -25,7 +25,7 @@ import { Logger } from "../utils/logger.js";
  */
 
 export class BanBypassModule extends BaseModule {
-    public name = "BanBypassModule";
+    public name = "BanBypass Module";
 
     // Classes
     private MainMenuViewModel!: Il2Cpp.Class;
@@ -52,7 +52,7 @@ export class BanBypassModule extends BaseModule {
 
         this.ShowAntiCheatPopup.implementation = function (): void {
             Logger.hook("ShowAntiCheatPopup called");
-            const popupModule = ModuleManager.get(PopupModule);
+            const popupModule = ModuleManager.get(PopupManagerModule);
             popupModule?.showPopup(I18n.t("messages.account_banned"), I18n.t("messages.account_banned_desc"), ModalType_enum.MT_OK, OkButtonType_enum.Green);
             return;
         };

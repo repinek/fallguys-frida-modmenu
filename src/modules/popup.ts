@@ -1,3 +1,4 @@
+import { ok } from "assert";
 import { AssemblyHelper } from "../core/assemblyHelper.js";
 import { BaseModule } from "../core/baseModule.js";
 import { Logger } from "../utils/logger.js";
@@ -17,8 +18,8 @@ export enum OkButtonType_enum {
     Yellow = "CallToAction"
 }
 
-export class PopupModule extends BaseModule {
-    public name = "PopupModule";
+export class PopupManagerModule extends BaseModule {
+    public name = "PopupManager Module";
 
     // Classes
     private PopupManager!: Il2Cpp.Class;
@@ -46,7 +47,7 @@ export class PopupModule extends BaseModule {
 
     public showPopup(title: string, message: string, modalType: ModalType_enum, okButtonType: OkButtonType_enum): void {
         try {
-            Logger.debug("Showing popup..."); // TODO: add logging
+            Logger.debug("Showing popup:", title, message, modalType, okButtonType);
             const ShowModalMessageDataInstance = this.PopupManagerInstance.method<boolean>("Show", 3).overload(
                 "FGClient.UI.PopupInteractionType",
                 "FGClient.UI.ModalMessageData",
