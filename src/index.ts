@@ -3,12 +3,17 @@ import "frida-java-menu";
 
 import { AssemblyHelper } from "./core/assemblyHelper.js";
 import { ModuleManager } from "./core/moduleManager.js";
+
 import { ModPreferences } from "./data/modPreferences.js";
 import { ObsidianConfig } from "./data/menuConfig.js";
 import { Config } from "./data/config.js";
+
 import { GraphicsModule } from "./modules/graphics.js";
+import { ModalType_enum, OkButtonType_enum, PopupModule } from "./modules/popup.js";
+
 import { I18n } from "./i18n/i18n.js";
 import en from "./i18n/localization/en.json";
+
 import { UnityUtils, TeleportManager } from "./utils/unityUtils.js";
 import * as javaUtils from "./utils/javaUtils.js";
 import { Logger } from "./utils/logger.js";
@@ -45,15 +50,6 @@ function main() {
     const FNMMSClientRemoteService = AssemblyHelper.MTFGClient.class("FGClient.FNMMSClientRemoteService");
     const CatapultServicesManager = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager");
 
-    const PopupManager = AssemblyHelper.MTFGClient.class("FGClient.UI.PopupManager");
-    const LocaliseOption = AssemblyHelper.MTFGClient.class("FGClient.UI.UIModalMessage/LocaliseOption");
-    const ModalType = AssemblyHelper.MTFGClient.class("FGClient.UI.UIModalMessage/ModalType");
-    const OkButtonType = AssemblyHelper.MTFGClient.class("FGClient.UI.UIModalMessage/OKButtonType");
-
-    // refer createPopup()
-    const ModalMessageData = AssemblyHelper.MTFGClient.class("FGClient.UI.ModalMessageData");
-    const PopupInteractionType = AssemblyHelper.MTFGClient.class("FGClient.UI.PopupInteractionType");
-
     const CharacterDataMonitor = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const MotorFunctionJump = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
     const MPGNetMotorTasks = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks"); // MPG - The Multiplayer Group
@@ -75,11 +71,6 @@ function main() {
     const HttpNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.HttpNetworkHost");
     const WebSocketNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
     const AnalyticsService = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Analytics.AnalyticsService");
-    const Show_method = PopupManager.method("Show", 3).overload(
-        "FGClient.UI.PopupInteractionType",
-        "FGClient.UI.ModalMessageData",
-        "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"
-    );
 
     // === Methods ===
     const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
@@ -242,34 +233,6 @@ function main() {
         */
         Logger.hook("CheckAntiCheatClientServiceForError called");
         return false;
-    };
-
-    // TODO: I guess I need to disable this hook after fake popup
-    Show_method.implementation = function (PopupInteractionTypeValue, ModalMessageDataValue, ModalMessageFailedToShow) {
-        Logger.hook("Show called with args:", PopupInteractionTypeValue, ModalMessageDataValue, ModalMessageFailedToShow);
-        ModalMessageDataValue = ModalMessageDataValue as Il2Cpp.Object;
-
-        if (ModalMessageDataValue.field<Il2Cpp.String>("Title").value.content == "anticheat_error_title") {
-            /*
-            ShowAntiCheatPopup will called by _CheckRestrictedGameAccess_d__69::MoveNext corutine
-            CheckRestrictedGameAccess called by OnLoginSuccessful (When you login in)
-            */
-            const NotLocalised_Option = LocaliseOption.field<Il2Cpp.ValueType>("NotLocalised").value;
-
-            ModalMessageDataValue.field<Il2Cpp.ValueType>("LocaliseTitle").value = NotLocalised_Option;
-            ModalMessageDataValue.field<Il2Cpp.ValueType>("LocaliseMessage").value = NotLocalised_Option;
-            ModalMessageDataValue.field<Il2Cpp.ValueType>("ModalType").value = ModalType.field<Il2Cpp.ValueType>(ModalType_enum.MT_OK).value;
-            ModalMessageDataValue.field<Il2Cpp.ValueType>("OkButtonType").value = OkButtonType.field<Il2Cpp.ValueType>(OkButtonType_enum.Green).value;
-            ModalMessageDataValue.field<Il2Cpp.String>("Title").value = Il2Cpp.string(en.messages.account_banned);
-            ModalMessageDataValue.field<Il2Cpp.String>("Message").value = Il2Cpp.string(en.messages.account_banned_desc);
-        }
-
-        const this_method = this.method("Show", 3).overload(
-            "FGClient.UI.PopupInteractionType",
-            "FGClient.UI.ModalMessageData",
-            "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"
-        ); // for instance
-        return this_method.invoke(PopupInteractionTypeValue, ModalMessageDataValue, ModalMessageFailedToShow);
     };
 
     // Utils
@@ -633,56 +596,6 @@ function main() {
         }
     };
 
-    enum ModalType_enum {
-        MT_OK = "MT_OK",
-        MT_OK_CANCEL = "MT_OK_CANCEL",
-        MT_BLOCKING = "MT_BLOCKING",
-        MT_WAIT_FOR_EVENT = "MT_WAIT_FOR_EVENT",
-        MT_NO_BUTTONS = "MT_NO_BUTTONS"
-    }
-
-    enum OkButtonType_enum {
-        Blue = "Default",
-        Red = "Disruptive",
-        Green = "Positive",
-        Yellow = "CallToAction"
-    }
-
-    function createPopup(Title: string, Message: string, ModalTypeValue: ModalType_enum, OkButtonTypeValue: OkButtonType_enum) {
-        try {
-            Logger.debug("Creating popup...");
-            const PopupManager_Instance = PopupManager.method<Il2Cpp.Object>("get_Instance").invoke();
-            const Show_ModalMessageData_method = PopupManager_Instance.method<boolean>("Show", 3).overload(
-                "FGClient.UI.PopupInteractionType",
-                "FGClient.UI.ModalMessageData",
-                "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"
-            );
-
-            // 1 arg
-            const Info_Value = PopupInteractionType.field<Il2Cpp.ValueType>("Info").value;
-
-            // 2 arg
-            const NotLocalised_Value = LocaliseOption.field<Il2Cpp.ValueType>("NotLocalised").value;
-            // Create new instance of ModalMessageData class
-            // btw, you can't create it in one line, it will return undefined (uhh?)
-            const ModalMessageData_Instance = ModalMessageData.alloc();
-            ModalMessageData_Instance.method<Il2Cpp.Object>(".ctor").invoke();
-
-            ModalMessageData_Instance.field<Il2Cpp.ValueType>("LocaliseTitle").value = NotLocalised_Value;
-            ModalMessageData_Instance.field<Il2Cpp.ValueType>("LocaliseMessage").value = NotLocalised_Value;
-            ModalMessageData_Instance.field<Il2Cpp.ValueType>("ModalType").value = ModalType.field<Il2Cpp.ValueType>(ModalTypeValue).value;
-            ModalMessageData_Instance.field<Il2Cpp.ValueType>("OkButtonType").value = OkButtonType.field<Il2Cpp.ValueType>(OkButtonTypeValue).value;
-            ModalMessageData_Instance.field<Il2Cpp.String>("Title").value = Il2Cpp.string(Title);
-            ModalMessageData_Instance.field<Il2Cpp.String>("Message").value = Il2Cpp.string(Message);
-            ModalMessageData_Instance.field("OnCloseButtonPressed").value = NULL;
-
-            // 3 arg is onFailedCallback delegate, which is default is null
-            Show_ModalMessageData_method.invoke(Info_Value, ModalMessageData_Instance, NULL);
-        } catch (error: any) {
-            Logger.errorThrow(error);
-        }
-    }
-
     const initMenu = () => {
         try {
             const layout = new Menu.ObsidianLayout(ObsidianConfig);
@@ -690,6 +603,7 @@ function main() {
             composer.icon(Config.MOD_MENU_ICON_URL, "Web");
 
             const graphicsModule = ModuleManager.get(GraphicsModule);
+            const popupModule = ModuleManager.get(PopupModule);
 
             if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
                 Menu.add(
@@ -705,7 +619,7 @@ function main() {
                 Menu.add(
                     layout.button("Debug", () => {
                         Il2Cpp.perform(() => {
-                            createPopup("Test Popup", "Message of Test Popup", ModalType_enum.MT_OK, OkButtonType_enum.Green);
+                            popupModule?.showPopup("Test Popup", "Message of Test Popup", ModalType_enum.MT_OK, OkButtonType_enum.Green);
                         }, "main"); // From Java.scheduleOnMainThread you need to Il2cpp.perform main!
                     })
                 );

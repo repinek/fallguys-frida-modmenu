@@ -13,7 +13,7 @@ export class I18n {
     private static supportedLocales: string[] = Object.keys(TRANSLATIONS);
     private static currentLocale: string = "en";
 
-    public static init() {
+    public static init(): void {
         let targetLocale = "en";
 
         // Current thread is not attached to the Java VM; please move this code inside a Java.perform() callback
@@ -23,7 +23,7 @@ export class I18n {
                 const savedLocale = Menu.sharedPreferences.getString("locale");
                 if (this.isLocaleSupported(savedLocale)) {
                     targetLocale = savedLocale;
-                    Logger.debug(`[I18n] Loaded locale from config: ${targetLocale}`);
+                    Logger.info(`[I18n] Loaded locale from config: ${targetLocale}`);
                 } else {
                     Logger.warn(`[I18n] Locale ${savedLocale} from config is not supported`);
                 }
@@ -34,7 +34,7 @@ export class I18n {
                 else Logger.warn(`[I18n] Locale ${systemLang} from system is not supported`);
 
                 Menu.sharedPreferences.putString("locale", targetLocale);
-                Logger.debug("[I18n] Saved system locale to config:", targetLocale);
+                Logger.info("[I18n] Saved system locale to config:", targetLocale);
             }
             this.currentLocale = targetLocale;
         });
@@ -53,7 +53,7 @@ export class I18n {
     public static t(key: string): string {
         const value = this.resolveKey(TRANSLATIONS[this.currentLocale], key);
 
-        if (!value) return key;
+        if (!value) return `MISSING: ${key}`;
 
         return value;
     }

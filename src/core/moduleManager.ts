@@ -1,18 +1,18 @@
 import { BaseModule } from "./baseModule.js";
 
-import { Logger } from "../utils/logger.js";
-
 import { GraphicsModule } from "../modules/graphics.js";
+import { PopupModule } from "../modules/popup.js";
+
+import { Logger } from "../utils/logger.js";
 
 export class ModuleManager {
     // prettier-ignore
     private static modules: BaseModule[] = [
-        new GraphicsModule()
+        new GraphicsModule(),
+        new PopupModule()
     ];
 
-    /**
-     * Initializes all modules by calling init() in module
-     */
+    /** Initializes all modules by calling init() in module */
     public static initAll() {
         Logger.info("[ModuleManager] Initializing modules...");
 

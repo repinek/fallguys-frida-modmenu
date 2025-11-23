@@ -1,7 +1,7 @@
 import { AssemblyHelper } from "../core/assemblyHelper.js";
 import { BaseModule } from "../core/baseModule.js";
-import { Logger } from "../utils/logger.js";
 import { Config } from "../data/config.js";
+import { Logger } from "../utils/logger.js";
 
 export class GraphicsModule extends BaseModule {
     public name = "GraphicsModule";
@@ -27,9 +27,9 @@ export class GraphicsModule extends BaseModule {
         this.PlayerInfoHUDBase = AssemblyHelper.MTFGClient.class("FGClient.PlayerInfoHUDBase");
         this.Camera = AssemblyHelper.CoreModule.class("UnityEngine.Camera");
 
-        this.get_TargetFrameRate = this.GraphicsSettings.method("get_TargetFrameRate");
+        this.get_TargetFrameRate = this.GraphicsSettings.method<number>("get_TargetFrameRate");
         this.set_TargetFrameRate = this.GraphicsSettings.method("set_TargetFrameRate", 1);
-        this.get_ResolutionScale = this.GraphicsSettings.method("get_ResolutionScale");
+        this.get_ResolutionScale = this.GraphicsSettings.method<number>("get_ResolutionScale");
         this.set_ResolutionScale = this.GraphicsSettings.method("set_ResolutionScale", 1);
 
         this.get_ShowNames = this.PlayerInfoHUDBase.method<boolean>("get_ShowNames");

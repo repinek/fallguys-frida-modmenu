@@ -1,11 +1,12 @@
 export const ModPreferences = {
-    VERSION: "2.56", // Don't forget update after changes!
-    ENV: "release", // dev, staging, release
+    VERSION: "2.57", // Don't forget update after changes!
+    ENV: "dev", // dev, staging, release
     FOR_GAME_VERSION: "21.0.1"
 };
 
 /*
 !! TODO: 
+refactor localization
 logcat logging
 on screen logging
 unity logging
@@ -20,3 +21,8 @@ maybe:
 refactor structure of project / script (all script in one file :cry:)
 fork menu and update it to frida 17
 */
+
+/*
+                ShowAntiCheatPopup will called by _CheckRestrictedGameAccess_d__69::MoveNext corutine
+                CheckRestrictedGameAccess called by OnLoginSuccessful (When you login in)
+                */
