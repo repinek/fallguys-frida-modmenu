@@ -43,7 +43,7 @@
     "typescript-eslint": "^8.47.0"
   },
   "dependencies": {
-    "frida-il2cpp-bridge": "^0.11.0",
+    "frida-il2cpp-bridge": "^0.9.1",
     "frida-java-menu": "github:commonuserlol/frida-java-menu"
   },
   "prettier": {

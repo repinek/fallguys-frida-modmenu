@@ -36,9 +36,8 @@ export class I18n {
                 Menu.sharedPreferences.putString("locale", targetLocale);
                 Logger.debug("[I18n] Saved system locale to config:", targetLocale);
             }
+            this.currentLocale = targetLocale;
         });
-
-        this.currentLocale = targetLocale;
     }
 
     private static isLocaleSupported(locale: string): boolean {

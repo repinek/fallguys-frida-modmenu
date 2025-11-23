@@ -1,17 +1,17 @@
 import "frida-il2cpp-bridge";
 import "frida-java-menu";
 
-import { UnityUtils, TeleportManager } from "./utils/unityUtils.js";
-import * as javaUtils from "./utils/javaUtils.js";
+import { AssemblyHelper } from "./core/assemblyHelper.js";
+import { ModuleManager } from "./core/moduleManager.js";
 import { ModPreferences } from "./data/modPreferences.js";
 import { ObsidianConfig } from "./data/menuConfig.js";
 import { Config } from "./data/config.js";
-import { Logger } from "./utils/logger.js";
+import { GraphicsModule } from "./modules/graphics.js";
 import { I18n } from "./i18n/i18n.js";
-
-import { AssemblyHelper } from "./core/assemblyHelper.js";
-
 import en from "./i18n/localization/en.json";
+import { UnityUtils, TeleportManager } from "./utils/unityUtils.js";
+import * as javaUtils from "./utils/javaUtils.js";
+import { Logger } from "./utils/logger.js";
 
 /*
 My code is kinda structless. Maybe I'll refactor it later, but I'm too lazy since I lost interest in this project
@@ -21,10 +21,13 @@ honourable mention: Failed to load script: the connection is closed. Thank you f
 */
 
 function main() {
-    Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
+    Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV})`);
+
     I18n.init();
 
     AssemblyHelper.init();
+    
+    ModuleManager.initAll();
 
     // === Classes ===
     const Vector3class = AssemblyHelper.CoreModule.class("UnityEngine.Vector3");
@@ -32,7 +35,6 @@ function main() {
     const Camera = AssemblyHelper.CoreModule.class("UnityEngine.Camera");
 
     const BuildInfo = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.BuildInfo");
-    const GraphicsSettings = AssemblyHelper.MTFGClient.class("FGClient.GraphicsSettings");
     const PlayerInfoHUDBase = AssemblyHelper.MTFGClient.class("FGClient.PlayerInfoHUDBase"); // ShowNames field storing here
     const UICanvas = AssemblyHelper.MTFGClient.class("FGClient.UI.Core.UICanvas");
     const MainMenuViewModel = AssemblyHelper.MTFGClient.class("FGClient.MainMenuViewModel");
@@ -86,10 +88,7 @@ function main() {
     const CheckAntiCheatClientServiceForError_method = MainMenuViewModel.method<boolean>("CheckAntiCheatClientServiceForError");
 
     const set_fieldOfView_method = Camera.method("set_fieldOfView", 1);
-    const get_TargetFrameRate_method = GraphicsSettings.method("get_TargetFrameRate");
-    const set_TargetFrameRate_method = GraphicsSettings.method("set_TargetFrameRate", 1);
-    const get_ResolutionScale_method = GraphicsSettings.method("get_ResolutionScale");
-    const set_ResolutionScale_method = GraphicsSettings.method("set_ResolutionScale", 1);
+
     const SetShowPlayerNamesByDefault_method = PlayerInfoHUDBase.method("SetShowPlayerNamesByDefault", 1);
 
     const StartAFKManager_method = AFKManager.method("Start");
@@ -107,7 +106,7 @@ function main() {
     let CharacterControllerData_Instance: Il2Cpp.Object;
     let JumpMotorFunction_Instance: Il2Cpp.Object;
     let FGDebug_Instance: Il2Cpp.Object;
-    let GraphicsSettings_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in get_ResolutionScale
+    // let GraphicsSettings_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in get_ResolutionScale
     let GlobalGameStateClient_Instance: Il2Cpp.Object;
     let ClientGameManager_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in GameLevelLoaded
     let Camera_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in set_fieldOfView
@@ -117,7 +116,7 @@ function main() {
     let currentSceneName;
     let showPlayerNames: boolean;
 
-    Logger.debug("Loaded il2cpp, assemblies, classes and method pointers.");
+    Logger.debug("Loaded il2cpp, assemblies, classes and method pointers");
 
     // === Fetching Data ===
     let fetchedClientDetails;
@@ -289,27 +288,6 @@ function main() {
         return this.method("set_fieldOfView", 1).invoke(value);
     };
 
-    get_TargetFrameRate_method.implementation = function () {
-        Logger.hook("get_TargetFrameRate called");
-        return 1337; // litterally unlimited, because it's linked to the screen refresh rate
-    };
-
-    set_TargetFrameRate_method.implementation = function (fps) {
-        Logger.hook("set_TargetFrameRate called with args:", fps);
-        return this.method("set_TargetFrameRate", 1).invoke(1337);
-    };
-
-    get_ResolutionScale_method.implementation = function () {
-        Logger.hook("get_ResolutionScale called");
-        GraphicsSettings_Instance = this; // often gc.choose causes crashes
-        return Config.CustomValues.ResolutionScale;
-    };
-
-    set_ResolutionScale_method.implementation = function (scale) {
-        Logger.hook("set_ResolutionScale called with args:", scale);
-        return this.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale);
-    };
-
     SetShowPlayerNamesByDefault_method.implementation = function (value) {
         Logger.hook("SetShowPlayerNamesByDefault called with args:", value);
         showPlayerNames = value as boolean;
@@ -402,7 +380,7 @@ function main() {
         return this.method("SendEventBatch").invoke();
     };
 
-    //@ts-ignore, code from wiki snippets btw lol
+    //@ts-ignore
     ProcessMessageReceived_method.implementation = function (jsonMessage: Il2Cpp.String) {
         if (Config.Toggles.toggleShowQueuedPlayers) {
             Logger.debug("ProcessMessageReceived jsonMessage:", jsonMessage.content!);
@@ -418,7 +396,7 @@ function main() {
 
     BuildInfo_OnEnable_method.implementation = function () {
         Logger.hook("BuildInfo::OnEnable called");
-        Config.BuildInfo.gameVersion = Il2Cpp.application.version!;
+        //Config.BuildInfo.gameVersion = Il2Cpp.application.version!;
         Config.BuildInfo.unityVersion = Il2Cpp.unityVersion;
         Config.BuildInfo.buildNumber = this.field<Il2Cpp.String>("buildNumber").value.content!;
         Config.BuildInfo.buildDate = this.field<Il2Cpp.String>("buildDate").value.content!;
@@ -626,19 +604,6 @@ function main() {
                 const characterRigidBody = FallGuysCharacterController_Instance.method<Il2Cpp.Object>("get_RigidBody").invoke();
                 characterRigidBody.method("set_isKinematic").invoke(false);
             }
-        }
-    };
-
-    const changeResolutionScale = () => {
-        try {
-            Logger.debug("Changing resolution scale to:", Config.CustomValues.ResolutionScale);
-            GraphicsSettings_Instance.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale);
-            /*
-            i wanted to make this value changeable in the game, but unfortunately 
-            calling ResolutionScaling::UpdateResolutionScaleStatus() just crashes the game for now.
-            */
-        } catch (error: any) {
-            Logger.errorThrow(error);
         }
     };
 
@@ -926,7 +891,8 @@ function main() {
             Menu.add(
                 layout.seekbar(en.functions.custom_resolution, 100, 1, (value: number) => {
                     Config.CustomValues.ResolutionScale = value / 100;
-                    changeResolutionScale();
+                    const graphicsModule = ModuleManager.get(GraphicsModule);
+                    graphicsModule?.changeResolutionScale();
                 })
             );
 
