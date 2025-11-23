@@ -21,18 +21,18 @@ honourable mention: Failed to load script: the connection is closed. Thank you f
 */
 
 function main() {
-    Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV})`);
+    Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
 
     I18n.init();
 
     AssemblyHelper.init();
-    
+
+    UnityUtils.init();
     ModuleManager.initAll();
 
     // === Classes ===
     const Vector3class = AssemblyHelper.CoreModule.class("UnityEngine.Vector3");
     const SceneManager = AssemblyHelper.CoreModule.class("UnityEngine.SceneManagement.SceneManager");
-    const Camera = AssemblyHelper.CoreModule.class("UnityEngine.Camera");
 
     const BuildInfo = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.BuildInfo");
     const PlayerInfoHUDBase = AssemblyHelper.MTFGClient.class("FGClient.PlayerInfoHUDBase"); // ShowNames field storing here
@@ -87,8 +87,6 @@ function main() {
     const SendEventBatch_method = AnalyticsService.method("SendEventBatch");
     const CheckAntiCheatClientServiceForError_method = MainMenuViewModel.method<boolean>("CheckAntiCheatClientServiceForError");
 
-    const set_fieldOfView_method = Camera.method("set_fieldOfView", 1);
-
     const SetShowPlayerNamesByDefault_method = PlayerInfoHUDBase.method("SetShowPlayerNamesByDefault", 1);
 
     const StartAFKManager_method = AFKManager.method("Start");
@@ -106,17 +104,15 @@ function main() {
     let CharacterControllerData_Instance: Il2Cpp.Object;
     let JumpMotorFunction_Instance: Il2Cpp.Object;
     let FGDebug_Instance: Il2Cpp.Object;
-    // let GraphicsSettings_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in get_ResolutionScale
     let GlobalGameStateClient_Instance: Il2Cpp.Object;
     let ClientGameManager_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in GameLevelLoaded
-    let Camera_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in set_fieldOfView
     let UICanvas_Instance: Il2Cpp.Object;
 
     let reachedMainMenu = false;
     let currentSceneName;
     let showPlayerNames: boolean;
 
-    Logger.debug("Loaded il2cpp, assemblies, classes and method pointers");
+    Logger.info("Loaded il2cpp, assemblies, classes and method pointers");
 
     // === Fetching Data ===
     let fetchedClientDetails;
@@ -280,14 +276,6 @@ function main() {
     };
 
     // Graphics
-    set_fieldOfView_method.implementation = function (value) {
-        Camera_Instance = this;
-        if (Config.Toggles.toggleCustomFov) {
-            value = Config.CustomValues.FOV;
-        }
-        return this.method("set_fieldOfView", 1).invoke(value);
-    };
-
     SetShowPlayerNamesByDefault_method.implementation = function (value) {
         Logger.hook("SetShowPlayerNamesByDefault called with args:", value);
         showPlayerNames = value as boolean;
@@ -396,7 +384,7 @@ function main() {
 
     BuildInfo_OnEnable_method.implementation = function () {
         Logger.hook("BuildInfo::OnEnable called");
-        //Config.BuildInfo.gameVersion = Il2Cpp.application.version!;
+        Config.BuildInfo.gameVersion = Il2Cpp.application.version!;
         Config.BuildInfo.unityVersion = Il2Cpp.unityVersion;
         Config.BuildInfo.buildNumber = this.field<Il2Cpp.String>("buildNumber").value.content!;
         Config.BuildInfo.buildDate = this.field<Il2Cpp.String>("buildDate").value.content!;
@@ -454,6 +442,7 @@ function main() {
     };
 
     // === Functions ===
+    // TODO: broken
     const FGDebug = {
         enable() {
             Config.Toggles.toggleFGDebug = true;
@@ -501,13 +490,6 @@ function main() {
             if (UICanvas_Instance) {
                 UICanvas_Instance.method("SetEnabled").invoke(false);
             }
-        }
-    };
-
-    const changeFov = (value: number) => {
-        if (Camera_Instance) {
-            Config.CustomValues.FOV = value;
-            Camera_Instance.method("set_fieldOfView", 1).invoke(value);
         }
     };
 
@@ -717,6 +699,8 @@ function main() {
             const composer = new Menu.Composer(en.info.name, en.info.warn, layout);
             composer.icon(Config.MOD_MENU_ICON_URL, "Web");
 
+            const graphicsModule = ModuleManager.get(GraphicsModule);
+
             if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
                 Menu.add(
                     // prettier-ignore
@@ -867,7 +851,7 @@ function main() {
             Menu.add(
                 layout.seekbar(en.functions.custom_fov, 180, 1, (value: number) => {
                     if (Config.Toggles.toggleCustomFov) {
-                        changeFov(value);
+                        graphicsModule?.changeFOV(value);
                     }
                 })
             );
@@ -891,7 +875,6 @@ function main() {
             Menu.add(
                 layout.seekbar(en.functions.custom_resolution, 100, 1, (value: number) => {
                     Config.CustomValues.ResolutionScale = value / 100;
-                    const graphicsModule = ModuleManager.get(GraphicsModule);
                     graphicsModule?.changeResolutionScale();
                 })
             );

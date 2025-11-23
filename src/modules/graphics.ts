@@ -4,24 +4,30 @@ import { Logger } from "../utils/logger.js";
 import { Config } from "../data/config.js";
 
 export class GraphicsModule extends BaseModule {
-    public name = "FPSBypass";
+    public name = "GraphicsModule";
 
     private GraphicsSettings!: Il2Cpp.Class;
-    private GraphicsSettings_Instance?: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType;
+    private GraphicsSettingsInstance?: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType;
+    private Camera!: Il2Cpp.Class;
+    private CameraInstance?: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType;
 
     private get_TargetFrameRate!: Il2Cpp.Method;
     private set_TargetFrameRate!: Il2Cpp.Method;
-
     private get_ResolutionScale!: Il2Cpp.Method;
     private set_ResolutionScale!: Il2Cpp.Method;
 
+    private set_fieldOfView!: Il2Cpp.Method;
+
     public init(): void {
         this.GraphicsSettings = AssemblyHelper.MTFGClient.class("FGClient.GraphicsSettings");
+        this.Camera = AssemblyHelper.CoreModule.class("UnityEngine.Camera");
 
         this.get_TargetFrameRate = this.GraphicsSettings.method("get_TargetFrameRate");
         this.set_TargetFrameRate = this.GraphicsSettings.method("set_TargetFrameRate", 1);
         this.get_ResolutionScale = this.GraphicsSettings.method("get_ResolutionScale");
         this.set_ResolutionScale = this.GraphicsSettings.method("set_ResolutionScale", 1);
+
+        this.set_fieldOfView = this.Camera.method("set_fieldOfView", 1);
 
         this.onEnable();
     }
@@ -41,7 +47,7 @@ export class GraphicsModule extends BaseModule {
 
         this.get_ResolutionScale.implementation = function () {
             Logger.hook("get_ResolutionScale called");
-            module.GraphicsSettings_Instance = this;
+            module.GraphicsSettingsInstance = this;
             return Config.CustomValues.ResolutionScale;
         };
 
@@ -49,22 +55,38 @@ export class GraphicsModule extends BaseModule {
             Logger.hook("set_ResolutionScale called with args:", scale);
             return this.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale);
         };
+
+        this.set_fieldOfView.implementation = function (value) {
+            module.CameraInstance = this;
+            if (Config.Toggles.toggleCustomFov) {
+                value = Config.CustomValues.FOV;
+            }
+            return this.method("set_fieldOfView", 1).invoke(value);
+        };
     }
 
     public changeResolutionScale(): void {
         try {
-            if (!this.GraphicsSettings_Instance) {
+            if (!this.GraphicsSettingsInstance) {
                 return;
             }
 
             Logger.debug("Changing resolution scale to:", Config.CustomValues.ResolutionScale);
-            this.GraphicsSettings_Instance.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale);
+            this.GraphicsSettingsInstance.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale);
             /*
             i wanted to make this value changeable in the game, but unfortunately 
             calling ResolutionScaling::UpdateResolutionScaleStatus() just crashes the game for now.
             */
         } catch (error: any) {
             Logger.errorThrow(error);
+        }
+    }
+
+    /** Wrapper over Config.CustomValues.FOV */
+    public changeFOV(value: number): void {
+        if (this.CameraInstance) {
+            Config.CustomValues.FOV = value;
+            //this.CameraInstance.method("set_fieldOfView", 1).invoke(value);
         }
     }
 }

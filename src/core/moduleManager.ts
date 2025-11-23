@@ -25,11 +25,11 @@ export class ModuleManager {
             }
         });
     }
-    
+
     /**
      * Finds the active instance of a module
-     * 
-     * @param moduleClass The class of the module to find
+     *
+     * @param moduleClass The class of the module
      */
     public static get<T extends BaseModule>(moduleClass: new (...args: any[]) => T): T | undefined {
         return this.modules.find(module => module instanceof moduleClass) as T | undefined;

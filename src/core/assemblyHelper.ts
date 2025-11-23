@@ -1,3 +1,5 @@
+import { Logger } from "../utils/logger.js";
+
 export class AssemblyHelper {
     public static MediatonicCatapultClientSdkRuntime: Il2Cpp.Image; // Catapult namespace & network related
     public static TheMultiplayerGuys: Il2Cpp.Image; // FG.Common
@@ -9,5 +11,7 @@ export class AssemblyHelper {
         this.TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
         this.MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image;
         this.CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
+
+        Logger.info("[AssemblyHelper] Initialized");
     }
 }

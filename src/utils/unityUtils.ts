@@ -7,7 +7,7 @@ export class UnityUtils {
 
     public static init() {
         this.Resources = AssemblyHelper.CoreModule.class("UnityEngine.Resources");
-        Logger.debug("[UnityUtils] Initialized");
+        Logger.info("[UnityUtils] Initialized");
     }
 
     /** Wrapper over `UnityEngine.Resources.FindObjectsOfTypeAll` */
