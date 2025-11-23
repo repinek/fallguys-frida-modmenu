@@ -6,12 +6,14 @@ import { Logger } from "../utils/logger.js";
 export class GraphicsModule extends BaseModule {
     public name = "GraphicsModule";
 
+    // Classes and Instances
     private GraphicsSettings!: Il2Cpp.Class;
     private GraphicsSettingsInstance?: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType;
     private PlayerInfoHUDBase!: Il2Cpp.Class;
     private Camera!: Il2Cpp.Class;
     private CameraInstance?: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType;
 
+    // Methods
     private get_TargetFrameRate!: Il2Cpp.Method;
     private set_TargetFrameRate!: Il2Cpp.Method;
     private get_ResolutionScale!: Il2Cpp.Method;
@@ -43,7 +45,7 @@ export class GraphicsModule extends BaseModule {
     public override onEnable(): void {
         const module = this;
 
-        this.get_TargetFrameRate.implementation = function () {
+        this.get_TargetFrameRate.implementation = function (): number {
             Logger.hook("get_TargetFrameRate called");
             return 1337; // litterally unlimited, because it's linked to the screen refresh rate
         };
@@ -53,7 +55,7 @@ export class GraphicsModule extends BaseModule {
             return this.method("set_TargetFrameRate", 1).invoke(1337);
         };
 
-        this.get_ResolutionScale.implementation = function () {
+        this.get_ResolutionScale.implementation = function (): number {
             Logger.hook("get_ResolutionScale called");
             module.GraphicsSettingsInstance = this;
             return Config.CustomValues.ResolutionScale;

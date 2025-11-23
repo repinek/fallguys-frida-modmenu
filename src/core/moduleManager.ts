@@ -1,5 +1,6 @@
 import { BaseModule } from "./baseModule.js";
 
+import { BanBypassModule } from "../modules/banBypass.js";
 import { GraphicsModule } from "../modules/graphics.js";
 import { PopupModule } from "../modules/popup.js";
 
@@ -8,6 +9,7 @@ import { Logger } from "../utils/logger.js";
 export class ModuleManager {
     // prettier-ignore
     private static modules: BaseModule[] = [
+        new BanBypassModule(),
         new GraphicsModule(),
         new PopupModule()
     ];
@@ -19,7 +21,7 @@ export class ModuleManager {
         this.modules.forEach(module => {
             try {
                 module.init();
-                Logger.debug(`[ModuleManager] ${module.name} loaded`);
+                Logger.info(`[ModuleManager] ${module.name} loaded`);
             } catch (error: any) {
                 Logger.errorThrow(error, `[ModuleManager] Failed to load ${module.name}`);
             }

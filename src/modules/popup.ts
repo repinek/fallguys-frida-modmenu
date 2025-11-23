@@ -1,6 +1,5 @@
 import { AssemblyHelper } from "../core/assemblyHelper.js";
 import { BaseModule } from "../core/baseModule.js";
-import { I18n } from "../i18n/i18n.js";
 import { Logger } from "../utils/logger.js";
 
 export enum ModalType_enum {
@@ -19,7 +18,7 @@ export enum OkButtonType_enum {
 }
 
 export class PopupModule extends BaseModule {
-    public name = "popupModule";
+    public name = "PopupModule";
 
     // Classes
     private PopupManager!: Il2Cpp.Class;
@@ -35,9 +34,6 @@ export class PopupModule extends BaseModule {
     private _notLocalised!: Il2Cpp.ValueType;
     private _info!: Il2Cpp.ValueType;
 
-    // Methods
-    private ShowModalMessageData!: Il2Cpp.Method;
-
     public init(): void {
         this.PopupManager = AssemblyHelper.MTFGClient.class("FGClient.UI.PopupManager");
         this.ModalMessageData = AssemblyHelper.MTFGClient.class("FGClient.UI.ModalMessageData");
@@ -46,43 +42,11 @@ export class PopupModule extends BaseModule {
         this.LocaliseOption = AssemblyHelper.MTFGClient.class("FGClient.UI.UIModalMessage/LocaliseOption");
         this.ModalType = AssemblyHelper.MTFGClient.class("FGClient.UI.UIModalMessage/ModalType");
         this.OkButtonType = AssemblyHelper.MTFGClient.class("FGClient.UI.UIModalMessage/OKButtonType");
-
-        this.ShowModalMessageData = this.PopupManager.method("Show", 3).overload(
-            "FGClient.UI.PopupInteractionType",
-            "FGClient.UI.ModalMessageData",
-            "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"
-        );
-        this.onEnable();
     }
 
-    public override onEnable(): void {
-        const module = this;
-
-        //@ts-ignore
-        this.ShowModalMessageData.implementation = function (popupInteractionTypeArg, ModalMessageDataArg: Il2Cpp.Object, ModalMessageFailedToShow) {
-            Logger.hook("Show called with args:", popupInteractionTypeArg, ModalMessageDataArg, ModalMessageFailedToShow);
-
-            if (ModalMessageDataArg.field<Il2Cpp.String>("Title").value.content == "anticheat_error_title") {
-                const NotLocalisedVal = module.NotLocalised;
-
-                ModalMessageDataArg.field<Il2Cpp.ValueType>("LocaliseTitle").value = NotLocalisedVal;
-                ModalMessageDataArg.field<Il2Cpp.ValueType>("LocaliseMessage").value = NotLocalisedVal;
-                ModalMessageDataArg.field<Il2Cpp.ValueType>("ModalType").value = module.ModalType.field<Il2Cpp.ValueType>(ModalType_enum.MT_OK).value;
-                ModalMessageDataArg.field<Il2Cpp.ValueType>("OkButtonType").value = module.OkButtonType.field<Il2Cpp.ValueType>(OkButtonType_enum.Green).value;
-                ModalMessageDataArg.field<Il2Cpp.String>("Title").value = Il2Cpp.string(I18n.t("messages.account_banned"));
-                ModalMessageDataArg.field<Il2Cpp.String>("Message").value = Il2Cpp.string(I18n.t("messages.account_banned_desc"));
-            }
-
-            // this - Instance, so we need overload here
-            return this.method("Show", 3)
-                .overload("FGClient.UI.PopupInteractionType", "FGClient.UI.ModalMessageData", "FGClient.UI.UIModalMessage.ModalMessageFailedToShow")
-                .invoke(popupInteractionTypeArg, ModalMessageDataArg, ModalMessageFailedToShow);
-        };
-    }
-
-    public showPopup(Title: string, Message: string, ModalTypeValue: ModalType_enum, OkButtonTypeValue: OkButtonType_enum): void {
+    public showPopup(title: string, message: string, modalType: ModalType_enum, okButtonType: OkButtonType_enum): void {
         try {
-            Logger.debug("Showing popup...");
+            Logger.debug("Showing popup..."); // TODO: add logging
             const ShowModalMessageDataInstance = this.PopupManagerInstance.method<boolean>("Show", 3).overload(
                 "FGClient.UI.PopupInteractionType",
                 "FGClient.UI.ModalMessageData",
@@ -96,10 +60,10 @@ export class PopupModule extends BaseModule {
 
             newModalMessageData.field<Il2Cpp.ValueType>("LocaliseTitle").value = this.NotLocalised;
             newModalMessageData.field<Il2Cpp.ValueType>("LocaliseMessage").value = this.NotLocalised;
-            newModalMessageData.field<Il2Cpp.ValueType>("ModalType").value = this.ModalType.field<Il2Cpp.ValueType>(ModalTypeValue).value;
-            newModalMessageData.field<Il2Cpp.ValueType>("OkButtonType").value = this.OkButtonType.field<Il2Cpp.ValueType>(OkButtonTypeValue).value;
-            newModalMessageData.field<Il2Cpp.String>("Title").value = Il2Cpp.string(Title);
-            newModalMessageData.field<Il2Cpp.String>("Message").value = Il2Cpp.string(Message);
+            newModalMessageData.field<Il2Cpp.ValueType>("ModalType").value = this.ModalType.field<Il2Cpp.ValueType>(modalType).value;
+            newModalMessageData.field<Il2Cpp.ValueType>("OkButtonType").value = this.OkButtonType.field<Il2Cpp.ValueType>(okButtonType).value;
+            newModalMessageData.field<Il2Cpp.String>("Title").value = Il2Cpp.string(title);
+            newModalMessageData.field<Il2Cpp.String>("Message").value = Il2Cpp.string(message);
             newModalMessageData.field("OnCloseButtonPressed").value = NULL;
 
             // 3 arg is onFailedCallback delegate, which is default is null

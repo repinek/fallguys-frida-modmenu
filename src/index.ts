@@ -18,6 +18,7 @@ import { UnityUtils, TeleportManager } from "./utils/unityUtils.js";
 import * as javaUtils from "./utils/javaUtils.js";
 import { Logger } from "./utils/logger.js";
 
+// WIP CODE !! working to refactor it
 /*
 My code is kinda structless. Maybe I'll refactor it later, but I'm too lazy since I lost interest in this project
 A lot of things has been done already, and I don't even know what else to do. 
@@ -42,7 +43,6 @@ function main() {
 
     const BuildInfo = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.BuildInfo");
     const UICanvas = AssemblyHelper.MTFGClient.class("FGClient.UI.Core.UICanvas");
-    const MainMenuViewModel = AssemblyHelper.MTFGClient.class("FGClient.MainMenuViewModel");
     const LobbyService = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.LobbyService");
     const GlobalGameStateClient = AssemblyHelper.MTFGClient.class("FGClient.GlobalGameStateClient");
     const ClientGameManager = AssemblyHelper.MTFGClient.class("FGClient.ClientGameManager");
@@ -76,7 +76,6 @@ function main() {
     const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
     const Init_ClientOnly_method = CatapultAnalyticsService.method("Init_ClientOnly", 3);
     const SendEventBatch_method = AnalyticsService.method("SendEventBatch");
-    const CheckAntiCheatClientServiceForError_method = MainMenuViewModel.method<boolean>("CheckAntiCheatClientServiceForError");
 
     const StartAFKManager_method = AFKManager.method("Start");
     const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
@@ -217,22 +216,6 @@ function main() {
             return this.method("Init_ClientOnly").invoke(analyticsServerHostAlloc, gatewayConnConfig, platformServiceProvider);
         }
         return this.method("Init_ClientOnly").invoke(serverAddress, gatewayConnConfig, platformServiceProvider);
-    };
-
-    // Bypass permanent ban
-    // Temporary bans cannot be bypassed, but permanent bans can be loool
-    CheckAntiCheatClientServiceForError_method.implementation = function () {
-        /* 
-        Called when trying to join matchmaking.
-        Returns true if: 
-            - no AntiCheatClient Instance
-            - AntiCheatClient::get_AllowOnlinePlay returned false 
-              (Since you are banned AllowOnlinePlay will be set to false)
-        If true: it won't be let matchmake you and will call ShowAntiCheatPopup method (also refer Show_method.implementation for more about ShowAntiCheatPopup)
-        So, we just return false here
-        */
-        Logger.hook("CheckAntiCheatClientServiceForError called");
-        return false;
     };
 
     // Utils
