@@ -1,6 +1,6 @@
 export const ModPreferences = {
-    VERSION: "2.55", // Don't forget update after changes!
-    ENV: "dev", // dev, staging, release
+    VERSION: "2.56", // Don't forget update after changes!
+    ENV: "release", // dev, staging, release
     FOR_GAME_VERSION: "21.0.1"
 };
 

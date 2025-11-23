@@ -28,6 +28,7 @@ function main() {
     AssemblyHelper.init();
 
     UnityUtils.init();
+
     ModuleManager.initAll();
 
     // === Classes ===
@@ -35,7 +36,6 @@ function main() {
     const SceneManager = AssemblyHelper.CoreModule.class("UnityEngine.SceneManagement.SceneManager");
 
     const BuildInfo = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.BuildInfo");
-    const PlayerInfoHUDBase = AssemblyHelper.MTFGClient.class("FGClient.PlayerInfoHUDBase"); // ShowNames field storing here
     const UICanvas = AssemblyHelper.MTFGClient.class("FGClient.UI.Core.UICanvas");
     const MainMenuViewModel = AssemblyHelper.MTFGClient.class("FGClient.MainMenuViewModel");
     const LobbyService = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.LobbyService");
@@ -87,8 +87,6 @@ function main() {
     const SendEventBatch_method = AnalyticsService.method("SendEventBatch");
     const CheckAntiCheatClientServiceForError_method = MainMenuViewModel.method<boolean>("CheckAntiCheatClientServiceForError");
 
-    const SetShowPlayerNamesByDefault_method = PlayerInfoHUDBase.method("SetShowPlayerNamesByDefault", 1);
-
     const StartAFKManager_method = AFKManager.method("Start");
     const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
     const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
@@ -110,7 +108,6 @@ function main() {
 
     let reachedMainMenu = false;
     let currentSceneName;
-    let showPlayerNames: boolean;
 
     Logger.info("Loaded il2cpp, assemblies, classes and method pointers");
 
@@ -273,13 +270,6 @@ function main() {
             "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"
         ); // for instance
         return this_method.invoke(PopupInteractionTypeValue, ModalMessageDataValue, ModalMessageFailedToShow);
-    };
-
-    // Graphics
-    SetShowPlayerNamesByDefault_method.implementation = function (value) {
-        Logger.hook("SetShowPlayerNamesByDefault called with args:", value);
-        showPlayerNames = value as boolean;
-        return this.method("SetShowPlayerNamesByDefault", 1).invoke(value);
     };
 
     // Utils
@@ -838,7 +828,7 @@ function main() {
 
             Menu.add(
                 layout.button(en.functions.toggle_view_names, () => {
-                    SetShowPlayerNamesByDefault_method.invoke(!showPlayerNames);
+                    graphicsModule?.toggleNames();
                 })
             );
 

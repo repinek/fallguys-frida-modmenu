@@ -8,6 +8,7 @@ export class GraphicsModule extends BaseModule {
 
     private GraphicsSettings!: Il2Cpp.Class;
     private GraphicsSettingsInstance?: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType;
+    private PlayerInfoHUDBase!: Il2Cpp.Class;
     private Camera!: Il2Cpp.Class;
     private CameraInstance?: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType;
 
@@ -16,16 +17,23 @@ export class GraphicsModule extends BaseModule {
     private get_ResolutionScale!: Il2Cpp.Method;
     private set_ResolutionScale!: Il2Cpp.Method;
 
+    private get_ShowNames!: Il2Cpp.Method;
+    private SetShowPlayerNamesByDefault!: Il2Cpp.Method;
+
     private set_fieldOfView!: Il2Cpp.Method;
 
     public init(): void {
         this.GraphicsSettings = AssemblyHelper.MTFGClient.class("FGClient.GraphicsSettings");
+        this.PlayerInfoHUDBase = AssemblyHelper.MTFGClient.class("FGClient.PlayerInfoHUDBase");
         this.Camera = AssemblyHelper.CoreModule.class("UnityEngine.Camera");
 
         this.get_TargetFrameRate = this.GraphicsSettings.method("get_TargetFrameRate");
         this.set_TargetFrameRate = this.GraphicsSettings.method("set_TargetFrameRate", 1);
         this.get_ResolutionScale = this.GraphicsSettings.method("get_ResolutionScale");
         this.set_ResolutionScale = this.GraphicsSettings.method("set_ResolutionScale", 1);
+
+        this.get_ShowNames = this.PlayerInfoHUDBase.method<boolean>("get_ShowNames");
+        this.SetShowPlayerNamesByDefault = this.PlayerInfoHUDBase.method("SetShowPlayerNamesByDefault", 1);
 
         this.set_fieldOfView = this.Camera.method("set_fieldOfView", 1);
 
@@ -80,6 +88,16 @@ export class GraphicsModule extends BaseModule {
         } catch (error: any) {
             Logger.errorThrow(error);
         }
+    }
+
+    /**
+     * Wrapper over PlayerInfoHUDBase::SetShowPlayerNamesByDefault()
+     *
+     * Reads state from PlayerInfoHUDBase::get_ShowNames
+     */
+    public toggleNames(): void {
+        const shouldShowPlayerNames = this.get_ShowNames.invoke() as boolean;
+        this.SetShowPlayerNamesByDefault.invoke(!shouldShowPlayerNames);
     }
 
     /** Wrapper over Config.CustomValues.FOV */
