@@ -602,26 +602,26 @@ function main() {
             }
 
             // === Movement Tab ===
-            const movement = layout.textView(en.tabs.movement_tab);
+            const movement = layout.textView(en.menu.tabs.movement_tab);
             movement.gravity = Menu.Api.CENTER;
             Menu.add(movement);
 
             Menu.add(
-                layout.toggle(en.functions.toggle_360_dives, (state: boolean) => {
+                layout.toggle(en.menu.functions.toggle_360_dives, (state: boolean) => {
                     Config.Toggles.toggle360Dives = state;
                 })
             );
 
             Menu.add(
-                layout.toggle(en.functions.toggle_air_jump, (state: boolean) => {
+                layout.toggle(en.menu.functions.toggle_air_jump, (state: boolean) => {
                     Config.Toggles.toggleAirJump = state;
                 })
             );
 
-            Menu.add(layout.toggle(en.functions.toggle_freeze_player, (state: boolean) => (state ? freezePlayer.enable() : freezePlayer.disable())));
+            Menu.add(layout.toggle(en.menu.functions.toggle_freeze_player, (state: boolean) => (state ? freezePlayer.enable() : freezePlayer.disable())));
 
             Menu.add(
-                layout.toggle(en.functions.toggle_dont_send_fallguy_state, (state: boolean) => {
+                layout.toggle(en.menu.functions.toggle_dont_send_fallguy_state, (state: boolean) => {
                     Config.Toggles.toggleDontSendFallGuyState = state;
                 })
             );
@@ -629,140 +629,140 @@ function main() {
             Menu.add(layout.textView(en.info.fg_state_warn));
 
             Menu.add(
-                layout.toggle(en.functions.toggle_custom_speed, (state: boolean) => {
+                layout.toggle(en.menu.functions.toggle_custom_speed, (state: boolean) => {
                     Config.Toggles.toggleCustomSpeed = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar(en.functions.custom_speed, 100, 1, (value: number) => {
+                layout.seekbar(en.menu.functions.custom_speed, 100, 1, (value: number) => {
                     Config.CustomValues.normalMaxSpeed = value;
                 })
             );
 
             Menu.add(
-                layout.toggle(en.functions.toggle_custom_velocity, (state: boolean) => {
+                layout.toggle(en.menu.functions.toggle_custom_velocity, (state: boolean) => {
                     Config.Toggles.toggleCustomVelocity = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar(en.functions.vertical_gravity_velocity, 100, 0, (value: number) => {
+                layout.seekbar(en.menu.functions.vertical_gravity_velocity, 100, 0, (value: number) => {
                     Config.CustomValues.maxGravityVelocity = value;
                 })
             );
 
             Menu.add(
-                layout.toggle(en.functions.toggle_negative_velocity, (state: boolean) => {
+                layout.toggle(en.menu.functions.toggle_negative_velocity, (state: boolean) => {
                     Config.Toggles.toggleNegativeVelocity = state;
                 })
             );
 
             Menu.add(
-                layout.toggle(en.functions.toggle_no_vertical_velocity, (state: boolean) => {
+                layout.toggle(en.menu.functions.toggle_no_vertical_velocity, (state: boolean) => {
                     Config.Toggles.toggleNoVelocity = state;
                 })
             );
 
             Menu.add(
-                layout.toggle(en.functions.toggle_custom_jump_strength, (state: boolean) => {
+                layout.toggle(en.menu.functions.toggle_custom_jump_strength, (state: boolean) => {
                     Config.Toggles.toggleCustomJumpForce = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar(en.functions.jump_strength, 100, 1, (value: number) => {
+                layout.seekbar(en.menu.functions.jump_strength, 100, 1, (value: number) => {
                     Config.CustomValues.jumpForce = value;
                 })
             );
 
             Menu.add(
-                layout.toggle(en.functions.toggle_custom_dive_strength, (state: boolean) => {
+                layout.toggle(en.menu.functions.toggle_custom_dive_strength, (state: boolean) => {
                     Config.Toggles.toggleCustomDiveForce = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar(en.functions.dive_strength, 100, 1, (value: number) => {
+                layout.seekbar(en.menu.functions.dive_strength, 100, 1, (value: number) => {
                     Config.CustomValues.diveForce = value;
                 })
             );
 
             // === Round Tab ===
-            const round_tab = layout.textView(en.tabs.round_tab);
+            const round_tab = layout.textView(en.menu.tabs.round_tab);
             round_tab.gravity = Menu.Api.CENTER;
             Menu.add(round_tab);
 
             Menu.add(
-                layout.toggle(en.functions.hide_real_doors, (state: boolean) => {
+                layout.toggle(en.menu.functions.hide_real_doors, (state: boolean) => {
                     Config.Toggles.toggleHideDoors = state;
                 })
             );
 
-            Menu.add(layout.button(en.functions.show_tiptoe_path, showTipToePath));
+            Menu.add(layout.button(en.menu.functions.show_tiptoe_path, showTipToePath));
 
             // === Teleports Tab ===
-            const teleports = layout.textView(en.tabs.teleports_tab);
+            const teleports = layout.textView(en.menu.tabs.teleports_tab);
             teleports.gravity = Menu.Api.CENTER;
             Menu.add(teleports);
 
-            Menu.add(layout.button(en.functions.teleport_to_finish_or_crown, teleportToFinish));
+            Menu.add(layout.button(en.menu.functions.teleport_to_finish_or_crown, teleportToFinish));
 
-            Menu.add(layout.button(en.functions.teleport_to_score, teleportToScore));
+            Menu.add(layout.button(en.menu.functions.teleport_to_score, teleportToScore));
 
             // === Utility Tab ===
-            const utility = layout.textView(en.tabs.utility_tab);
+            const utility = layout.textView(en.menu.tabs.utility_tab);
             utility.gravity = Menu.Api.CENTER;
             Menu.add(utility);
 
             Menu.add(
-                layout.button(en.functions.toggle_view_names, () => {
+                layout.button(en.menu.functions.toggle_view_names, () => {
                     graphicsModule?.toggleNames();
                 })
             );
 
             Menu.add(
-                layout.toggle(en.functions.toggle_custom_fov, (state: boolean) => {
+                layout.toggle(en.menu.functions.toggle_custom_fov, (state: boolean) => {
                     Config.Toggles.toggleCustomFov = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar(en.functions.custom_fov, 180, 1, (value: number) => {
+                layout.seekbar(en.menu.functions.custom_fov, 180, 1, (value: number) => {
                     if (Config.Toggles.toggleCustomFov) {
                         graphicsModule?.changeFOV(value);
                     }
                 })
             );
 
-            Menu.add(layout.toggle(en.functions.toggle_disable_ui, (state: boolean) => (state ? UICanvas_util.disable() : UICanvas_util.enable())));
+            Menu.add(layout.toggle(en.menu.functions.toggle_disable_ui, (state: boolean) => (state ? UICanvas_util.disable() : UICanvas_util.enable())));
 
-            Menu.add(layout.toggle(en.functions.toggle_fgdebug, (state: boolean) => (state ? FGDebug.enable() : FGDebug.disable())));
+            Menu.add(layout.toggle(en.menu.functions.toggle_fgdebug, (state: boolean) => (state ? FGDebug.enable() : FGDebug.disable())));
 
             Menu.add(
-                layout.toggle(en.functions.toggle_disable_analytics, (state: boolean) => {
+                layout.toggle(en.menu.functions.toggle_disable_analytics, (state: boolean) => {
                     Config.Toggles.toggleDisableAnalytics = state;
                 })
             );
 
             Menu.add(
-                layout.toggle(en.functions.show_number_of_queued_players, (state: boolean) => {
+                layout.toggle(en.menu.functions.show_number_of_queued_players, (state: boolean) => {
                     Config.Toggles.toggleShowQueuedPlayers = state;
                 })
             );
 
             Menu.add(
-                layout.seekbar(en.functions.custom_resolution, 100, 1, (value: number) => {
+                layout.seekbar(en.menu.functions.custom_resolution, 100, 1, (value: number) => {
                     Config.CustomValues.ResolutionScale = value / 100;
                     graphicsModule?.changeResolutionScale();
                 })
             );
 
-            Menu.add(layout.button(en.functions.show_game_details, showGameDetails));
-            Menu.add(layout.button(en.functions.show_and_copy_server_details, showServerDetails));
+            Menu.add(layout.button(en.menu.functions.show_game_details, showGameDetails));
+            Menu.add(layout.button(en.menu.functions.show_and_copy_server_details, showServerDetails));
 
             // === Links Tab ===
-            const links = layout.textView(en.tabs.links_tab);
+            const links = layout.textView(en.menu.tabs.links_tab);
             links.gravity = Menu.Api.CENTER;
             Menu.add(links);
 
@@ -770,7 +770,7 @@ function main() {
             Menu.add(layout.button(en.info.discord_url, () => javaUtils.openURL(Config.DISCORD_INVITE_URL)));
 
             // === Build Info Tab ===
-            const info = layout.textView(en.tabs.build_info_tab);
+            const info = layout.textView(en.menu.tabs.build_info_tab);
             info.gravity = Menu.Api.CENTER;
             Menu.add(info);
 

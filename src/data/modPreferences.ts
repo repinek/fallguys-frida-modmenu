@@ -1,13 +1,14 @@
 export const ModPreferences = {
-    VERSION: "2.61", // Don't forget update after changes!
+    VERSION: "2.63", // Don't forget update after changes!
     ENV: "release", // dev, staging, release
     FOR_GAME_VERSION: "21.0.1"
 };
 
 /*
 !! TODO: 
+[00:44:19] [INFO] [I18n] Loaded locale from config: en (why)
 move teleport manager from utils
-refactor localization
+refactor localization (info and other)
 logcat logging
 on screen logging
 unity logging

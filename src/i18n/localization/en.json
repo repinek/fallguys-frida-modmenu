@@ -1,17 +1,6 @@
-{
+{   
     "hi": {
         "hi": "hello from i18n"
-    },
-    "messages": {
-        "menu_will_appear_later": "Menu will appear once you enter the main menu",
-        "display_menu": "Displaying the menu",
-        "no_finish": "No Finish or Crown was found. The round probably does not have a finish or a crown.",
-        "no_score": "No bubbles or buttons were found.",
-        "not_in_the_game": "You are not in the game!",
-        "server": "Server",
-        "ping": "Ping",
-        "account_banned": "Account Banned",
-        "account_banned_desc": "Your Fall Guys Account is permanently banned, but you can still play with mod menu.\nEnjoy!"
     },
     "toasts": {
         "signature_not_fetched": "Actual server signature can't be fetched, spoof won't be working",
@@ -19,43 +8,54 @@
         "mod_menu_version_actual": "Mod menu is up to date",
         "mod_menu_version_outdated": "Mod menu version is outdated, redirecting to download page..."
     },
-    "tabs": {
-        "movement_tab": "<b>--- Movement ---</b>",
-        "round_tab": "<b>--- Round ---</b>",
-        "teleports_tab": "<b>--- Teleports ---</b>",
-        "utility_tab": "<b>--- Utility ---</b>",
-        "links_tab": "<b>--- Links ---</b>",
-        "build_info_tab": "<b>--- Build Info ---</b>"
-    },
-    "functions": {
-        "toggle_360_dives": "Enable 360 Dives",
-        "toggle_air_jump": "Air Jump",
-        "toggle_freeze_player": "Freeze Player",
-        "toggle_dont_send_fallguy_state": "Don't send Fall Guy state",
-        "toggle_custom_speed": "Use Custom Speed",
-        "custom_speed": "Custom Speed: {0} / 100",
-        "toggle_custom_velocity": "Enable Custom Velocity",
-        "vertical_gravity_velocity": "Vertical Gravity Velocity: {0} / 100",
-        "toggle_negative_velocity": "Negative Velocity",
-        "toggle_no_vertical_velocity": "No Vertical Velocity",
-        "toggle_custom_jump_strength": "Use Custom Jump Strength",
-        "jump_strength": "Jump Strength: {0} / 100",
-        "toggle_custom_dive_strength": "Use Custom Dive Strength",
-        "dive_strength": "Dive Strength: {0} / 100",
-        "hide_real_doors": "Hide Real Doors",
-        "show_tiptoe_path": "Show Tip Toe Path",
-        "teleport_to_finish_or_crown": "Teleport To Finish / Crown",
-        "teleport_to_score": "Teleport To Bubble / Active Button",
-        "toggle_view_names": "Toggle Player Names",
-        "toggle_custom_fov": "Use Custom FOV",
-        "custom_fov": "Custom FOV: {0}",
-        "toggle_disable_ui": "Disable UI (also hides touch controls)",
-        "toggle_fgdebug": "Display FGDebug",
-        "toggle_disable_analytics": "Disable Analytics",
-        "show_number_of_queued_players": "Show Number of Queued Players",
-        "custom_resolution": "Custom Resolution (will apply in next round): {0}% / 100%",
-        "show_game_details": "Show Game Details",
-        "show_and_copy_server_details": "Show and Copy Server Details"
+    "menu": {
+        "tabs": {
+            "movement_tab": "<b>--- Movement ---</b>",
+            "round_tab": "<b>--- Round ---</b>",
+            "teleports_tab": "<b>--- Teleports ---</b>",
+            "utility_tab": "<b>--- Utility ---</b>",
+            "links_tab": "<b>--- Links ---</b>",
+            "build_info_tab": "<b>--- Build Info ---</b>"
+        },
+        "functions": {
+            "toggle_360_dives": "Enable 360 Dives",
+            "toggle_air_jump": "Air Jump",
+            "toggle_freeze_player": "Freeze Player",
+            "toggle_dont_send_fallguy_state": "Don't send Fall Guy state",
+            "toggle_custom_speed": "Use Custom Speed",
+            "custom_speed": "Custom Speed: {0} / 100",
+            "toggle_custom_velocity": "Enable Custom Velocity",
+            "vertical_gravity_velocity": "Vertical Gravity Velocity: {0} / 100",
+            "toggle_negative_velocity": "Negative Velocity",
+            "toggle_no_vertical_velocity": "No Vertical Velocity",
+            "toggle_custom_jump_strength": "Use Custom Jump Strength",
+            "jump_strength": "Jump Strength: {0} / 100",
+            "toggle_custom_dive_strength": "Use Custom Dive Strength",
+            "dive_strength": "Dive Strength: {0} / 100",
+            "hide_real_doors": "Hide Real Doors",
+            "show_tiptoe_path": "Show Tip Toe Path",
+            "teleport_to_finish_or_crown": "Teleport To Finish / Crown",
+            "teleport_to_score": "Teleport To Bubble / Active Button",
+            "toggle_view_names": "Toggle Player Names",
+            "toggle_custom_fov": "Use Custom FOV",
+            "custom_fov": "Custom FOV: {0}",
+            "toggle_disable_ui": "Disable UI (also hides touch controls)",
+            "toggle_fgdebug": "Display FGDebug",
+            "toggle_disable_analytics": "Disable Analytics",
+            "show_number_of_queued_players": "Show Number of Queued Players",
+            "custom_resolution": "Custom Resolution (will apply in next round): {0}% / 100%",
+            "show_game_details": "Show Game Details",
+            "show_and_copy_server_details": "Show and Copy Server Details"
+        },
+        "toasts": {
+            "no_overlay_permission": "Overlay permission is needed to show the menu",
+            "hide_button": "Hide",
+            "close_button": "Close",
+            "hide_callback": "Icon hidden",
+            "kill_callback": "Menu killed",
+            "menu_will_appear_later": "Menu will appear once you enter the main menu",
+            "display_menu": "Displaying the menu"
+        }
     },
     "info": {
         "name": "Fall Guys Mod Menu",
@@ -78,11 +78,16 @@
         "game_build_date": "Game Build date:",
         "package_name": "Package Name:"
     },
-    "menu": {
-        "no_overlay_permission": "Overlay permission is needed to show the menu",
-        "hide_button": "Hide",
-        "close_button": "Close",
-        "hide_callback": "Icon hidden",
-        "kill_callback": "Menu killed"
+    "messages": {
+        "menu_will_appear_later": "Menu will appear once you enter the main menu",
+        "display_menu": "Displaying the menu",
+        "no_finish": "No Finish or Crown was found. The round probably does not have a finish or a crown.",
+        "no_score": "No bubbles or buttons were found.",
+        "not_in_the_game": "You are not in the game!",
+        "server": "Server",
+        "ping": "Ping",
+        "account_banned": "Account Banned",
+        "account_banned_desc": "Your Fall Guys Account is permanently banned, but you can still play with mod menu.\nEnjoy!"
     }
 }
+
