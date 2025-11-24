@@ -22,8 +22,8 @@ export class AntiAFKModule extends BaseModule {
 
     public override onEnable(): void {
         this.AFKManagerStart.implementation = function (): void {
-            Logger.hook("AFKManagerStart called");
+            Logger.hook("AFKManager::Start called");
             return;
-        }
+        };
     }
 }

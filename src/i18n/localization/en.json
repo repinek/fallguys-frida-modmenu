@@ -1,4 +1,4 @@
-{   
+{
     "hi": {
         "hi": "hello from i18n"
     },
@@ -90,4 +90,3 @@
         "account_banned_desc": "Your Fall Guys Account is permanently banned, but you can still play with mod menu.\nEnjoy!"
     }
 }
-

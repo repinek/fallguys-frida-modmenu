@@ -10,7 +10,7 @@ import { Logger } from "../utils/logger.js";
 /*
  * === Permanent Ban Bypass Logic ===
  * Temporary bans can't be bypassed, but permament can be lol
- * 
+ *
  * 1. MainMenuViewModel::CheckAntiCheatClientServiceForError
  *    - Called by: MainMenuViewModel::TryConnect (Matchmaking start)
  *    - Behavior: Checks if AntiCheatClient::get_AllowOnlinePlay is false (since you're banned it's false)

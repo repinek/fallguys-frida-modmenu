@@ -3,5 +3,5 @@ export abstract class BaseModule {
 
     abstract init(): void;
 
-    public onEnable(): void {}
+    public onEnable(): void {} // hooks here
 }

@@ -3,6 +3,7 @@ import { Logger } from "./logger.js";
 import { Config } from "../data/config.js";
 
 export class UnityUtils {
+    // Classes
     private static Resources: Il2Cpp.Class;
 
     public static init() {
@@ -14,8 +15,19 @@ export class UnityUtils {
     public static findObjectsOfTypeAll(klass: Il2Cpp.Class): Il2Cpp.Array<Il2Cpp.Object> {
         return this.Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
     }
+
+    public static getInstance(klass: Il2Cpp.Class): Il2Cpp.Object | undefined {
+        const instanceMethod = klass.tryMethod<Il2Cpp.Object>("get_Instance");
+        if (!instanceMethod) {
+            Logger.error(`[UnityUtils] ${klass.name} is missing get_Instance`);
+            return undefined;
+        }
+
+        return instanceMethod.invoke();
+    }
 }
 
+// TODO: move to module
 export class TeleportManager {
     private static lastTeleportTime = 0;
 

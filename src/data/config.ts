@@ -69,12 +69,8 @@ export const Config = {
 
     BuildInfo: {
         PLATFORM: "android_ega",
-        gameVersion: "" as string,
         spoofedGameVersion: "" as string,
         originalSignature: "" as string,
-        spoofedSignature: "" as string,
-        unityVersion: "" as string,
-        buildNumber: "Local build",
-        buildDate: "n/a"
+        spoofedSignature: "" as string
     }
 };

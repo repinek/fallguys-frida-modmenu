@@ -1,7 +1,8 @@
 import { BaseModule } from "./baseModule.js";
 
-import { AntiAFKModule } from "../modules/antiAfk.js";
+import { AntiAFKModule } from "../modules/antiAFK.js";
 import { BanBypassModule } from "../modules/banBypass.js";
+import { BuildInfoModule } from "../modules/buildInfo.js";
 import { GraphicsModule } from "../modules/graphics.js";
 import { PopupManagerModule } from "../modules/popup.js";
 
@@ -12,6 +13,7 @@ export class ModuleManager {
     private static modules: BaseModule[] = [
         new AntiAFKModule(),
         new BanBypassModule(),
+        new BuildInfoModule(),
         new GraphicsModule(),
         new PopupManagerModule()
     ];

@@ -9,6 +9,7 @@ import { ObsidianConfig } from "./data/menuConfig.js";
 import { Config } from "./data/config.js";
 
 import { GraphicsModule } from "./modules/graphics.js";
+import { BuildInfoModule } from "./modules/buildInfo.js";
 import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./modules/popup.js";
 
 import { I18n } from "./i18n/i18n.js";
@@ -41,7 +42,6 @@ function main() {
     const Vector3class = AssemblyHelper.CoreModule.class("UnityEngine.Vector3");
     const SceneManager = AssemblyHelper.CoreModule.class("UnityEngine.SceneManagement.SceneManager");
 
-    const BuildInfo = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.BuildInfo");
     const UICanvas = AssemblyHelper.MTFGClient.class("FGClient.UI.Core.UICanvas");
     const LobbyService = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.LobbyService");
     const GlobalGameStateClient = AssemblyHelper.MTFGClient.class("FGClient.GlobalGameStateClient");
@@ -80,7 +80,6 @@ function main() {
     const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
     const SendMessage_method = MPGNetMotorTasks.method("SendMessage", 1);
     const ProcessMessageReceived_method = FNMMSClientRemoteService.method("ProcessMessageReceived");
-    const BuildInfo_OnEnable_method = BuildInfo.method("OnEnable");
 
     const CheckCharacterControllerData_method = CharacterDataMonitor.method("CheckCharacterControllerData", 1);
     const CanJump_method = MotorFunctionJump.method<boolean>("CanJump");
@@ -215,10 +214,10 @@ function main() {
         }
         return this.method("Init_ClientOnly").invoke(serverAddress, gatewayConnConfig, platformServiceProvider);
     };
-    
+
     // Utils
     OnMainMenuDisplayed_method.implementation = function (event) {
-        Logger.hook("OnMainMenuDisplayed Called!");
+        Logger.hook("OnMainMenuDisplayed Called");
 
         if (!reachedMainMenu) {
             /*
@@ -309,17 +308,6 @@ function main() {
             }
         }
         return this.method("ProcessMessageReceived", 1).invoke(jsonMessage);
-    };
-
-    BuildInfo_OnEnable_method.implementation = function () {
-        Logger.hook("BuildInfo::OnEnable called");
-        Config.BuildInfo.gameVersion = Il2Cpp.application.version!;
-        Config.BuildInfo.unityVersion = Il2Cpp.unityVersion;
-        Config.BuildInfo.buildNumber = this.field<Il2Cpp.String>("buildNumber").value.content!;
-        Config.BuildInfo.buildDate = this.field<Il2Cpp.String>("buildDate").value.content!;
-        // other fields are useless, if you want you can grab it too
-
-        return this.method("OnEnable").invoke();
     };
 
     // Physics
@@ -578,7 +566,8 @@ function main() {
             composer.icon(Config.MOD_MENU_ICON_URL, "Web");
 
             const graphicsModule = ModuleManager.get(GraphicsModule);
-            const popupModule = ModuleManager.get(PopupManagerModule);
+            const popupManagerModule = ModuleManager.get(PopupManagerModule);
+            const buildInfoModule = ModuleManager.get(BuildInfoModule);
 
             if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
                 Menu.add(
@@ -594,7 +583,7 @@ function main() {
                 Menu.add(
                     layout.button("Debug", () => {
                         Il2Cpp.perform(() => {
-                            popupModule?.showPopup("Test Popup", "Message of Test Popup", ModalType_enum.MT_OK, OkButtonType_enum.Green);
+                            popupManagerModule?.showPopup("Test Popup", "Message of Test Popup", ModalType_enum.MT_OK, OkButtonType_enum.Green);
                         }, "main"); // From Java.scheduleOnMainThread you need to Il2cpp.perform main!
                     })
                 );
@@ -770,21 +759,26 @@ function main() {
             Menu.add(layout.button(en.info.discord_url, () => javaUtils.openURL(Config.DISCORD_INVITE_URL)));
 
             // === Build Info Tab ===
+            // TODO: correct this with i18n and if
             const info = layout.textView(en.menu.tabs.build_info_tab);
             info.gravity = Menu.Api.CENTER;
             Menu.add(info);
 
+            Menu.add(layout.textView("Game info"));
+            Menu.add(layout.textView(buildInfoModule!.getShortString()));
+            Menu.add(layout.textView(`${en.info.unity_version} ${Il2Cpp.unityVersion}`));
+            Menu.add(layout.textView(`${en.info.package_name} ${Il2Cpp.application.identifier}`));
+
+            Menu.add(layout.textView("Mod Menu info"));
             Menu.add(layout.textView(`${en.info.mod_menu_version} ${ModPreferences.VERSION}`));
-            Menu.add(layout.textView(`${en.info.game_version} ${Config.BuildInfo.gameVersion}`));
+            Menu.add(layout.textView(`${en.info.mod_menu_version} ${ModPreferences.ENV}`));
+
+            Menu.add(layout.textView("Spoof info"));
             Menu.add(layout.textView(`${en.info.is_spoofed} ${Config.USE_SPOOF}`));
             if (Config.USE_SPOOF) Menu.add(layout.textView(`${en.info.spoofed_game_version} ${Config.BuildInfo.spoofedGameVersion}`));
             Menu.add(layout.textView(`${en.info.original_signature} ${Config.BuildInfo.originalSignature}`));
             if (Config.USE_SPOOF) Menu.add(layout.textView(`${en.info.spoofed_signature} ${Config.BuildInfo.spoofedSignature}`));
             Menu.add(layout.textView(`${en.info.platform} ${Config.BuildInfo.PLATFORM}`));
-            Menu.add(layout.textView(`${en.info.unity_version} ${Config.BuildInfo.unityVersion}`));
-            Menu.add(layout.textView(`${en.info.game_build_number} ${Config.BuildInfo.buildNumber}`));
-            Menu.add(layout.textView(`${en.info.game_build_date} ${Config.BuildInfo.buildDate}`));
-            Menu.add(layout.textView(`${en.info.package_name} ${Il2Cpp.application.identifier}`));
 
             const author = layout.textView(en.info.author);
             author.gravity = Menu.Api.CENTER;

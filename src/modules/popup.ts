@@ -1,7 +1,7 @@
-import { ok } from "assert";
 import { AssemblyHelper } from "../core/assemblyHelper.js";
 import { BaseModule } from "../core/baseModule.js";
 import { Logger } from "../utils/logger.js";
+import { UnityUtils } from "../utils/unityUtils.js";
 
 export enum ModalType_enum {
     MT_OK = "MT_OK",
@@ -23,7 +23,7 @@ export class PopupManagerModule extends BaseModule {
 
     // Classes
     private PopupManager!: Il2Cpp.Class;
-    private _popupManagerInstance!: Il2Cpp.Object;
+    private _popupManagerInstance?: Il2Cpp.Object;
     private ModalMessageData!: Il2Cpp.Class;
 
     // Enums
@@ -48,7 +48,7 @@ export class PopupManagerModule extends BaseModule {
     public showPopup(title: string, message: string, modalType: ModalType_enum, okButtonType: OkButtonType_enum): void {
         try {
             Logger.debug("Showing popup:", title, message, modalType, okButtonType);
-            const ShowModalMessageDataInstance = this.PopupManagerInstance.method<boolean>("Show", 3).overload(
+            const ShowModalMessageDataInstance = this.PopupManagerInstance!.method<boolean>("Show", 3).overload(
                 "FGClient.UI.PopupInteractionType",
                 "FGClient.UI.ModalMessageData",
                 "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"
@@ -74,9 +74,9 @@ export class PopupManagerModule extends BaseModule {
         }
     }
 
-    private get PopupManagerInstance(): Il2Cpp.Object {
+    private get PopupManagerInstance(): Il2Cpp.Object | undefined {
         if (!this._popupManagerInstance) {
-            this._popupManagerInstance = this.PopupManager.method<Il2Cpp.Object>("get_Instance").invoke();
+            this._popupManagerInstance = UnityUtils.getInstance(this.PopupManager);
         }
         return this._popupManagerInstance;
     }
