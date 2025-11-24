@@ -11,11 +11,12 @@ export class UnityUtils {
         Logger.info("[UnityUtils] Initialized");
     }
 
-    /** Wrapper over `UnityEngine.Resources.FindObjectsOfTypeAll` */
+    /** Wrapper over UnityEngine.Resources.FindObjectsOfTypeAll */
     public static findObjectsOfTypeAll(klass: Il2Cpp.Class): Il2Cpp.Array<Il2Cpp.Object> {
         return this.Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
     }
 
+    /** Wrapper over get_Instance */
     public static getInstance(klass: Il2Cpp.Class): Il2Cpp.Object | undefined {
         const instanceMethod = klass.tryMethod<Il2Cpp.Object>("get_Instance");
         if (!instanceMethod) {
