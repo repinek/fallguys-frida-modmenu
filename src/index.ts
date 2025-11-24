@@ -11,6 +11,7 @@ import { Config } from "./data/config.js";
 import { GraphicsModule } from "./modules/graphics.js";
 import { BuildInfoModule } from "./modules/buildInfo.js";
 import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./modules/popup.js";
+import { UICanvasModule } from "./modules/uiCanvas.js";
 
 import { I18n } from "./i18n/i18n.js";
 import en from "./i18n/localization/en.json";
@@ -42,7 +43,6 @@ function main() {
     const Vector3class = AssemblyHelper.CoreModule.class("UnityEngine.Vector3");
     const SceneManager = AssemblyHelper.CoreModule.class("UnityEngine.SceneManagement.SceneManager");
 
-    const UICanvas = AssemblyHelper.MTFGClient.class("FGClient.UI.Core.UICanvas");
     const LobbyService = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.LobbyService");
     const GlobalGameStateClient = AssemblyHelper.MTFGClient.class("FGClient.GlobalGameStateClient");
     const ClientGameManager = AssemblyHelper.MTFGClient.class("FGClient.ClientGameManager");
@@ -91,7 +91,6 @@ function main() {
     let FGDebug_Instance: Il2Cpp.Object;
     let GlobalGameStateClient_Instance: Il2Cpp.Object;
     let ClientGameManager_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in GameLevelLoaded
-    let UICanvas_Instance: Il2Cpp.Object;
 
     let reachedMainMenu = false;
     let currentSceneName;
@@ -394,21 +393,6 @@ function main() {
         }
     };
 
-    const UICanvas_util = {
-        enable() {
-            UICanvas_Instance = UnityUtils.findObjectsOfTypeAll(UICanvas).get(0);
-            if (UICanvas_Instance) {
-                UICanvas_Instance.method("SetEnabled").invoke(true);
-            }
-        },
-        disable() {
-            UICanvas_Instance = UnityUtils.findObjectsOfTypeAll(UICanvas).get(0);
-            if (UICanvas_Instance) {
-                UICanvas_Instance.method("SetEnabled").invoke(false);
-            }
-        }
-    };
-
     const teleportToFinish = () => {
         if (!TeleportManager.checkCooldown()) return;
 
@@ -568,6 +552,7 @@ function main() {
             const graphicsModule = ModuleManager.get(GraphicsModule);
             const popupManagerModule = ModuleManager.get(PopupManagerModule);
             const buildInfoModule = ModuleManager.get(BuildInfoModule);
+            const uiCanvasModule = ModuleManager.get(UICanvasModule);
 
             if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
                 Menu.add(
@@ -724,7 +709,13 @@ function main() {
                 })
             );
 
-            Menu.add(layout.toggle(en.menu.functions.toggle_disable_ui, (state: boolean) => (state ? UICanvas_util.disable() : UICanvas_util.enable())));
+            Menu.add(
+                layout.toggle(en.menu.functions.toggle_disable_ui, (state: boolean) =>
+                    Il2Cpp.perform(() => {
+                        uiCanvasModule?.toggleUICanvas(!state);
+                    }, "main")
+                )
+            );
 
             Menu.add(layout.toggle(en.menu.functions.toggle_fgdebug, (state: boolean) => (state ? FGDebug.enable() : FGDebug.disable())));
 

@@ -80,7 +80,7 @@ Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 
 **Q:** Why frida 16.7.19 is used instead 17.1.4 with Android 16 support?  
 **A:** Since frida-java-menu builded on 16.7.19, It can't be loaded on 17+. Current thread is not attached to the Java VM; please move this code inside a Java.perform() callback
-- Frida 17 works in listen mode, but not in the script, because java already loaded (?)
+- Frida 17 works in listen mode, but not in the script, because java is not loaded (?)
 
 **Q:** Are emulators supported?  
 **A:** No. Emulators are not supported because they cannot handle the Java required for the menu.  
@@ -127,17 +127,17 @@ Script will be saved at the path: ./dist/agent.js
 ```
 <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 ```
-3. Download frida-gadget for frida version from requirements.txt: [arm64](https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm64.so.xz) (you need frida-gadget-FRIDA_VERSION-android-arm64.so.xz)
+3. Download frida-gadget for frida version from requirements.txt: [arm](https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm.so.xz) (you need frida-gadget-FRIDA_VERSION-android-arm.so.xz) and [arm64](https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm64.so.xz) (you need frida-gadget-FRIDA_VERSION-android-arm64.so.xz) 
 4. Install [frida-gadget injector](https://github.com/commonuserlol/fgi?tab=readme-ov-file#installing) (You can use any other way to inject frida-gadget to your APK)
 5. Extract .so file and copy downloaded frida gadget to C:\Users\YOURUSER\\.fgi\arm64.so (rename it to arm64.so as well)
 6. Inject frida-gadget
 ###### short command:
 ```
-fgi -i <path_to_your_fall_guys.apk> -a arm64 -t script -l ./dist/agent.js --offline-mode
+fgi -i <path_to_your_fall_guys.apk> -t script -l ./dist/agent.js --offline-mode
 ```
 ###### full command:
 ```
-fgi -i <path_to_your_fall_guys.apk> -a arm64 -t script -l ./dist/agent.js -n libModMenu.so -s libModMenu.s.so --offline-mode
+fgi -i <path_to_your_fall_guys.apk> -t script -l ./dist/agent.js -n libModMenu.so -s libModMenu.s.so --offline-mode
 ```
 Apk will be saved as ./your_fall_guys.patched.apk 
 

@@ -38,8 +38,6 @@ export class GraphicsModule extends BaseModule {
         this.SetShowPlayerNamesByDefault = this.PlayerInfoHUDBase.method("SetShowPlayerNamesByDefault", 1);
 
         this.set_fieldOfView = this.Camera.method("set_fieldOfView", 1);
-
-        this.onEnable();
     }
 
     public override onEnable(): void {

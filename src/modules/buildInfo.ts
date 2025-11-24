@@ -19,8 +19,6 @@ export class BuildInfoModule extends BaseModule {
         this.BuildInfo = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.BuildInfo");
 
         this.BuildInfoOnEnable = this.BuildInfo.method("OnEnable");
-
-        this.onEnable();
     }
 
     public override onEnable(): void {

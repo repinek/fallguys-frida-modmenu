@@ -40,8 +40,6 @@ export class BanBypassModule extends BaseModule {
         this.CheckAntiCheatClientServiceForError = this.MainMenuViewModel.method<boolean>("CheckAntiCheatClientServiceForError");
         // ShowAntiCheatPopup(AntiCheatError errorMessage, bool shouldQuit)
         this.ShowAntiCheatPopup = this.MainMenuViewModel.method("ShowAntiCheatPopup", 2);
-
-        this.onEnable();
     }
 
     public override onEnable(): void {

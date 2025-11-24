@@ -5,6 +5,7 @@ import { BanBypassModule } from "../modules/banBypass.js";
 import { BuildInfoModule } from "../modules/buildInfo.js";
 import { GraphicsModule } from "../modules/graphics.js";
 import { PopupManagerModule } from "../modules/popup.js";
+import { UICanvasModule } from "../modules/uiCanvas.js";
 
 import { Logger } from "../utils/logger.js";
 
@@ -15,7 +16,8 @@ export class ModuleManager {
         new BanBypassModule(),
         new BuildInfoModule(),
         new GraphicsModule(),
-        new PopupManagerModule()
+        new PopupManagerModule(),
+        new UICanvasModule(),
     ];
 
     /** Initializes all modules by calling init() in module */
@@ -25,6 +27,7 @@ export class ModuleManager {
         this.modules.forEach(module => {
             try {
                 module.init();
+                module.onEnable();
                 Logger.info(`[ModuleManager] ${module.name} loaded`);
             } catch (error: any) {
                 Logger.errorThrow(error, `[ModuleManager] Failed to load ${module.name}`);
