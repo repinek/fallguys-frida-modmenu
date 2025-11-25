@@ -3,6 +3,12 @@ import { BaseModule } from "../core/baseModule.js";
 import { I18n } from "../i18n/i18n.js";
 import { UnityUtils } from "../utils/unityUtils.js";
 
+/*
+ * Every TipToe tile has Levels::TipToe::TipToe_Platform component
+ * It has a boolean field IsFakePlatform
+ * If it returns true, we disable the GameObject using SetActive
+ */
+
 export class TipToeModule extends BaseModule {
     public name = "TipToe Manager";
 

@@ -3,6 +3,13 @@ import { BaseModule } from "../core/baseModule.js";
 import { Logger } from "../utils/logger.js";
 import { UnityUtils } from "../utils/unityUtils.js";
 
+/*
+ * Since the GvrFPS object is in the DontDestroyOnLoad scene, we can cache the Instance
+ *
+ * Scale to 0.4 (default size is too big for mobile)
+ * and enable GameObject using setActive
+ */
+
 export class FGDebugModule extends BaseModule {
     public name = "FG Debug";
 
