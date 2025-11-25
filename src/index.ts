@@ -47,7 +47,6 @@ function main() {
     const LobbyService = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.LobbyService");
     const GlobalGameStateClient = AssemblyHelper.MTFGClient.class("FGClient.GlobalGameStateClient");
     const ClientGameManager = AssemblyHelper.MTFGClient.class("FGClient.ClientGameManager");
-    const FNMMSClientRemoteService = AssemblyHelper.MTFGClient.class("FGClient.FNMMSClientRemoteService");
     const CatapultServicesManager = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager");
 
     const CharacterDataMonitor = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
@@ -67,17 +66,14 @@ function main() {
 
     const HttpNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.HttpNetworkHost");
     const WebSocketNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
-    const AnalyticsService = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Analytics.AnalyticsService");
 
     // === Methods ===
     const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
     const Init_ClientOnly_method = CatapultAnalyticsService.method("Init_ClientOnly", 3);
-    const SendEventBatch_method = AnalyticsService.method("SendEventBatch");
 
     const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
     const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
     const SendMessage_method = MPGNetMotorTasks.method("SendMessage", 1);
-    const ProcessMessageReceived_method = FNMMSClientRemoteService.method("ProcessMessageReceived");
 
     const CheckCharacterControllerData_method = CharacterDataMonitor.method("CheckCharacterControllerData", 1);
     const CanJump_method = MotorFunctionJump.method<boolean>("CanJump");
@@ -283,27 +279,6 @@ function main() {
             return;
         }
         return this.method("SendMessage", 1).invoke(bypassNetworkLOD);
-    };
-
-    SendEventBatch_method.implementation = function () {
-        if (Config.Toggles.toggleDisableAnalytics) {
-            return;
-        }
-        return this.method("SendEventBatch").invoke();
-    };
-
-    //@ts-ignore
-    ProcessMessageReceived_method.implementation = function (jsonMessage: Il2Cpp.String) {
-        if (Config.Toggles.toggleShowQueuedPlayers) {
-            Logger.debug("ProcessMessageReceived jsonMessage:", jsonMessage.content!);
-            const json = JSON.parse(jsonMessage.content!); // .content because it's Il2cpp.String
-            if (json.payload) {
-                if (json.payload.state == "Queued") {
-                    Menu.toast(`Queued Players: ${json.payload.queuedPlayers.toString()}`, 0);
-                }
-            }
-        }
-        return this.method("ProcessMessageReceived", 1).invoke(jsonMessage);
     };
 
     // Physics

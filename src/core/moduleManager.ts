@@ -5,6 +5,7 @@ import { BanBypassModule } from "../modules/banBypass.js";
 import { BuildInfoModule } from "../modules/buildInfo.js";
 import { FGDebugModule } from "../modules/fgDebug.js";
 import { GraphicsManagerModule } from "../modules/graphicsManager.js";
+import { NetworkModule } from "../modules/network.js";
 import { PopupManagerModule } from "../modules/popupManager.js";
 import { TipToeModule } from "../modules/tipToeManager.js";
 import { UICanvasModule } from "../modules/uiCanvas.js";
@@ -19,6 +20,7 @@ export class ModuleManager {
         new BuildInfoModule(),
         new FGDebugModule(),
         new GraphicsManagerModule(),
+        new NetworkModule(),
         new PopupManagerModule(),
         new TipToeModule(),
         new UICanvasModule(),
@@ -32,9 +34,9 @@ export class ModuleManager {
             try {
                 module.init();
                 module.onEnable();
-                Logger.debug(`[ModuleManager] ${module.name} loaded`);
+                Logger.debug(`[ModuleManager] ${module.name} module loaded`);
             } catch (error: any) {
-                Logger.errorThrow(error, `[ModuleManager] Failed to load ${module.name}`);
+                Logger.errorThrow(error, `[ModuleManager] Failed to load ${module.name} module`);
             }
         });
 

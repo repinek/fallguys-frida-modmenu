@@ -44,11 +44,6 @@ export class Logger {
         console.error(`${this.getTime()} ${this.RED}[ERROR]${this.RESET}`, ...args);
     }
 
-    public static warnThrow(error: any, message: string = "") {
-        this.warn(`${message} ${error.stack}`);
-        Menu.toast(`${message} ${error.message}`, 1);
-    }
-
     /**
      * Error log and showing toast for 3.5s
      *
