@@ -6,6 +6,7 @@ import { BuildInfoModule } from "../modules/buildInfo.js";
 import { FGDebugModule } from "../modules/fgDebug.js";
 import { GraphicsManagerModule } from "../modules/graphicsManager.js";
 import { PopupManagerModule } from "../modules/popupManager.js";
+import { TipToeModule } from "../modules/tipToeManager.js";
 import { UICanvasModule } from "../modules/uiCanvas.js";
 
 import { Logger } from "../utils/logger.js";
@@ -19,6 +20,7 @@ export class ModuleManager {
         new FGDebugModule(),
         new GraphicsManagerModule(),
         new PopupManagerModule(),
+        new TipToeModule(),
         new UICanvasModule(),
     ];
 

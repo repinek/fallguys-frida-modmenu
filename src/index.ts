@@ -12,6 +12,7 @@ import { GraphicsManagerModule } from "./modules/graphicsManager.js";
 import { BuildInfoModule } from "./modules/buildInfo.js";
 import { FGDebugModule } from "./modules/fgDebug.js";
 import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./modules/popupManager.js";
+import { TipToeModule } from "./modules/tipToeManager.js";
 import { UICanvasModule } from "./modules/uiCanvas.js";
 
 import { I18n } from "./i18n/i18n.js";
@@ -59,7 +60,6 @@ function main() {
     const SpawnableCollectable = AssemblyHelper.TheMultiplayerGuys.class("Levels.ScoreZone.SpawnableCollectable"); // bubble unity
     const COMMON_ScoringBubble = AssemblyHelper.TheMultiplayerGuys.class("Levels.Progression.COMMON_ScoringBubble"); // bubble creative
     const ScoredButton = AssemblyHelper.TheMultiplayerGuys.class("ScoredButton"); // trigger button unity
-    const TipToe_Platform = AssemblyHelper.TheMultiplayerGuys.class("Levels.TipToe.TipToe_Platform");
     const FakeDoorController = AssemblyHelper.TheMultiplayerGuys.class("Levels.DoorDash.FakeDoorController");
     const CrownMazeDoor = AssemblyHelper.TheMultiplayerGuys.class("Levels.CrownMaze.CrownMazeDoor");
     // const FollowTheLeaderZone = AssemblyHelper.TheMultiplayerGuys.class("Levels.ScoreZone.FollowTheLeader.FollowTheLeaderZone"); // leading light
@@ -490,21 +490,6 @@ function main() {
         }
     };
 
-    const showTipToePath = () => {
-        try {
-            const tiptoePlatformArray = UnityUtils.findObjectsOfTypeAll(TipToe_Platform);
-            for (const tiptoe of tiptoePlatformArray) {
-                const isTiptoeFake = tiptoe.method<boolean>("get_IsFakePlatform").invoke();
-                if (isTiptoeFake) {
-                    const tiptoeObject = tiptoe.method<Il2Cpp.Object>("get_gameObject").invoke();
-                    tiptoeObject.method("SetActive").invoke(false);
-                }
-            }
-        } catch (error: any) {
-            Logger.errorThrow(error);
-        }
-    };
-
     const initMenu = () => {
         try {
             const layout = new Menu.ObsidianLayout(ObsidianConfig);
@@ -514,7 +499,9 @@ function main() {
             const graphicsModule = ModuleManager.get(GraphicsManagerModule);
             const popupManagerModule = ModuleManager.get(PopupManagerModule);
             const buildInfoModule = ModuleManager.get(BuildInfoModule);
+            const tipToeModule = ModuleManager.get(TipToeModule);
             const fgDebugModule = ModuleManager.get(FGDebugModule);
+
             const uiCanvasModule = ModuleManager.get(UICanvasModule);
 
             if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
@@ -636,7 +623,13 @@ function main() {
                 })
             );
 
-            Menu.add(layout.button(en.menu.functions.show_tiptoe_path, showTipToePath));
+            Menu.add(
+                layout.button(en.menu.functions.show_tiptoe_path, () =>
+                    Il2Cpp.perform(() => {
+                        tipToeModule?.removeFakeTipToe();
+                    }, "main")
+                )
+            );
 
             // === Teleports Tab ===
             const teleports = layout.textView(en.menu.tabs.teleports_tab);

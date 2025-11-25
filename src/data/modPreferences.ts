@@ -1,5 +1,5 @@
 export const ModPreferences = {
-    VERSION: "2.67", // Don't forget update after changes!
+    VERSION: "2.68", // Don't forget update after changes!
     ENV: "release", // dev, staging, release
     FOR_GAME_VERSION: "21.0.1"
 };
@@ -9,6 +9,7 @@ export const ModPreferences = {
 something with classes like vector3, which will be used in different modules, like, how to make it global? 
 nvm moved to unitytools...
 
+improve logging at modules
 move teleport manager from utils
 refactor localization (info and other)
 logcat logging
