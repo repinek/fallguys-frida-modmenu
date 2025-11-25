@@ -19,9 +19,9 @@ export enum OkButtonType_enum {
 }
 
 export class PopupManagerModule extends BaseModule {
-    public name = "PopupManager Module";
+    public name = "PopupManager Manager";
 
-    // Classes
+    // Classes and Instances
     private PopupManager!: Il2Cpp.Class;
     private _popupManagerInstance?: Il2Cpp.Object;
     private ModalMessageData!: Il2Cpp.Class;
@@ -47,7 +47,7 @@ export class PopupManagerModule extends BaseModule {
 
     public showPopup(title: string, message: string, modalType: ModalType_enum, okButtonType: OkButtonType_enum): void {
         try {
-            Logger.debug("Showing popup:", title, message, modalType, okButtonType);
+            Logger.info("Showing popup:", title, message, modalType, okButtonType);
             const ShowModalMessageDataInstance = this.PopupManagerInstance!.method<boolean>("Show", 3).overload(
                 "FGClient.UI.PopupInteractionType",
                 "FGClient.UI.ModalMessageData",
@@ -55,9 +55,8 @@ export class PopupManagerModule extends BaseModule {
             );
 
             // 2 arg
-            // Create new instance of ModalMessageData class. Btw, you can't create it in one line, it will return undefined (uhh?)
             const newModalMessageData = this.ModalMessageData.alloc();
-            newModalMessageData.method<Il2Cpp.Object>(".ctor").invoke();
+            newModalMessageData.method(".ctor").invoke();
 
             newModalMessageData.field<Il2Cpp.ValueType>("LocaliseTitle").value = this.NotLocalised;
             newModalMessageData.field<Il2Cpp.ValueType>("LocaliseMessage").value = this.NotLocalised;

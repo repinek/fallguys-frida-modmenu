@@ -8,9 +8,10 @@ import { ModPreferences } from "./data/modPreferences.js";
 import { ObsidianConfig } from "./data/menuConfig.js";
 import { Config } from "./data/config.js";
 
-import { GraphicsModule } from "./modules/graphics.js";
+import { GraphicsManagerModule } from "./modules/graphicsManager.js";
 import { BuildInfoModule } from "./modules/buildInfo.js";
-import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./modules/popup.js";
+import { FGDebugModule } from "./modules/fgDebug.js";
+import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./modules/popupManager.js";
 import { UICanvasModule } from "./modules/uiCanvas.js";
 
 import { I18n } from "./i18n/i18n.js";
@@ -40,7 +41,6 @@ function main() {
     ModuleManager.initAll();
 
     // === Classes ===
-    const Vector3class = AssemblyHelper.CoreModule.class("UnityEngine.Vector3");
     const SceneManager = AssemblyHelper.CoreModule.class("UnityEngine.SceneManagement.SceneManager");
 
     const LobbyService = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.LobbyService");
@@ -53,8 +53,6 @@ function main() {
     const MotorFunctionJump = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
     const MPGNetMotorTasks = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks"); // MPG - The Multiplayer Group
     const CatapultAnalyticsService = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.CatapultAnalyticsService");
-
-    const DebugClass = AssemblyHelper.TheMultiplayerGuys.class("GvrFPS"); // FGDebug
 
     const ObjectiveReachEndZone = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone"); // finish
     const GrabToQualify = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crown
@@ -88,7 +86,6 @@ function main() {
     let FallGuysCharacterController_Instance: Il2Cpp.Object;
     let CharacterControllerData_Instance: Il2Cpp.Object;
     let JumpMotorFunction_Instance: Il2Cpp.Object;
-    let FGDebug_Instance: Il2Cpp.Object;
     let GlobalGameStateClient_Instance: Il2Cpp.Object;
     let ClientGameManager_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in GameLevelLoaded
 
@@ -229,9 +226,9 @@ function main() {
 
             Menu.waitForInit(initMenu);
             reachedMainMenu = true;
-            if (Config.Toggles.toggleFGDebug) {
-                FGDebug.enable(); // may cause error, frida & il2cpp-bridge lore, so unstable tbh
-            }
+            // if (Config.Toggles.toggleFGDebug) {
+            //     FGDebug.enable(); // may cause error, frida & il2cpp-bridge lore, so unstable tbh. UPD: no, i'm just dumb
+            // }
         }
 
         return this.method("OnMainMenuDisplayed", 1).invoke(event);
@@ -358,41 +355,6 @@ function main() {
     };
 
     // === Functions ===
-    const FGDebug = {
-        enable() {
-            Config.Toggles.toggleFGDebug = true;
-
-            if (!reachedMainMenu) {
-                return; // it will enable after hook onMainMenuDisplayed
-            }
-
-            try {
-                FGDebug_Instance = UnityUtils.findObjectsOfTypeAll(DebugClass).get(0); // find object with debug class
-
-                const localScale = Vector3class.alloc().unbox();
-                localScale.method(".ctor", 3).invoke(0.4, 0.4, 0.4); // new scale (original is 0.6, too big)
-
-                // prettier-ignore
-                FGDebug_Instance
-                .method<Il2Cpp.Object>("get_transform").invoke()
-                .method<Il2Cpp.Object>("set_localScale").invoke(localScale);
-
-                const gameObject = FGDebug_Instance.method<Il2Cpp.Object>("get_gameObject").invoke();
-                gameObject.method("SetActive").invoke(true);
-            } catch (error: any) {
-                Logger.errorThrow(error);
-            }
-        },
-        disable() {
-            Config.Toggles.toggleFGDebug = false;
-            FGDebug_Instance = UnityUtils.findObjectsOfTypeAll(DebugClass).get(0);
-            if (FGDebug_Instance) {
-                const gameObject = FGDebug_Instance.method<Il2Cpp.Object>("get_gameObject").invoke();
-                gameObject.method("SetActive").invoke(false);
-            }
-        }
-    };
-
     const teleportToFinish = () => {
         if (!TeleportManager.checkCooldown()) return;
 
@@ -549,9 +511,10 @@ function main() {
             const composer = new Menu.Composer(en.info.name, en.info.warn, layout);
             composer.icon(Config.MOD_MENU_ICON_URL, "Web");
 
-            const graphicsModule = ModuleManager.get(GraphicsModule);
+            const graphicsModule = ModuleManager.get(GraphicsManagerModule);
             const popupManagerModule = ModuleManager.get(PopupManagerModule);
             const buildInfoModule = ModuleManager.get(BuildInfoModule);
+            const fgDebugModule = ModuleManager.get(FGDebugModule);
             const uiCanvasModule = ModuleManager.get(UICanvasModule);
 
             if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
@@ -717,7 +680,13 @@ function main() {
                 )
             );
 
-            Menu.add(layout.toggle(en.menu.functions.toggle_fgdebug, (state: boolean) => (state ? FGDebug.enable() : FGDebug.disable())));
+            Menu.add(
+                layout.toggle(en.menu.functions.toggle_fgdebug, (state: boolean) =>
+                    Il2Cpp.perform(() => {
+                        fgDebugModule?.toggleFGDebug(state);
+                    }, "main")
+                )
+            );
 
             Menu.add(
                 layout.toggle(en.menu.functions.toggle_disable_analytics, (state: boolean) => {

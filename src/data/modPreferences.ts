@@ -1,11 +1,14 @@
 export const ModPreferences = {
-    VERSION: "2.65", // Don't forget update after changes!
+    VERSION: "2.67", // Don't forget update after changes!
     ENV: "release", // dev, staging, release
     FOR_GAME_VERSION: "21.0.1"
 };
 
 /*
 !! TODO: 
+something with classes like vector3, which will be used in different modules, like, how to make it global? 
+nvm moved to unitytools...
+
 move teleport manager from utils
 refactor localization (info and other)
 logcat logging
@@ -20,7 +23,8 @@ custom image on loading screen
 login by token
 config file (?)
 log file
-all cosmetics lobby
+all cosmetics lobby (?)
+comments over module
 
 maybe:
 refactor structure of project / script (all script in one file :cry:)

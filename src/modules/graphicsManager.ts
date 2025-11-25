@@ -3,8 +3,8 @@ import { BaseModule } from "../core/baseModule.js";
 import { Config } from "../data/config.js";
 import { Logger } from "../utils/logger.js";
 
-export class GraphicsModule extends BaseModule {
-    public name = "Graphics Module";
+export class GraphicsManagerModule extends BaseModule {
+    public name = "Graphics Manager";
 
     // Classes and Instances
     private GraphicsSettings!: Il2Cpp.Class;

@@ -5,13 +5,15 @@ import { Config } from "../data/config.js";
 export class UnityUtils {
     // Classes
     private static Resources: Il2Cpp.Class;
+    private static Vector3: Il2Cpp.Class;
 
     public static init() {
         this.Resources = AssemblyHelper.CoreModule.class("UnityEngine.Resources");
+        this.Vector3 = AssemblyHelper.CoreModule.class("UnityEngine.Vector3");
         Logger.info("[UnityUtils] Initialized");
     }
 
-    /** Wrapper over UnityEngine.Resources.FindObjectsOfTypeAll */
+    /** Wrapper over UnityEngine::Resources::FindObjectsOfTypeAll */
     public static findObjectsOfTypeAll(klass: Il2Cpp.Class): Il2Cpp.Array<Il2Cpp.Object> {
         return this.Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
     }
@@ -25,6 +27,13 @@ export class UnityUtils {
         }
 
         return instanceMethod.invoke();
+    }
+
+    /** Wrapper over UnityEngine::Vector3::.ctor */
+    public static createVector3(x: number, y: number, z: number): Il2Cpp.ValueType {
+        const vec = this.Vector3.alloc().unbox();
+        vec.method(".ctor", 3).invoke(x, y, z);
+        return vec;
     }
 }
 

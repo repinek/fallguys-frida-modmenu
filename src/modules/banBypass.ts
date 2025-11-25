@@ -4,7 +4,7 @@ import { BaseModule } from "../core/baseModule.js";
 
 import { I18n } from "../i18n/i18n.js";
 
-import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./popup.js";
+import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./popupManager.js";
 import { Logger } from "../utils/logger.js";
 
 /*
@@ -25,7 +25,7 @@ import { Logger } from "../utils/logger.js";
  */
 
 export class BanBypassModule extends BaseModule {
-    public name = "BanBypass Module";
+    public name = "Ban Bypass";
 
     // Classes
     private MainMenuViewModel!: Il2Cpp.Class;

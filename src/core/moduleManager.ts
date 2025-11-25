@@ -3,8 +3,9 @@ import { BaseModule } from "./baseModule.js";
 import { AntiAFKModule } from "../modules/antiAFK.js";
 import { BanBypassModule } from "../modules/banBypass.js";
 import { BuildInfoModule } from "../modules/buildInfo.js";
-import { GraphicsModule } from "../modules/graphics.js";
-import { PopupManagerModule } from "../modules/popup.js";
+import { FGDebugModule } from "../modules/fgDebug.js";
+import { GraphicsManagerModule } from "../modules/graphicsManager.js";
+import { PopupManagerModule } from "../modules/popupManager.js";
 import { UICanvasModule } from "../modules/uiCanvas.js";
 
 import { Logger } from "../utils/logger.js";
@@ -15,7 +16,8 @@ export class ModuleManager {
         new AntiAFKModule(),
         new BanBypassModule(),
         new BuildInfoModule(),
-        new GraphicsModule(),
+        new FGDebugModule(),
+        new GraphicsManagerModule(),
         new PopupManagerModule(),
         new UICanvasModule(),
     ];
@@ -28,11 +30,13 @@ export class ModuleManager {
             try {
                 module.init();
                 module.onEnable();
-                Logger.info(`[ModuleManager] ${module.name} loaded`);
+                Logger.debug(`[ModuleManager] ${module.name} loaded`);
             } catch (error: any) {
                 Logger.errorThrow(error, `[ModuleManager] Failed to load ${module.name}`);
             }
         });
+
+        Logger.info("[ModuleManager] All modules Initialized");
     }
 
     /**

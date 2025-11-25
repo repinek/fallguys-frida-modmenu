@@ -3,9 +3,9 @@ import { BaseModule } from "../core/baseModule.js";
 import { UnityUtils } from "../utils/unityUtils.js";
 
 export class UICanvasModule extends BaseModule {
-    public name = "UICanvas Module";
+    public name = "UICanvas";
 
-    // Classes
+    // Classes and Instances
     private UICanvas!: Il2Cpp.Class;
     private _uiCanvasInstance!: Il2Cpp.Object;
 

@@ -3,7 +3,7 @@ import { BaseModule } from "../core/baseModule.js";
 import { Logger } from "../utils/logger.js";
 
 export class BuildInfoModule extends BaseModule {
-    public name = "BuildInfo Module";
+    public name = "Build Info";
 
     // Classes
     private BuildInfo!: Il2Cpp.Class;
