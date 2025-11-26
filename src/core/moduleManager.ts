@@ -12,7 +12,7 @@ import { PopupManagerModule } from "../modules/popupManager.js";
 import { TipToeModule } from "../modules/tipToeManager.js";
 import { UICanvasModule } from "../modules/uiCanvas.js";
 
-import { Logger } from "../utils/logger.js";
+import { Logger } from "../logger/logger.js";
 
 export class ModuleManager {
     // prettier-ignore

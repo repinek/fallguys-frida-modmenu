@@ -5,7 +5,7 @@ import { BaseModule } from "../core/baseModule.js";
 import { I18n } from "../i18n/i18n.js";
 
 import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./popupManager.js";
-import { Logger } from "../utils/logger.js";
+import { Logger } from "../logger/logger.js";
 
 /*
  * Temporary bans can't be bypassed, but permament can be lol

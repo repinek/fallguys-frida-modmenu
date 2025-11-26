@@ -1,7 +1,7 @@
 import { Config } from "../data/config.js";
 import { ModPreferences } from "../data/modPreferences.js";
 import * as JavaUtils from "./javaUtils.js";
-import { Logger } from "./logger.js";
+import { Logger } from "../logger/logger.js";
 
 export class UpdateUtils {
     public static checkForUpdate(): void {

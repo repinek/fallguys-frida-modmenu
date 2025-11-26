@@ -2,7 +2,7 @@ import { AssemblyHelper } from "../core/assemblyHelper.js";
 import { BaseModule } from "../core/baseModule.js";
 
 import { Config } from "../data/config.js";
-import { Logger } from "../utils/logger.js";
+import { Logger } from "../logger/logger.js";
 
 export class CharacterPhysicsModule extends BaseModule {
     public name = "CharacterPhysics";
@@ -114,6 +114,7 @@ export class CharacterPhysicsModule extends BaseModule {
             characterRigidBody.method<void>("set_isKinematic").invoke(state);
         } catch (error: any) {
             Logger.warn(`[${this.name}::freezePlayer] No character Instance found: ${error.name}`);
+            //Menu.toast()
         }
 
     }

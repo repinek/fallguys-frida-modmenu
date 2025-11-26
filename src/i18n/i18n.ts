@@ -1,5 +1,5 @@
 import { getSystemLocale } from "../utils/javaUtils.js";
-import { Logger } from "../utils/logger.js";
+import { Logger } from "../logger/logger.js";
 
 import en from "./localization/en.json";
 import ru from "./localization/ru.json";

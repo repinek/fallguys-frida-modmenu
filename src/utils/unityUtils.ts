@@ -1,5 +1,5 @@
 import { AssemblyHelper } from "../core/assemblyHelper.js";
-import { Logger } from "./logger.js";
+import { Logger } from "../logger/logger.js";
 import { Config } from "../data/config.js";
 
 export class UnityUtils {

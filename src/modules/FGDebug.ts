@@ -1,6 +1,6 @@
 import { AssemblyHelper } from "../core/assemblyHelper.js";
 import { BaseModule } from "../core/baseModule.js";
-import { Logger } from "../utils/logger.js";
+import { Logger } from "../logger/logger.js";
 import { UnityUtils } from "../utils/unityUtils.js";
 
 /*

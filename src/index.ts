@@ -21,7 +21,7 @@ import en from "./i18n/localization/en.json";
 
 import { UnityUtils, TeleportManager } from "./utils/unityUtils.js";
 import * as javaUtils from "./utils/javaUtils.js";
-import { Logger } from "./utils/logger.js";
+import { Logger } from "./logger/logger.js";
 import { UpdateUtils } from "./utils/updateUtils.js";
 
 // WIP CODE !! working to refactor it
