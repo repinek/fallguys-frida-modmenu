@@ -15,7 +15,7 @@ export class AntiAFKModule extends BaseModule {
     public init(): void {
         this.AFKManager = AssemblyHelper.MTFGClient.class("FGClient.AFKManager");
 
-        this.AFKManagerStart = this.AFKManager.method("Start");
+        this.AFKManagerStart = this.AFKManager.method<void>("Start");
     }
 
     public override onEnable(): void {

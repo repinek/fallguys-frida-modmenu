@@ -30,12 +30,12 @@ export class GraphicsManagerModule extends BaseModule {
         this.Camera = AssemblyHelper.CoreModule.class("UnityEngine.Camera");
 
         this.get_TargetFrameRate = this.GraphicsSettings.method<number>("get_TargetFrameRate");
-        this.set_TargetFrameRate = this.GraphicsSettings.method("set_TargetFrameRate", 1);
+        this.set_TargetFrameRate = this.GraphicsSettings.method<void>("set_TargetFrameRate", 1);
         this.get_ResolutionScale = this.GraphicsSettings.method<number>("get_ResolutionScale");
-        this.set_ResolutionScale = this.GraphicsSettings.method("set_ResolutionScale", 1);
+        this.set_ResolutionScale = this.GraphicsSettings.method<void>("set_ResolutionScale", 1);
 
         this.get_ShowNames = this.PlayerInfoHUDBase.method<boolean>("get_ShowNames");
-        this.SetShowPlayerNamesByDefault = this.PlayerInfoHUDBase.method("SetShowPlayerNamesByDefault", 1);
+        this.SetShowPlayerNamesByDefault = this.PlayerInfoHUDBase.method<void>("SetShowPlayerNamesByDefault", 1);
 
         this.set_fieldOfView = this.Camera.method("set_fieldOfView", 1);
     }
@@ -48,9 +48,9 @@ export class GraphicsManagerModule extends BaseModule {
             return 1337; // litterally unlimited, because it's linked to the screen refresh rate
         };
 
-        this.set_TargetFrameRate.implementation = function (fps) {
+        this.set_TargetFrameRate.implementation = function (fps): void {
             Logger.hook("set_TargetFrameRate called with args:", fps);
-            return this.method("set_TargetFrameRate", 1).invoke(1337);
+            return this.method<void>("set_TargetFrameRate", 1).invoke(1337);
         };
 
         this.get_ResolutionScale.implementation = function (): number {
@@ -59,17 +59,17 @@ export class GraphicsManagerModule extends BaseModule {
             return Config.CustomValues.ResolutionScale;
         };
 
-        this.set_ResolutionScale.implementation = function (scale) {
+        this.set_ResolutionScale.implementation = function (scale): void {
             Logger.hook("set_ResolutionScale called with args:", scale);
-            return this.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale);
+            return this.method<void>("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale);
         };
 
-        this.set_fieldOfView.implementation = function (value) {
+        this.set_fieldOfView.implementation = function (value): void {
             module.CameraInstance = this;
             if (Config.Toggles.toggleCustomFov) {
                 value = Config.CustomValues.FOV;
             }
-            return this.method("set_fieldOfView", 1).invoke(value);
+            return this.method<void>("set_fieldOfView", 1).invoke(value);
         };
     }
 

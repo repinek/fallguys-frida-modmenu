@@ -18,19 +18,19 @@ export class BuildInfoModule extends BaseModule {
     public init(): void {
         this.BuildInfo = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.BuildInfo");
 
-        this.BuildInfoOnEnable = this.BuildInfo.method("OnEnable");
+        this.BuildInfoOnEnable = this.BuildInfo.method<void>("OnEnable");
     }
 
     public override onEnable(): void {
         const module = this;
 
-        this.BuildInfoOnEnable.implementation = function () {
+        this.BuildInfoOnEnable.implementation = function (): void {
             Logger.hook("BuildInfo::OnEnable called");
             module.gameVersion = Il2Cpp.application.version!;
             module.buildNumber = this.field<Il2Cpp.String>("buildNumber").value.content!;
             module.buildDate = this.field<Il2Cpp.String>("buildDate").value.content!;
 
-            return this.method("OnEnable").invoke();
+            return this.method<void>("OnEnable").invoke();
         };
     }
 

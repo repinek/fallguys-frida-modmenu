@@ -26,13 +26,13 @@ export class CatapultModule extends BaseModule {
         this.HttpNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.HttpNetworkHost");
         this.WebSocketNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
 
-        this.BuildCatapultConfig = this.CatapultServicesManager.method("BuildCatapultConfig");
-        this.WebSocketNetworkHostCtor = this.WebSocketNetworkHost.method(".ctor", 3);
+        this.BuildCatapultConfig = this.CatapultServicesManager.method<Il2Cpp.Object>("BuildCatapultConfig");
+        this.WebSocketNetworkHostCtor = this.WebSocketNetworkHost.method<void>(".ctor", 3);
 
         this.fetchSpoofData();
     }
 
-    public onEnable(): void {
+    public override onEnable(): void {
         const module = this;
 
         this.BuildCatapultConfig.implementation = function (): Il2Cpp.Object {
@@ -67,7 +67,7 @@ export class CatapultModule extends BaseModule {
         };
 
         //@ts-ignore
-        this.WebSocketNetworkHostCtor.implementation = function (serverAddress: Il2Cpp.String, port: number, isSecure: boolean) {
+        this.WebSocketNetworkHostCtor.implementation = function (serverAddress: Il2Cpp.String, port: number, isSecure: boolean): void {
             Logger.hook("WebSocketNetworkHost::.ctor called with args:", serverAddress, port, isSecure);
 
             if (Config.USE_CUSTOM_SERVER) {
@@ -80,7 +80,7 @@ export class CatapultModule extends BaseModule {
                 }
             }
 
-            return this.method(".ctor", 3).invoke(serverAddress, port, isSecure);
+            return this.method<void>(".ctor", 3).invoke(serverAddress, port, isSecure);
         };
     }
 

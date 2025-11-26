@@ -8,7 +8,6 @@ import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./popupMa
 import { Logger } from "../utils/logger.js";
 
 /*
- * === Permanent Ban Bypass Logic ===
  * Temporary bans can't be bypassed, but permament can be lol
  *
  * 1. MainMenuViewModel::CheckAntiCheatClientServiceForError
@@ -38,8 +37,8 @@ export class BanBypassModule extends BaseModule {
         this.MainMenuViewModel = AssemblyHelper.MTFGClient.class("FGClient.MainMenuViewModel");
 
         this.CheckAntiCheatClientServiceForError = this.MainMenuViewModel.method<boolean>("CheckAntiCheatClientServiceForError");
-        // ShowAntiCheatPopup(AntiCheatError errorMessage, bool shouldQuit)
-        this.ShowAntiCheatPopup = this.MainMenuViewModel.method("ShowAntiCheatPopup", 2);
+        // void ShowAntiCheatPopup(AntiCheatError errorMessage, bool shouldQuit)
+        this.ShowAntiCheatPopup = this.MainMenuViewModel.method<void>("ShowAntiCheatPopup", 2);
     }
 
     public override onEnable(): void {

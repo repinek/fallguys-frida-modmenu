@@ -18,22 +18,22 @@ export class NetworkModule extends BaseModule {
         this.AnalyticsService = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Analytics.AnalyticsService");
         this.FNMMSClientRemoteService = AssemblyHelper.MTFGClient.class("FGClient.FNMMSClientRemoteService");
 
-        this.SendEventBatch = this.AnalyticsService.method("SendEventBatch");
-        this.ProcessMessageReceived = this.FNMMSClientRemoteService.method("ProcessMessageReceived");
+        this.SendEventBatch = this.AnalyticsService.method<void>("SendEventBatch");
+        this.ProcessMessageReceived = this.FNMMSClientRemoteService.method<void>("ProcessMessageReceived");
     }
 
     public override onEnable(): void {
         const module = this;
 
-        this.SendEventBatch.implementation = function () {
+        this.SendEventBatch.implementation = function (): void {
             if (Config.Toggles.toggleDisableAnalytics) {
                 return;
             }
-            return this.method("SendEventBatch").invoke();
+            return this.method<void>("SendEventBatch").invoke();
         };
 
         //@ts-ignore
-        this.ProcessMessageReceived.implementation = function (jsonMessage: Il2Cpp.String) {
+        this.ProcessMessageReceived.implementation = function (jsonMessage: Il2Cpp.String): void {
             if (Config.Toggles.toggleShowQueuedPlayers) {
                 const json = JSON.parse(jsonMessage.content!); // .content because it's Il2cpp.String
                 Logger.debug(`[${module.name}] Received matchmaking message: ${jsonMessage.content!}`);
@@ -43,7 +43,7 @@ export class NetworkModule extends BaseModule {
                     Menu.toast(`Queued Players: ${json.payload.queuedPlayers.toString()}`, 0); // TODO: add localization
                 }
             }
-            return this.method("ProcessMessageReceived", 1).invoke(jsonMessage);
+            return this.method<void>("ProcessMessageReceived", 1).invoke(jsonMessage);
         };
     }
 }

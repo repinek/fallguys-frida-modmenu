@@ -35,6 +35,11 @@ export class UnityUtils {
         vector.method(".ctor", 3).invoke(x, y, z);
         return vector;
     }
+
+    /** Wrapper over constructor.name */
+    public static getTypeName(object: any) {
+        return object.constructor.name;
+    }
 }
 
 // TODO: move to module

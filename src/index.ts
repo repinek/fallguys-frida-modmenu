@@ -9,7 +9,8 @@ import { ObsidianConfig } from "./data/menuConfig.js";
 import { Config } from "./data/config.js";
 
 import { GraphicsManagerModule } from "./modules/graphicsManager.js";
-import { BuildInfoModule } from "./modules/buildInfo.js";
+import { BuildInfoModule } from "./modules/buildInfo.js"
+import { CharacterPhysicsModule } from "./modules/characterPhysics.js";;
 import { FGDebugModule } from "./modules/fgDebug.js";
 import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./modules/popupManager.js";
 import { TipToeModule } from "./modules/tipToeManager.js";
@@ -51,10 +52,6 @@ function main() {
     const GlobalGameStateClient = AssemblyHelper.MTFGClient.class("FGClient.GlobalGameStateClient");
     const ClientGameManager = AssemblyHelper.MTFGClient.class("FGClient.ClientGameManager");
 
-    const CharacterDataMonitor = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
-    const MotorFunctionJump = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
-    const MPGNetMotorTasks = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks"); // MPG - The Multiplayer Group
-
     const ObjectiveReachEndZone = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone"); // finish
     const GrabToQualify = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crown
     const SpawnableCollectable = AssemblyHelper.TheMultiplayerGuys.class("Levels.ScoreZone.SpawnableCollectable"); // bubble unity
@@ -68,15 +65,8 @@ function main() {
     // === Methods ===
     const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
     const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
-    const SendMessage_method = MPGNetMotorTasks.method("SendMessage", 1);
-
-    const CheckCharacterControllerData_method = CharacterDataMonitor.method("CheckCharacterControllerData", 1);
-    const CanJump_method = MotorFunctionJump.method<boolean>("CanJump");
 
     // === Cache ===
-    let FallGuysCharacterController_Instance: Il2Cpp.Object;
-    let CharacterControllerData_Instance: Il2Cpp.Object;
-    let JumpMotorFunction_Instance: Il2Cpp.Object;
     let GlobalGameStateClient_Instance: Il2Cpp.Object;
     let ClientGameManager_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in GameLevelLoaded
 
@@ -156,60 +146,7 @@ function main() {
         return this.method("GameLevelLoaded", 1).invoke(ugcLevelHash);
     };
 
-    SendMessage_method.implementation = function (bypassNetworkLOD) {
-        if (Config.Toggles.toggleDontSendFallGuyState) {
-            return;
-        }
-        return this.method("SendMessage", 1).invoke(bypassNetworkLOD);
-    };
-
-    // Physics
-    CheckCharacterControllerData_method.implementation = function (character: any) {
-        FallGuysCharacterController_Instance = character;
-        CharacterControllerData_Instance = character.method("get_Data").invoke(); // get Data instance
-        JumpMotorFunction_Instance = character.method("get_JumpMotorFunction").invoke(); // get JumpMotorFunction
-
-        CharacterControllerData_Instance.field("divePlayerSensitivity").value = Config.Toggles.toggle360Dives
-            ? 69420
-            : Config.DefaultValues.divePlayerSensitivity;
-
-        CharacterControllerData_Instance.field("normalMaxSpeed").value = Config.Toggles.toggleCustomSpeed
-            ? Config.CustomValues.normalMaxSpeed
-            : Config.DefaultValues.normalMaxSpeed;
-        CharacterControllerData_Instance.field("carryMaxSpeed").value = Config.Toggles.toggleCustomSpeed
-            ? Config.CustomValues.normalMaxSpeed
-            : Config.DefaultValues.carryMaxSpeed;
-        CharacterControllerData_Instance.field("grabbingMaxSpeed").value = Config.Toggles.toggleCustomSpeed
-            ? Config.CustomValues.normalMaxSpeed
-            : Config.DefaultValues.grabbingMaxSpeed;
-
-        CharacterControllerData_Instance.field("maxGravityVelocity").value = Config.Toggles.toggleCustomVelocity
-            ? Config.Toggles.toggleNoVelocity
-                ? 0 // if enable no velocity
-                : Config.Toggles.toggleNegativeVelocity
-                  ? -Config.CustomValues.maxGravityVelocity // if enable negative velocity
-                  : Config.CustomValues.maxGravityVelocity
-            : Config.DefaultValues.maxGravityVelocity;
-
-        CharacterControllerData_Instance.field("diveForce").value = Config.Toggles.toggleCustomDiveForce
-            ? Config.CustomValues.diveForce
-            : Config.DefaultValues.diveForce;
-        CharacterControllerData_Instance.field("airDiveForce").value = Config.Toggles.toggleCustomDiveForce
-            ? Config.CustomValues.diveForce / Config.DefaultValues.diveMultiplier
-            : Config.DefaultValues.airDiveForce;
-
-        const jumpForce = JumpMotorFunction_Instance.field<Il2Cpp.Object>("_jumpForce").value;
-        jumpForce.field("y").value = Config.Toggles.toggleCustomJumpForce ? Config.CustomValues.jumpForce : Config.DefaultValues.jumpForce;
-
-        return true;
-    };
-
-    CanJump_method.implementation = function () {
-        if (Config.Toggles.toggleAirJump) {
-            return true;
-        }
-        return this.method<boolean>("CanJump").invoke();
-    };
+    // deprecated: Physics, moved to modules/characterPhysics.ts
 
     // === Functions ===
     const teleportToFinish = () => {
@@ -229,16 +166,17 @@ function main() {
         }
 
         const finishObject = endZoneObject! ?? crownObject!;
-        if (finishObject) {
-            TeleportManager.teleportTo(FallGuysCharacterController_Instance, finishObject);
-        } else {
-            Menu.toast(en.messages.no_finish, 0);
-        }
+        // if (finishObject) {
+        //     TeleportManager.teleportTo(FallGuysCharacterController_Instance, finishObject);
+        // } else {
+        //     Menu.toast(en.messages.no_finish, 0);
+        // }
     };
 
     const teleportToScore = () => {
         if (!TeleportManager.checkCooldown()) return;
 
+        /*
         try {
             const unityBubblesArray = UnityUtils.findObjectsOfTypeAll(SpawnableCollectable);
             const creativeBubblesArray = UnityUtils.findObjectsOfTypeAll(COMMON_ScoringBubble);
@@ -272,7 +210,7 @@ function main() {
                 }
             }
 
-            /*
+            /* // creates
             for (const scoreZone of creativeScoreZonesArray) {
                 if (scoreZone.field<boolean>("_useForPointScoring").value) {
                     if (scoreZone.field<number>("_pointsScored").value > 0) {
@@ -286,26 +224,12 @@ function main() {
                 teleportTo(scoreZone);
                 return;
             }
-            */
+            // return here
         } catch (error: any) {
             Logger.errorThrow(error);
         }
+        */
         Menu.toast(en.messages.no_score, 0);
-    };
-
-    const freezePlayer = {
-        enable() {
-            if (FallGuysCharacterController_Instance) {
-                const characterRigidBody = FallGuysCharacterController_Instance.method<Il2Cpp.Object>("get_RigidBody").invoke();
-                characterRigidBody.method("set_isKinematic").invoke(true);
-            }
-        },
-        disable() {
-            if (FallGuysCharacterController_Instance) {
-                const characterRigidBody = FallGuysCharacterController_Instance.method<Il2Cpp.Object>("get_RigidBody").invoke();
-                characterRigidBody.method("set_isKinematic").invoke(false);
-            }
-        }
     };
 
     const showServerDetails = () => {
@@ -353,11 +277,13 @@ function main() {
             const composer = new Menu.Composer(en.info.name, en.info.warn, layout);
             composer.icon(Config.MOD_MENU_ICON_URL, "Web");
 
+            // TODO: fix sequence 
             const graphicsModule = ModuleManager.get(GraphicsManagerModule);
             const popupManagerModule = ModuleManager.get(PopupManagerModule);
             const buildInfoModule = ModuleManager.get(BuildInfoModule);
             const tipToeModule = ModuleManager.get(TipToeModule);
             const fgDebugModule = ModuleManager.get(FGDebugModule);
+            const characterPhysicsModule = ModuleManager.get(CharacterPhysicsModule);
 
             const uiCanvasModule = ModuleManager.get(UICanvasModule);
 
@@ -399,7 +325,7 @@ function main() {
                 })
             );
 
-            Menu.add(layout.toggle(en.menu.functions.toggle_freeze_player, (state: boolean) => (state ? freezePlayer.enable() : freezePlayer.disable())));
+            Menu.add(layout.toggle(en.menu.functions.toggle_freeze_player, (state: boolean) => characterPhysicsModule?.freezePlayer(state)));
 
             Menu.add(
                 layout.toggle(en.menu.functions.toggle_dont_send_fallguy_state, (state: boolean) => {
