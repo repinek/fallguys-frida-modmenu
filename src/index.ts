@@ -21,6 +21,7 @@ import en from "./i18n/localization/en.json";
 import { UnityUtils, TeleportManager } from "./utils/unityUtils.js";
 import * as javaUtils from "./utils/javaUtils.js";
 import { Logger } from "./utils/logger.js";
+import { UpdateUtils } from "./utils/update.js";
 
 // WIP CODE !! working to refactor it
 /*
@@ -32,6 +33,8 @@ honourable mention: Failed to load script: the connection is closed. Thank you f
 
 function main() {
     Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
+
+    UpdateUtils.checkForUpdate();
 
     I18n.init();
 
@@ -81,36 +84,6 @@ function main() {
     let currentSceneName;
 
     Logger.info("Loaded il2cpp, assemblies, classes and method pointers");
-
-    // === Fetching Data ===
-    let fetchedModmenuVersion;
-
-    // complicated a little
-    // response should be like: {"script_version":"0.0"}
-    if (ModPreferences.ENV !== "release") {
-        Logger.debug("Skipping mod menu version check in dev/staging");
-    } else {
-        javaUtils.httpGet(Config.MOD_MENU_VERSION_URL, response => {
-            if (!response) {
-                Logger.warn("Actual mod menu version can't be fetched");
-                Menu.toast(en.toasts.mod_menu_version_not_fetched, 1);
-                return;
-            }
-            try {
-                fetchedModmenuVersion = JSON.parse(response);
-                if (fetchedModmenuVersion.script_version == ModPreferences.VERSION) {
-                    Logger.info("Mod menu is up to date");
-                    Menu.toast(en.toasts.mod_menu_version_actual, 1);
-                } else {
-                    Logger.warn("Mod menu version is outdated, redirecting to download page...");
-                    Menu.toast(en.toasts.mod_menu_version_not_fetched, 1);
-                    javaUtils.openURL(Config.GITHUB_RELEASES_URL);
-                }
-            } catch (error: any) {
-                Logger.errorThrow(error, "Parse mod menu version");
-            }
-        });
-    }
 
     Menu.toast(en.messages.menu_will_appear_later, 1);
 

@@ -13,7 +13,6 @@ export const Config = {
     USE_SPOOF: true,
 
     // === Custom Server ===
-    // refer to BuildCatapultConfig_method.implementation
     USE_CUSTOM_SERVER: false,
 
     CUSTOM_LOGIN_URL: "https://login.fallguys.oncatapult.com/api/v1",
