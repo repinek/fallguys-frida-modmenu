@@ -1,6 +1,6 @@
 import { Config } from "../data/config.js";
 import { ModPreferences } from "../data/modPreferences.js";
-import * as JavaUtils from "../utils/javaUtils.js";
+import * as JavaUtils from "./javaUtils.js";
 import { Logger } from "./logger.js";
 
 export class UpdateUtils {
