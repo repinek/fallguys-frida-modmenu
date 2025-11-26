@@ -15,6 +15,7 @@ export const Config = {
     // === Custom Server ===
     // refer to BuildCatapultConfig_method.implementation
     USE_CUSTOM_SERVER: false,
+
     CUSTOM_LOGIN_URL: "https://login.fallguys.oncatapult.com/api/v1",
     CUSTOM_LOGIN_PORT: -1,
     CUSTOM_GATEWAY_URL: "gateway.fallguys.oncatapult.com",
@@ -68,7 +69,7 @@ export const Config = {
     },
 
     BuildInfo: {
-        PLATFORM: "android_ega",
+        PLATFORM: "ports3_2",
         spoofedGameVersion: "" as string,
         originalSignature: "" as string,
         spoofedSignature: "" as string

@@ -31,9 +31,9 @@ export class UnityUtils {
 
     /** Wrapper over UnityEngine::Vector3::.ctor */
     public static createVector3(x: number, y: number, z: number): Il2Cpp.ValueType {
-        const vec = this.Vector3.alloc().unbox();
-        vec.method(".ctor", 3).invoke(x, y, z);
-        return vec;
+        const vector = this.Vector3.alloc().unbox();
+        vector.method(".ctor", 3).invoke(x, y, z);
+        return vector;
     }
 }
 

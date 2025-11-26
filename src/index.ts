@@ -47,12 +47,10 @@ function main() {
     const LobbyService = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.LobbyService");
     const GlobalGameStateClient = AssemblyHelper.MTFGClient.class("FGClient.GlobalGameStateClient");
     const ClientGameManager = AssemblyHelper.MTFGClient.class("FGClient.ClientGameManager");
-    const CatapultServicesManager = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager");
 
     const CharacterDataMonitor = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
     const MotorFunctionJump = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
     const MPGNetMotorTasks = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks"); // MPG - The Multiplayer Group
-    const CatapultAnalyticsService = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.CatapultAnalyticsService");
 
     const ObjectiveReachEndZone = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone"); // finish
     const GrabToQualify = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crown
@@ -64,13 +62,7 @@ function main() {
     // const FollowTheLeaderZone = AssemblyHelper.TheMultiplayerGuys.class("Levels.ScoreZone.FollowTheLeader.FollowTheLeaderZone"); // leading light
     // const LevelEditorTriggerZoneActiveBase = WushuLevelEditorRuntime.class("LevelEditorTriggerZoneActiveBase"); // trigger zone creative
 
-    const HttpNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.HttpNetworkHost");
-    const WebSocketNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
-
     // === Methods ===
-    const BuildCatapultConfig_method = CatapultServicesManager.method("BuildCatapultConfig");
-    const Init_ClientOnly_method = CatapultAnalyticsService.method("Init_ClientOnly", 3);
-
     const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
     const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
     const SendMessage_method = MPGNetMotorTasks.method("SendMessage", 1);
@@ -91,7 +83,6 @@ function main() {
     Logger.info("Loaded il2cpp, assemblies, classes and method pointers");
 
     // === Fetching Data ===
-    let fetchedClientDetails;
     let fetchedModmenuVersion;
 
     // complicated a little
@@ -121,92 +112,10 @@ function main() {
         });
     }
 
-    // response should be like: {"client_version":"0.0.0","signature":"ABC123"}
-    if (Config.USE_SPOOF) {
-        javaUtils.httpGet(Config.SPOOF_VERSION_URL, response => {
-            if (!response) {
-                Logger.warn("Actual server signature can't be fetched, spoof won't be working");
-                Menu.toast(en.toasts.signature_not_fetched, 1);
-                return;
-            }
-            try {
-                fetchedClientDetails = JSON.parse(response);
-            } catch (error: any) {
-                Logger.errorThrow(error, "Parse spoof signature");
-            }
-        });
-    }
-
     Menu.toast(en.messages.menu_will_appear_later, 1);
 
-    // === Helpers ===
-
+    // deprecated: === Helpers ===, moved to utils/UnityUtils.ts
     // === Hooks ===
-    // Spoofs
-    BuildCatapultConfig_method.implementation = function (): Il2Cpp.Object {
-        /*
-        Change the signature and client version for the request, so that it thinks we are using the latest one.
-        Getting it from Config.VERSION_URL, thx to floyzi. You can find it yourself if you want.
-
-        You can also change the platform here, but make sure it exists (otherwise you won't be able to login, mediatonic fixed this)
-        Some existing platforms: ps5, pc_steam, pc_standalone (no longer used for official clients), ports3_2...
-        More can be found in the CMS and game code
-        */
-        Logger.hook("BuildCatapultConfig called");
-        if (Config.USE_SPOOF && fetchedClientDetails!) {
-            const newConfig = this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // create new config
-
-            Config.BuildInfo.originalSignature = newConfig.field<Il2Cpp.String>("ClientVersionSignature").value.content!;
-            Config.BuildInfo.spoofedSignature = fetchedClientDetails.signature;
-            Config.BuildInfo.spoofedGameVersion = fetchedClientDetails.client_version;
-
-            newConfig.field("ClientVersion").value = Il2Cpp.string(fetchedClientDetails.client_version);
-            newConfig.field("ClientVersionSignature").value = Il2Cpp.string(fetchedClientDetails.signature);
-
-            // Spoof platform
-            if (Config.BuildInfo.PLATFORM != "android_ega") {
-                newConfig.field("Platform").value = Il2Cpp.string(Config.BuildInfo.PLATFORM);
-                Logger.debug("Modified signature, client version and platform");
-            } else Logger.debug("Modified signature and client version");
-
-            // Custom server
-            if (Config.USE_CUSTOM_SERVER) {
-                const loginServerHostAlloc = HttpNetworkHost.alloc();
-                const gatewayServerHostAlloc = WebSocketNetworkHost.alloc();
-
-                // Adds port to the host string if port > 0
-                loginServerHostAlloc.method(".ctor").invoke(Il2Cpp.string(Config.CUSTOM_LOGIN_URL), Config.CUSTOM_LOGIN_PORT);
-                // (string host, int port, bool isSecure) — wss if secure, ws otherwise: (isSecure ? "wss://{0}:{1}/ws" : "ws://{0}:{1}/ws");
-                gatewayServerHostAlloc.method(".ctor").invoke(Il2Cpp.string(Config.CUSTOM_GATEWAY_URL), Config.CUSTOM_GATEWAY_PORT, Config.IS_GATEWAY_SECURE);
-
-                newConfig.field("LoginServerHost").value = loginServerHostAlloc;
-                newConfig.field("GatewayServerHost").value = gatewayServerHostAlloc;
-
-                Logger.debug("Modified Login and Gatewat server hosts");
-            }
-            return newConfig;
-        } else {
-            return this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // without any changes
-        }
-    };
-
-    //@ts-ignore
-    Init_ClientOnly_method.implementation = function (serverAddress: Il2Cpp.Object, gatewayConnConfig: Il2Cpp.Object, platformServiceProvider: Il2Cpp.String) {
-        Logger.hook("Init_ClientOnly called with args:", serverAddress, gatewayConnConfig, platformServiceProvider);
-        if (Config.USE_CUSTOM_SERVER) {
-            // refer BuildCatapultConfig_method.implementation
-            const analyticsServerHostAlloc = WebSocketNetworkHost.alloc();
-            analyticsServerHostAlloc
-                .method(".ctor")
-                .invoke(Il2Cpp.string(Config.CUSTOM_ANALYTICS_URL), Config.CUSTOM_ANALYTICS_PORT, Config.IS_ANALYTICS_SECURE);
-
-            Logger.debug("Modified Analytics server host");
-
-            return this.method("Init_ClientOnly").invoke(analyticsServerHostAlloc, gatewayConnConfig, platformServiceProvider);
-        }
-        return this.method("Init_ClientOnly").invoke(serverAddress, gatewayConnConfig, platformServiceProvider);
-    };
-
     // Utils
     OnMainMenuDisplayed_method.implementation = function (event) {
         Logger.hook("OnMainMenuDisplayed Called");

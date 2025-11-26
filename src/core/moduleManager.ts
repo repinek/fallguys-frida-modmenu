@@ -3,6 +3,7 @@ import { BaseModule } from "./baseModule.js";
 import { AntiAFKModule } from "../modules/antiAFK.js";
 import { BanBypassModule } from "../modules/banBypass.js";
 import { BuildInfoModule } from "../modules/buildInfo.js";
+import { CatapultModule } from "../modules/catapult.js";
 import { FGDebugModule } from "../modules/fgDebug.js";
 import { GraphicsManagerModule } from "../modules/graphicsManager.js";
 import { NetworkModule } from "../modules/network.js";
@@ -18,6 +19,7 @@ export class ModuleManager {
         new AntiAFKModule(),
         new BanBypassModule(),
         new BuildInfoModule(),
+        new CatapultModule(),
         new FGDebugModule(),
         new GraphicsManagerModule(),
         new NetworkModule(),
