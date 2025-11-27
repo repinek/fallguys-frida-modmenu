@@ -9,6 +9,7 @@ import { FGDebugModule } from "../modules/fgDebug.js";
 import { GraphicsManagerModule } from "../modules/graphicsManager.js";
 import { NetworkModule } from "../modules/network.js";
 import { PopupManagerModule } from "../modules/popupManager.js";
+import { TeleportManager } from "../modules/teleportManager.js";
 import { TipToeModule } from "../modules/tipToeManager.js";
 import { UICanvasModule } from "../modules/uiCanvas.js";
 
@@ -26,6 +27,7 @@ export class ModuleManager {
         new GraphicsManagerModule(),
         new NetworkModule(),
         new PopupManagerModule(),
+        new TeleportManager(),
         new TipToeModule(),
         new UICanvasModule(),
     ];

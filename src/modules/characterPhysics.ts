@@ -12,7 +12,8 @@ export class CharacterPhysicsModule extends BaseModule {
     private MotorFunctionJump!: Il2Cpp.Class;
     private MPGNetMotorTasks!: Il2Cpp.Class;
 
-    public character?: Il2Cpp.Object; // FallGuysCharacterController
+    private character?: Il2Cpp.Object; // FallGuysCharacterController
+    public static _character?: Il2Cpp.Object;
 
     // Methods
     private CheckCharacterControllerData!: Il2Cpp.Method;
@@ -36,6 +37,7 @@ export class CharacterPhysicsModule extends BaseModule {
         //@ts-ignore
         this.CheckCharacterControllerData.implementation = function (character: Il2Cpp.Object): boolean {
             module.character = character; // Instance of class FallGuysCharacterController
+            CharacterPhysicsModule._character = character;
 
             const data = character.method<Il2Cpp.Object>("get_Data").invoke(); // Instance of class CharacterControllerData
             const jumpMotor = character.method<Il2Cpp.Object>("get_JumpMotorFunction").invoke(); // Instance of class MotorFunctionJump
@@ -109,13 +111,16 @@ export class CharacterPhysicsModule extends BaseModule {
     }
 
     public freezePlayer(state: boolean): void {
-        try { 
+        try {
             const characterRigidBody = this.character!.method<Il2Cpp.Object>("get_RigidBody").invoke();
             characterRigidBody.method<void>("set_isKinematic").invoke(state);
         } catch (error: any) {
             Logger.warn(`[${this.name}::freezePlayer] No character Instance found: ${error.name}`);
             //Menu.toast()
         }
-
+    }
+    
+    public static get Character(): Il2Cpp.Object | undefined {
+        return this._character;
     }
 }

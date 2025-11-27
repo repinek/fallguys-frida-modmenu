@@ -9,17 +9,18 @@ import { ObsidianConfig } from "./data/menuConfig.js";
 import { Config } from "./data/config.js";
 
 import { GraphicsManagerModule } from "./modules/graphicsManager.js";
-import { BuildInfoModule } from "./modules/buildInfo.js"
-import { CharacterPhysicsModule } from "./modules/characterPhysics.js";;
+import { BuildInfoModule } from "./modules/buildInfo.js";
+import { CharacterPhysicsModule } from "./modules/characterPhysics.js";
 import { FGDebugModule } from "./modules/fgDebug.js";
 import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./modules/popupManager.js";
+import { TeleportManager } from "./modules/teleportManager.js";
 import { TipToeModule } from "./modules/tipToeManager.js";
 import { UICanvasModule } from "./modules/uiCanvas.js";
 
 import { I18n } from "./i18n/i18n.js";
 import en from "./i18n/localization/en.json";
 
-import { UnityUtils, TeleportManager } from "./utils/unityUtils.js";
+import { UnityUtils } from "./utils/unityUtils.js";
 import * as javaUtils from "./utils/javaUtils.js";
 import { Logger } from "./logger/logger.js";
 import { UpdateUtils } from "./utils/updateUtils.js";
@@ -52,11 +53,6 @@ function main() {
     const GlobalGameStateClient = AssemblyHelper.MTFGClient.class("FGClient.GlobalGameStateClient");
     const ClientGameManager = AssemblyHelper.MTFGClient.class("FGClient.ClientGameManager");
 
-    const ObjectiveReachEndZone = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone"); // finish
-    const GrabToQualify = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crown
-    const SpawnableCollectable = AssemblyHelper.TheMultiplayerGuys.class("Levels.ScoreZone.SpawnableCollectable"); // bubble unity
-    const COMMON_ScoringBubble = AssemblyHelper.TheMultiplayerGuys.class("Levels.Progression.COMMON_ScoringBubble"); // bubble creative
-    const ScoredButton = AssemblyHelper.TheMultiplayerGuys.class("ScoredButton"); // trigger button unity
     const FakeDoorController = AssemblyHelper.TheMultiplayerGuys.class("Levels.DoorDash.FakeDoorController");
     const CrownMazeDoor = AssemblyHelper.TheMultiplayerGuys.class("Levels.CrownMaze.CrownMazeDoor");
     // const FollowTheLeaderZone = AssemblyHelper.TheMultiplayerGuys.class("Levels.ScoreZone.FollowTheLeader.FollowTheLeaderZone"); // leading light
@@ -149,92 +145,9 @@ function main() {
     // deprecated: Physics, moved to modules/characterPhysics.ts
 
     // === Functions ===
-    const teleportToFinish = () => {
-        if (!TeleportManager.checkCooldown()) return;
-
-        let endZoneObject: Il2Cpp.Object | null;
-        let crownObject: Il2Cpp.Object | null;
-
-        const endZoneArray = UnityUtils.findObjectsOfTypeAll(ObjectiveReachEndZone);
-        if (endZoneArray.length > 0) {
-            endZoneObject = endZoneArray.get(0);
-        }
-
-        const crownArray = UnityUtils.findObjectsOfTypeAll(GrabToQualify);
-        if (crownArray.length > 0) {
-            crownObject = crownArray.get(0);
-        }
-
-        const finishObject = endZoneObject! ?? crownObject!;
-        // if (finishObject) {
-        //     TeleportManager.teleportTo(FallGuysCharacterController_Instance, finishObject);
-        // } else {
-        //     Menu.toast(en.messages.no_finish, 0);
-        // }
-    };
-
-    const teleportToScore = () => {
-        if (!TeleportManager.checkCooldown()) return;
-
-        /*
-        try {
-            const unityBubblesArray = UnityUtils.findObjectsOfTypeAll(SpawnableCollectable);
-            const creativeBubblesArray = UnityUtils.findObjectsOfTypeAll(COMMON_ScoringBubble);
-            const scoredButtonArray = UnityUtils.findObjectsOfTypeAll(ScoredButton);
-            // I'm too lazy to add these sorry
-            // const creativeScoreZonesArray = UnityUtils.findObjectsOfTypeAll(LevelEditorTriggerZoneActiveBase);
-            // const FollowTheLeaderZonesArray = UnityUtils.findObjectsOfTypeAll(FollowTheLeaderZone)
-
-            // Rest of the function remains the same...
-            for (const bubble of unityBubblesArray) {
-                if (bubble.method<boolean>("get_Spawned").invoke()) {
-                    TeleportManager.teleportTo(FallGuysCharacterController_Instance, bubble);
-                    return;
-                }
-            }
-
-            for (const bubble of creativeBubblesArray) {
-                if (bubble.field<number>("_pointsAwarded").value > 0) {
-                    const bubbleHandle = bubble.field<Il2Cpp.Object>("_bubbleHandle").value;
-                    if (bubbleHandle.field<boolean>("_spawned").value) {
-                        TeleportManager.teleportTo(FallGuysCharacterController_Instance, bubble);
-                        return;
-                    }
-                }
-            }
-
-            for (const button of scoredButtonArray) {
-                if (button.field<boolean>("_isAnActiveTarget").value) {
-                    TeleportManager.teleportTo(FallGuysCharacterController_Instance, button);
-                    return;
-                }
-            }
-
-            /* // creates
-            for (const scoreZone of creativeScoreZonesArray) {
-                if (scoreZone.field<boolean>("_useForPointScoring").value) {
-                    if (scoreZone.field<number>("_pointsScored").value > 0) {
-                        teleportTo(scoreZone);
-                        return;
-                    }
-                }
-            }
-    
-            for (const scoreZone of FollowTheLeaderZonesArray) {
-                teleportTo(scoreZone);
-                return;
-            }
-            // return here
-        } catch (error: any) {
-            Logger.errorThrow(error);
-        }
-        */
-        Menu.toast(en.messages.no_score, 0);
-    };
-
     const showServerDetails = () => {
         try {
-            if (GlobalGameStateClient_Instance) {
+            if (GlobalGameStateClient_Instance) { // rename to get instance
                 const networkManager = GlobalGameStateClient_Instance.method<Il2Cpp.Object>("get_NetworkManager").invoke();
                 const gameConnection = networkManager.method<Il2Cpp.Object>("get_ConnectionToServer").invoke();
 
@@ -277,7 +190,7 @@ function main() {
             const composer = new Menu.Composer(en.info.name, en.info.warn, layout);
             composer.icon(Config.MOD_MENU_ICON_URL, "Web");
 
-            // TODO: fix sequence 
+            // TODO: fix sequence
             const graphicsModule = ModuleManager.get(GraphicsManagerModule);
             const popupManagerModule = ModuleManager.get(PopupManagerModule);
             const buildInfoModule = ModuleManager.get(BuildInfoModule);
@@ -286,6 +199,7 @@ function main() {
             const characterPhysicsModule = ModuleManager.get(CharacterPhysicsModule);
 
             const uiCanvasModule = ModuleManager.get(UICanvasModule);
+            const teleportManager = ModuleManager.get(TeleportManager);
 
             if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
                 Menu.add(
@@ -419,9 +333,9 @@ function main() {
             teleports.gravity = Menu.Api.CENTER;
             Menu.add(teleports);
 
-            Menu.add(layout.button(en.menu.functions.teleport_to_finish_or_crown, teleportToFinish));
+            Menu.add(layout.button(en.menu.functions.teleport_to_finish_or_crown, () => teleportManager?.teleportToFinish()));
 
-            Menu.add(layout.button(en.menu.functions.teleport_to_score, teleportToScore));
+            Menu.add(layout.button(en.menu.functions.teleport_to_score, () => teleportManager?.teleportToScore()));
 
             // === Utility Tab ===
             const utility = layout.textView(en.menu.tabs.utility_tab);

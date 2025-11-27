@@ -54,6 +54,7 @@ export class Logger {
      * @param error The error object
      * @param message "desc" -> "desc Error: {stack}"
      */
+    // errortoast
     public static errorThrow(error: any, message: string = "") {
         this.error(`${message} ${error.stack}`);
         Menu.toast(`${message} ${error.message}`, 1);

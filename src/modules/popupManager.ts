@@ -48,7 +48,7 @@ export class PopupManagerModule extends BaseModule {
     public showPopup(title: string, message: string, modalType: ModalType_enum, okButtonType: OkButtonType_enum): void {
         try {
             Logger.info("Showing popup:", title, message, modalType, okButtonType);
-            const ShowModalMessageDataInstance = this.PopupManagerInstance!.method<boolean>("Show", 3).overload(
+            const ShowModalMessageDataInstance = this.popupManagerInstance!.method<boolean>("Show", 3).overload(
                 "FGClient.UI.PopupInteractionType",
                 "FGClient.UI.ModalMessageData",
                 "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"
@@ -58,8 +58,8 @@ export class PopupManagerModule extends BaseModule {
             const newModalMessageData = this.ModalMessageData.alloc();
             newModalMessageData.method(".ctor").invoke();
 
-            newModalMessageData.field<Il2Cpp.ValueType>("LocaliseTitle").value = this.NotLocalised;
-            newModalMessageData.field<Il2Cpp.ValueType>("LocaliseMessage").value = this.NotLocalised;
+            newModalMessageData.field<Il2Cpp.ValueType>("LocaliseTitle").value = this.notLocalised;
+            newModalMessageData.field<Il2Cpp.ValueType>("LocaliseMessage").value = this.notLocalised;
             newModalMessageData.field<Il2Cpp.ValueType>("ModalType").value = this.ModalType.field<Il2Cpp.ValueType>(modalType).value;
             newModalMessageData.field<Il2Cpp.ValueType>("OkButtonType").value = this.OkButtonType.field<Il2Cpp.ValueType>(okButtonType).value;
             newModalMessageData.field<Il2Cpp.String>("Title").value = Il2Cpp.string(title);
@@ -67,27 +67,27 @@ export class PopupManagerModule extends BaseModule {
             newModalMessageData.field("OnCloseButtonPressed").value = NULL;
 
             // 3 arg is onFailedCallback delegate, which is default is null
-            ShowModalMessageDataInstance.invoke(this.Info, newModalMessageData, NULL);
+            ShowModalMessageDataInstance.invoke(this.info, newModalMessageData, NULL);
         } catch (error: any) {
             Logger.errorThrow(error);
         }
     }
 
-    private get PopupManagerInstance(): Il2Cpp.Object | undefined {
+    private get popupManagerInstance(): Il2Cpp.Object | undefined {
         if (!this._popupManagerInstance) {
             this._popupManagerInstance = UnityUtils.getInstance(this.PopupManager);
         }
         return this._popupManagerInstance;
     }
 
-    private get NotLocalised(): Il2Cpp.ValueType {
+    private get notLocalised(): Il2Cpp.ValueType {
         if (!this._notLocalised) {
             this._notLocalised = this.LocaliseOption.field<Il2Cpp.ValueType>("NotLocalised").value;
         }
         return this._notLocalised;
     }
 
-    private get Info(): Il2Cpp.ValueType {
+    private get info(): Il2Cpp.ValueType {
         if (!this._info) {
             this._info = this.PopupInteractionType.field<Il2Cpp.ValueType>("Info").value;
         }

@@ -68,7 +68,7 @@ export const Config = {
     },
 
     BuildInfo: {
-        PLATFORM: "ports3_2",
+        PLATFORM: "android_ega", // android_ega is original
         spoofedGameVersion: "" as string,
         originalSignature: "" as string,
         spoofedSignature: "" as string
