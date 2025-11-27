@@ -9,6 +9,7 @@ import { ObsidianConfig } from "./data/menuConfig.js";
 import { Config } from "./data/config.js";
 
 import { BuildInfoModule } from "./modules/game/buildInfo.js";
+import { MatchInfoModule } from "./modules/game/matchInfo.js";
 
 import { CharacterPhysicsModule } from "./modules/player/characterPhysics.js";
 import { TeleportManagerModule } from "./modules/player/teleportManager.js";
@@ -89,18 +90,20 @@ function main() {
             const composer = new Menu.Composer(en.info.name, en.info.warn, layout);
             composer.icon(Config.MOD_MENU_ICON_URL, "Web");
 
-            // TODO: fix sequence
-            const graphicsModule = ModuleManager.get(GraphicsManagerModule);
-            const popupManagerModule = ModuleManager.get(PopupManagerModule);
             const buildInfoModule = ModuleManager.get(BuildInfoModule);
-            const tipToeModule = ModuleManager.get(TipToeModule);
-            const fgDebugModule = ModuleManager.get(FGDebugModule);
-            const characterPhysicsModule = ModuleManager.get(CharacterPhysicsModule);
-            const doorManagerModule = ModuleManager.get(DoorManagerModule);
+            const matchInfoModule = ModuleManager.get(MatchInfoModule);
 
-            const uiCanvasModule = ModuleManager.get(UICanvasModule);
+            const characterPhysicsModule = ModuleManager.get(CharacterPhysicsModule);
             const teleportModule = ModuleManager.get(TeleportManagerModule);
 
+            const doorManagerModule = ModuleManager.get(DoorManagerModule);
+            const tipToeModule = ModuleManager.get(TipToeModule);
+
+            const fgDebugModule = ModuleManager.get(FGDebugModule);
+            const graphicsModule = ModuleManager.get(GraphicsManagerModule);
+            const popupManagerModule = ModuleManager.get(PopupManagerModule);
+            const uiCanvasModule = ModuleManager.get(UICanvasModule);
+            
             if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
                 Menu.add(
                     // prettier-ignore
@@ -305,8 +308,8 @@ function main() {
                 })
             );
 
-            Menu.add(layout.button(en.menu.functions.show_game_details, showGameDetails));
-            Menu.add(layout.button(en.menu.functions.show_and_copy_server_details, showServerDetails));
+            Menu.add(layout.button(en.menu.functions.show_game_details, () => {matchInfoModule?.showGameDetails()} ));
+            Menu.add(layout.button(en.menu.functions.show_and_copy_server_details, () => {matchInfoModule?.showServerDetails()}));
 
             // === Links Tab ===
             const links = layout.textView(en.menu.tabs.links_tab);
