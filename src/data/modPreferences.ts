@@ -1,7 +1,7 @@
 export const ModPreferences = {
-    VERSION: "2.73", // Don't forget update after changes!
+    VERSION: "2.74", // Don't forget update after changes!
     ENV: "release", // dev, staging, release
-    FOR_GAME_VERSION: "21.0.1"
+    FOR_GAME_VERSION: "21.1.1"
 };
 
 /*
@@ -9,6 +9,8 @@ export const ModPreferences = {
 something with classes like vector3, which will be used in different modules, like, how to make it global? 
 nvm moved to unitytools...
 
+wrapper over setActive
+rename onEnable to initHooks
 add changelog in menu
 create cool screenshots for readme
 improve logging at modules

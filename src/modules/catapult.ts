@@ -4,6 +4,11 @@ import { Config } from "../data/config.js";
 import { Logger } from "../logger/logger.js";
 import * as JavaUtils from "../utils/javaUtils.js";
 
+interface IClientDetails {
+    clientVersion: string;
+    clientVersionSignature: string;
+}
+
 export class CatapultModule extends BaseModule {
     public name = "Catapult";
 
@@ -18,7 +23,7 @@ export class CatapultModule extends BaseModule {
 
     private WebSocketNetworkHostCtor!: Il2Cpp.Method;
 
-    private fetchedClientDetails: any = null;
+    private clientDetails: IClientDetails | null = null;
 
     public init(): void {
         this.CatapultServicesManager = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager");
@@ -29,7 +34,7 @@ export class CatapultModule extends BaseModule {
         this.BuildCatapultConfig = this.CatapultServicesManager.method<Il2Cpp.Object>("BuildCatapultConfig");
         this.WebSocketNetworkHostCtor = this.WebSocketNetworkHost.method<void>(".ctor", 3);
 
-        this.fetchSpoofData();
+        this.fetchClientDetails();
     }
 
     public override onEnable(): void {
@@ -40,10 +45,10 @@ export class CatapultModule extends BaseModule {
 
             const catapultConfig = this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // <--- OnLeave
 
-            if (Config.USE_SPOOF && module.fetchedClientDetails) {
-                catapultConfig.field<Il2Cpp.String>("ClientVersion").value = Il2Cpp.string(module.fetchedClientDetails.client_version);
-                catapultConfig.field<Il2Cpp.String>("ClientVersionSignature").value = Il2Cpp.string(module.fetchedClientDetails.signature);
-                Logger.debug(`[${module.name}] Applied version spoof to ${module.fetchedClientDetails.client_version}`);
+            if (Config.USE_SPOOF && module.clientDetails) {
+                catapultConfig.field<Il2Cpp.String>("ClientVersion").value = Il2Cpp.string(module.clientDetails.clientVersion);
+                catapultConfig.field<Il2Cpp.String>("ClientVersionSignature").value = Il2Cpp.string(module.clientDetails.clientVersionSignature);
+                Logger.debug(`[${module.name}] Applied version spoof to ${module.clientDetails.clientVersion}`);
             }
 
             if (Config.BuildInfo.PLATFORM != "android_ega") {
@@ -84,16 +89,15 @@ export class CatapultModule extends BaseModule {
         };
     }
 
-    // response should be like: {"client_version":"0.0.0","signature":"ABC123"}
-    private fetchSpoofData() {
+    private fetchClientDetails() {
         if (Config.USE_SPOOF) {
             JavaUtils.httpGet(Config.SPOOF_VERSION_URL, response => {
                 if (!response) {
-                    Logger.warn(`[${this.name}] Actual server signature can't be fetched, spoof won't be working`);
+                    Logger.warn(`[${this.name}::fetchSpoofData] Actual server signature can't be fetched, spoof won't be working`);
                     //Menu.toast(en.toasts.signature_not_fetched, 1);
                     return;
                 }
-                this.fetchedClientDetails = JSON.parse(response);
+                this.clientDetails = JSON.parse(response) as IClientDetails;
             });
         }
     }
