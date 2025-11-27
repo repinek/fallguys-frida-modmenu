@@ -119,7 +119,7 @@ export class CharacterPhysicsModule extends BaseModule {
             //Menu.toast()
         }
     }
-    
+
     public static get Character(): Il2Cpp.Object | undefined {
         return this._character;
     }

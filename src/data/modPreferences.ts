@@ -1,14 +1,16 @@
 export const ModPreferences = {
-    VERSION: "2.74", // Don't forget update after changes!
+    VERSION: "2.75", // Don't forget update after changes!
     ENV: "release", // dev, staging, release
-    FOR_GAME_VERSION: "21.1.1"
+    FOR_GAME_VERSION: "21.0.1" // 21.1.1 is not released for mobile LMAOМ
 };
 
 /*
 !! TODO: 
-something with classes like vector3, which will be used in different modules, like, how to make it global? 
-nvm moved to unitytools...
-
+implement extensions.ts (.setActive, .getGameObject, safe execute wrapper) 
+i18n refactor
+logging refactor
+project structure
+unityTools
 wrapper over setActive
 rename onEnable to initHooks
 add changelog in menu
@@ -31,6 +33,6 @@ all cosmetics lobby (?)
 comments over module
 
 maybe:
-refactor structure of project / script (all script in one file :cry:)
+refactor structure of project / script (all script in one file :cry:) working on it lol, takes a lot of time
 fork menu and update it to frida 17
 */

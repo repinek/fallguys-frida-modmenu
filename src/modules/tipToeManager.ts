@@ -1,7 +1,7 @@
 import { AssemblyHelper } from "../core/assemblyHelper.js";
 import { BaseModule } from "../core/baseModule.js";
-import { I18n } from "../i18n/i18n.js";
 import { UnityUtils } from "../utils/unityUtils.js";
+import { Logger } from "../logger/logger.js";
 
 /*
  * Every TipToe tile has Levels::TipToe::TipToe_Platform component
@@ -23,7 +23,8 @@ export class TipToeModule extends BaseModule {
         const platforms = UnityUtils.findObjectsOfTypeAll(this.TipToe_Platform);
 
         if (platforms.length === 0) {
-            Menu.toast(`[${this.name}] ${I18n.t("toasts.no_tiptoe")}`, 0);
+            Logger.debug(`[${this.name}::removeFakeTipToe] No TipToe`);
+            //Menu.toast(`[${this.name}] ${I18n.t("toasts.no_tiptoe")}`, 0);
             return;
         }
 

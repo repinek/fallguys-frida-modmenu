@@ -11,9 +11,10 @@ import { Config } from "./data/config.js";
 import { GraphicsManagerModule } from "./modules/graphicsManager.js";
 import { BuildInfoModule } from "./modules/buildInfo.js";
 import { CharacterPhysicsModule } from "./modules/characterPhysics.js";
+import { DoorManagerModule } from "./modules/doorManager.js";
 import { FGDebugModule } from "./modules/fgDebug.js";
 import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./modules/popupManager.js";
-import { TeleportManager } from "./modules/teleportManager.js";
+import { TeleportManagerModule } from "./modules/teleportManager.js";
 import { TipToeModule } from "./modules/tipToeManager.js";
 import { UICanvasModule } from "./modules/uiCanvas.js";
 
@@ -47,27 +48,13 @@ function main() {
     ModuleManager.initAll();
 
     // === Classes ===
-    const SceneManager = AssemblyHelper.CoreModule.class("UnityEngine.SceneManagement.SceneManager");
-
     const LobbyService = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.LobbyService");
-    const GlobalGameStateClient = AssemblyHelper.MTFGClient.class("FGClient.GlobalGameStateClient");
-    const ClientGameManager = AssemblyHelper.MTFGClient.class("FGClient.ClientGameManager");
-
-    const FakeDoorController = AssemblyHelper.TheMultiplayerGuys.class("Levels.DoorDash.FakeDoorController");
-    const CrownMazeDoor = AssemblyHelper.TheMultiplayerGuys.class("Levels.CrownMaze.CrownMazeDoor");
-    // const FollowTheLeaderZone = AssemblyHelper.TheMultiplayerGuys.class("Levels.ScoreZone.FollowTheLeader.FollowTheLeaderZone"); // leading light
-    // const LevelEditorTriggerZoneActiveBase = WushuLevelEditorRuntime.class("LevelEditorTriggerZoneActiveBase"); // trigger zone creative
 
     // === Methods ===
     const OnMainMenuDisplayed_method = LobbyService.method("OnMainMenuDisplayed", 1);
-    const GameLevelLoaded_method = ClientGameManager.method("GameLevelLoaded", 1);
 
     // === Cache ===
-    let GlobalGameStateClient_Instance: Il2Cpp.Object;
-    let ClientGameManager_Instance: Il2Cpp.Class | Il2Cpp.ValueType | Il2Cpp.Object; // obtaing in GameLevelLoaded
-
     let reachedMainMenu = false;
-    let currentSceneName;
 
     Logger.info("Loaded il2cpp, assemblies, classes and method pointers");
 
@@ -98,68 +85,23 @@ function main() {
         return this.method("OnMainMenuDisplayed", 1).invoke(event);
     };
 
-    GameLevelLoaded_method.implementation = function (ugcLevelHash) {
-        Logger.hook("GameLevelLoaded called with args:", ugcLevelHash);
-
-        ClientGameManager_Instance = this;
-        GlobalGameStateClient_Instance = GlobalGameStateClient.method<Il2Cpp.Object>("get_Instance").invoke();
-
-        const Scene_Instance = SceneManager.method<Il2Cpp.Object>("GetActiveScene").invoke();
-        currentSceneName = Scene_Instance.method<Il2Cpp.String>("get_name").invoke().content; // It's better to check by SceneName, instead round id (and easier lol)
-
-        if (Config.Toggles.toggleHideDoors) {
-            const manipulateObjects = (
-                type: Il2Cpp.Class, // class of object
-                field: string, // getter method name like get_IsFakeDoor
-                expectedValue: boolean
-            ) => {
-                const objectsArray = UnityUtils.findObjectsOfTypeAll(type);
-
-                for (const obj of objectsArray) {
-                    const value = obj.method<boolean>(field).invoke();
-                    if (value === expectedValue) {
-                        const gameObject = obj.method<Il2Cpp.Object>("get_gameObject").invoke();
-                        gameObject.method("SetActive").invoke(false);
-                    }
-                }
-            };
-
-            switch (true) {
-                case currentSceneName?.includes("FallGuy_DoorDash"):
-                    manipulateObjects(FakeDoorController, "get_IsFakeDoor", false);
-                    break;
-
-                case currentSceneName?.includes("FallGuy_Crown_Maze_Topdown"):
-                    manipulateObjects(CrownMazeDoor, "get_IsBreakable", true);
-                    break;
-
-                case currentSceneName?.includes("Fraggle"): // creative codename
-                    manipulateObjects(FakeDoorController, "get_IsFakeDoor", false);
-                    break;
-            }
-        }
-
-        return this.method("GameLevelLoaded", 1).invoke(ugcLevelHash);
-    };
-
     // deprecated: Physics, moved to modules/characterPhysics.ts
 
     // === Functions ===
     const showServerDetails = () => {
         try {
-            if (GlobalGameStateClient_Instance) { // rename to get instance
-                const networkManager = GlobalGameStateClient_Instance.method<Il2Cpp.Object>("get_NetworkManager").invoke();
-                const gameConnection = networkManager.method<Il2Cpp.Object>("get_ConnectionToServer").invoke();
-
-                const hostIPAddr = networkManager.method<Il2Cpp.String>("get_HostIPAddr").invoke().content;
-                const hostPortNo = networkManager.method<number>("get_HostPortNo").invoke();
-                const rtt = gameConnection.method<number>("CurrentRtt").invoke();
-
-                Menu.toast(`Server: ${hostIPAddr}:${hostPortNo}. Ping: ${rtt}ms`, 0); // little secret, you can ddos these servers, and it's not too hard.
-                javaUtils.copyToClipboard(`${hostIPAddr}:${hostPortNo}`);
-            } else {
-                Menu.toast(en.messages.not_in_the_game, 0);
-            }
+            // if (GlobalGameStateClient_Instance) {
+            //     // rename to get instance
+            //     const networkManager = GlobalGameStateClient_Instance.method<Il2Cpp.Object>("get_NetworkManager").invoke();
+            //     const gameConnection = networkManager.method<Il2Cpp.Object>("get_ConnectionToServer").invoke();
+            //     const hostIPAddr = networkManager.method<Il2Cpp.String>("get_HostIPAddr").invoke().content;
+            //     const hostPortNo = networkManager.method<number>("get_HostPortNo").invoke();
+            //     const rtt = gameConnection.method<number>("CurrentRtt").invoke();
+            //     Menu.toast(`Server: ${hostIPAddr}:${hostPortNo}. Ping: ${rtt}ms`, 0); // little secret, you can ddos these servers, and it's not too hard.
+            //     javaUtils.copyToClipboard(`${hostIPAddr}:${hostPortNo}`);
+            // } else {
+            //     Menu.toast(en.messages.not_in_the_game, 0);
+            // }
         } catch (error: any) {
             Logger.errorThrow(error);
         }
@@ -167,18 +109,17 @@ function main() {
 
     const showGameDetails = () => {
         try {
-            if (ClientGameManager_Instance) {
-                const round = ClientGameManager_Instance.field<Il2Cpp.Object>("_round").value;
-                const roundID = round.method<Il2Cpp.String>("get_Id").invoke().content;
-                const seed = ClientGameManager_Instance.method<number>("get_RandomSeed").invoke();
-                const eliminatedPlayerCount = ClientGameManager_Instance.field<number>("_eliminatedPlayerCount").value;
-                // const initialNumParticipants = ClientGameManager_Instance.field<number>("_initialNumParticipants").value;
-                // const allPlayers = ClientGameManager_Instance.method<Il2Cpp.Array<Il2Cpp.Object>>("get_AllPlayers").invoke();
-
-                Menu.toast(`RoundID: ${roundID}, Seed: ${seed}, Eliminated: ${eliminatedPlayerCount}`, 0);
-            } else {
-                Menu.toast(en.messages.not_in_the_game, 0);
-            }
+            // if (ClientGameManager_Instance) {
+            //     const round = ClientGameManager_Instance.field<Il2Cpp.Object>("_round").value;
+            //     const roundID = round.method<Il2Cpp.String>("get_Id").invoke().content;
+            //     const seed = ClientGameManager_Instance.method<number>("get_RandomSeed").invoke();
+            //     const eliminatedPlayerCount = ClientGameManager_Instance.field<number>("_eliminatedPlayerCount").value;
+            //     // const initialNumParticipants = ClientGameManager_Instance.field<number>("_initialNumParticipants").value;
+            //     // const allPlayers = ClientGameManager_Instance.method<Il2Cpp.Array<Il2Cpp.Object>>("get_AllPlayers").invoke();
+            //     Menu.toast(`RoundID: ${roundID}, Seed: ${seed}, Eliminated: ${eliminatedPlayerCount}`, 0);
+            // } else {
+            //     Menu.toast(en.messages.not_in_the_game, 0);
+            // }
         } catch (error: any) {
             Logger.errorThrow(error);
         }
@@ -197,9 +138,10 @@ function main() {
             const tipToeModule = ModuleManager.get(TipToeModule);
             const fgDebugModule = ModuleManager.get(FGDebugModule);
             const characterPhysicsModule = ModuleManager.get(CharacterPhysicsModule);
+            const doorManagerModule = ModuleManager.get(DoorManagerModule);
 
             const uiCanvasModule = ModuleManager.get(UICanvasModule);
-            const teleportManager = ModuleManager.get(TeleportManager);
+            const teleportModule = ModuleManager.get(TeleportManagerModule);
 
             if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
                 Menu.add(
@@ -321,11 +263,19 @@ function main() {
             );
 
             Menu.add(
-                layout.button(en.menu.functions.show_tiptoe_path, () =>
+                layout.button("hide real doors", () => {
+                    Il2Cpp.perform(() => {
+                        doorManagerModule?.removeRealDoors();
+                    }, "main");
+                })
+            );
+
+            Menu.add(
+                layout.button(en.menu.functions.show_tiptoe_path, () => {
                     Il2Cpp.perform(() => {
                         tipToeModule?.removeFakeTipToe();
-                    }, "main")
-                )
+                    }, "main");
+                })
             );
 
             // === Teleports Tab ===
@@ -333,9 +283,9 @@ function main() {
             teleports.gravity = Menu.Api.CENTER;
             Menu.add(teleports);
 
-            Menu.add(layout.button(en.menu.functions.teleport_to_finish_or_crown, () => teleportManager?.teleportToFinish()));
+            Menu.add(layout.button(en.menu.functions.teleport_to_finish_or_crown, () => teleportModule?.teleportToFinish()));
 
-            Menu.add(layout.button(en.menu.functions.teleport_to_score, () => teleportManager?.teleportToScore()));
+            Menu.add(layout.button(en.menu.functions.teleport_to_score, () => teleportModule?.teleportToScore()));
 
             // === Utility Tab ===
             const utility = layout.textView(en.menu.tabs.utility_tab);

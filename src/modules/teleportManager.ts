@@ -7,15 +7,15 @@ import { UnityUtils } from "../utils/unityUtils.js";
 
 // TODO: describe issue here
 
-export class TeleportManager extends BaseModule {
+export class TeleportManagerModule extends BaseModule {
     public name = "TeleportManager";
 
-    // Classes 
+    // Classes
     private ObjectiveReachEndZone!: Il2Cpp.Class;
     private GrabToQualify!: Il2Cpp.Class;
     private SpawnableCollectable!: Il2Cpp.Class;
     private ScoringBubble!: Il2Cpp.Class;
-    private ScoredButton!: Il2Cpp.Class; 
+    private ScoredButton!: Il2Cpp.Class;
 
     private lastTeleportTime = 0;
 
@@ -81,10 +81,7 @@ export class TeleportManager extends BaseModule {
             return;
         }
 
-        const targetClasses = [
-            this.ObjectiveReachEndZone,
-            this.GrabToQualify
-        ];
+        const targetClasses = [this.ObjectiveReachEndZone, this.GrabToQualify];
 
         for (const targetClass of targetClasses) {
             const objects = UnityUtils.findObjectsOfTypeAll(targetClass);
@@ -94,9 +91,9 @@ export class TeleportManager extends BaseModule {
                 return;
             }
 
-        Logger.debug(`[${this.name}::teleportToFinish] No object`);
-        //Menu.toast(en.messages.no_finish, 0);
-        };
+            Logger.debug(`[${this.name}::teleportToFinish] No object`);
+            //Menu.toast(en.messages.no_finish, 0);
+        }
     }
 
     public teleportToScore(): void {
@@ -110,16 +107,14 @@ export class TeleportManager extends BaseModule {
         try {
             let target = this.findUnityBubbles();
 
-            if (!target)
-                target = this.findCreativeBubbles();
+            if (!target) target = this.findCreativeBubbles();
 
-            if (!target)
-                target = this.findScoredButton();
+            if (!target) target = this.findScoredButton();
 
             if (target) {
                 this.teleportTo(this.character, target);
             } else {
-                Logger.debug(`[${this.name}::teleportToScore] No object`)
+                Logger.debug(`[${this.name}::teleportToScore] No object`);
                 //menu.toast
             }
         } catch (error: any) {
@@ -147,15 +142,13 @@ export class TeleportManager extends BaseModule {
             if (bubbleHandle.field<boolean>("_spawned").value) {
                 return bubble;
             }
-            
         }
     }
 
     private findScoredButton(): Il2Cpp.Object | undefined {
         const scoredButtons = UnityUtils.findObjectsOfTypeAll(this.ScoredButton);
         for (const button of scoredButtons) {
-            if (button.field<boolean>("_isAnActiveTarget").value) 
-                return button;
+            if (button.field<boolean>("_isAnActiveTarget").value) return button;
         }
     }
 }

@@ -5,17 +5,20 @@ import { BanBypassModule } from "../modules/banBypass.js";
 import { BuildInfoModule } from "../modules/buildInfo.js";
 import { CatapultModule } from "../modules/catapult.js";
 import { CharacterPhysicsModule } from "../modules/characterPhysics.js";
+import { DoorManagerModule } from "../modules/doorManager.js";
 import { FGDebugModule } from "../modules/fgDebug.js";
 import { GraphicsManagerModule } from "../modules/graphicsManager.js";
 import { NetworkModule } from "../modules/network.js";
 import { PopupManagerModule } from "../modules/popupManager.js";
-import { TeleportManager } from "../modules/teleportManager.js";
+import { TeleportManagerModule } from "../modules/teleportManager.js";
 import { TipToeModule } from "../modules/tipToeManager.js";
 import { UICanvasModule } from "../modules/uiCanvas.js";
 
 import { Logger } from "../logger/logger.js";
 
 export class ModuleManager {
+    public name = "ModuleManager";
+
     // prettier-ignore
     private static modules: BaseModule[] = [
         new AntiAFKModule(),
@@ -23,30 +26,31 @@ export class ModuleManager {
         new BuildInfoModule(),
         new CatapultModule(),
         new CharacterPhysicsModule(),
+        new DoorManagerModule(),
         new FGDebugModule(),
         new GraphicsManagerModule(),
         new NetworkModule(),
         new PopupManagerModule(),
-        new TeleportManager(),
+        new TeleportManagerModule(),
         new TipToeModule(),
         new UICanvasModule(),
     ];
 
     /** Initializes all modules by calling init() in module */
     public static initAll() {
-        Logger.info("[ModuleManager] Initializing modules...");
+        Logger.info(`[${this.name}::InitAll] Initializing modules...`);
 
         this.modules.forEach(module => {
             try {
                 module.init();
                 module.onEnable();
-                Logger.debug(`[ModuleManager] ${module.name} module loaded`);
+                Logger.debug(`[${this.name}::InitAll] ${module.name} module loaded`);
             } catch (error: any) {
-                Logger.errorThrow(error, `[ModuleManager] Failed to load ${module.name} module`);
+                Logger.errorThrow(error, `[${this.name}::InitAll] Failed to load ${module.name} module`);
             }
         });
 
-        Logger.info("[ModuleManager] All modules Initialized");
+        Logger.info(`[${this.name}::InitAll] All modules Initialized`);
     }
 
     /**
