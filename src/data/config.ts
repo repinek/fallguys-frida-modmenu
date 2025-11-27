@@ -1,7 +1,7 @@
 export const Config = {
     MOD_MENU_ICON_URL: "https://floyzi.github.io/images/obed-guys-present.png",
 
-    SPOOF_VERSION_URL: "https://floyzi.github.io/FGTools/mobile/version.json",
+    SPOOF_VERSION_URL: "https://floyzi.github.io/fallguys/version.json",
     MOD_MENU_VERSION_URL: "https://repinek.github.io/fallguys-modmenu/latest_version.json",
     GITHUB_URL: "https://github.com/repinek/fallguys-frida-modmenu",
     GITHUB_RELEASES_URL: "https://github.com/repinek/fallguys-frida-modmenu/releases/latest",
