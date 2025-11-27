@@ -1,7 +1,7 @@
-import { AssemblyHelper } from "../core/assemblyHelper.js";
-import { BaseModule } from "../core/baseModule.js";
-import { Config } from "../data/config.js";
-import { Logger } from "../logger/logger.js";
+import { AssemblyHelper } from "../../core/assemblyHelper.js";
+import { BaseModule } from "../../core/baseModule.js";
+import { Config } from "../../data/config.js";
+import { Logger } from "../../logger/logger.js";
 
 export class NetworkModule extends BaseModule {
     public name = "Network";

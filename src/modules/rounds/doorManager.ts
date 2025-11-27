@@ -1,7 +1,7 @@
-import { AssemblyHelper } from "../core/assemblyHelper.js";
-import { BaseModule } from "../core/baseModule.js";
-import { Logger } from "../logger/logger.js";
-import { UnityUtils } from "../utils/unityUtils.js";
+import { AssemblyHelper } from "../../core/assemblyHelper.js";
+import { BaseModule } from "../../core/baseModule.js";
+import { Logger } from "../../logger/logger.js";
+import { UnityUtils } from "../../utils/unityUtils.js";
 
 export class DoorManagerModule extends BaseModule {
     public name = "DoorManager";

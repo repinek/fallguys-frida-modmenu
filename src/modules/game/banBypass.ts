@@ -1,11 +1,11 @@
-import { AssemblyHelper } from "../core/assemblyHelper.js";
-import { ModuleManager } from "../core/moduleManager.js";
-import { BaseModule } from "../core/baseModule.js";
+import { AssemblyHelper } from "../../core/assemblyHelper.js";
+import { ModuleManager } from "../../core/moduleManager.js";
+import { BaseModule } from "../../core/baseModule.js";
 
-import { I18n } from "../i18n/i18n.js";
+import { I18n } from "../../i18n/i18n.js";
 
-import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./popupManager.js";
-import { Logger } from "../logger/logger.js";
+import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "../visuals/popupManager.js";
+import { Logger } from "../../logger/logger.js";
 
 /*
  * Temporary bans can't be bypassed, but permament can be lol

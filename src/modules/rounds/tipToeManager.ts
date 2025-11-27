@@ -1,7 +1,7 @@
-import { AssemblyHelper } from "../core/assemblyHelper.js";
-import { BaseModule } from "../core/baseModule.js";
-import { UnityUtils } from "../utils/unityUtils.js";
-import { Logger } from "../logger/logger.js";
+import { AssemblyHelper } from "../../core/assemblyHelper.js";
+import { BaseModule } from "../../core/baseModule.js";
+import { UnityUtils } from "../../utils/unityUtils.js";
+import { Logger } from "../../logger/logger.js";
 
 /*
  * Every TipToe tile has Levels::TipToe::TipToe_Platform component

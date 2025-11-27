@@ -8,15 +8,18 @@ import { ModPreferences } from "./data/modPreferences.js";
 import { ObsidianConfig } from "./data/menuConfig.js";
 import { Config } from "./data/config.js";
 
-import { GraphicsManagerModule } from "./modules/graphicsManager.js";
-import { BuildInfoModule } from "./modules/buildInfo.js";
-import { CharacterPhysicsModule } from "./modules/characterPhysics.js";
-import { DoorManagerModule } from "./modules/doorManager.js";
-import { FGDebugModule } from "./modules/fgDebug.js";
-import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./modules/popupManager.js";
-import { TeleportManagerModule } from "./modules/teleportManager.js";
-import { TipToeModule } from "./modules/tipToeManager.js";
-import { UICanvasModule } from "./modules/uiCanvas.js";
+import { BuildInfoModule } from "./modules/game/buildInfo.js";
+
+import { CharacterPhysicsModule } from "./modules/player/characterPhysics.js";
+import { TeleportManagerModule } from "./modules/player/teleportManager.js";
+
+import { DoorManagerModule } from "./modules/rounds/doorManager.js";
+import { TipToeModule } from "./modules/rounds/tipToeManager.js";
+
+import { FGDebugModule } from "./modules/visuals/fgDebug.js";
+import { GraphicsManagerModule } from "./modules/visuals/graphicsManager.js";
+import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "./modules/visuals/popupManager.js";
+import { UICanvasModule } from "./modules/visuals/uiCanvas.js";
 
 import { I18n } from "./i18n/i18n.js";
 import en from "./i18n/localization/en.json";
@@ -60,9 +63,7 @@ function main() {
 
     Menu.toast(en.messages.menu_will_appear_later, 1);
 
-    // deprecated: === Helpers ===, moved to utils/UnityUtils.ts
     // === Hooks ===
-    // Utils
     OnMainMenuDisplayed_method.implementation = function (event) {
         Logger.hook("OnMainMenuDisplayed Called");
 
@@ -77,52 +78,9 @@ function main() {
 
             Menu.waitForInit(initMenu);
             reachedMainMenu = true;
-            // if (Config.Toggles.toggleFGDebug) {
-            //     FGDebug.enable(); // may cause error, frida & il2cpp-bridge lore, so unstable tbh. UPD: no, i'm just dumb
-            // }
         }
 
         return this.method("OnMainMenuDisplayed", 1).invoke(event);
-    };
-
-    // deprecated: Physics, moved to modules/characterPhysics.ts
-
-    // === Functions ===
-    const showServerDetails = () => {
-        try {
-            // if (GlobalGameStateClient_Instance) {
-            //     // rename to get instance
-            //     const networkManager = GlobalGameStateClient_Instance.method<Il2Cpp.Object>("get_NetworkManager").invoke();
-            //     const gameConnection = networkManager.method<Il2Cpp.Object>("get_ConnectionToServer").invoke();
-            //     const hostIPAddr = networkManager.method<Il2Cpp.String>("get_HostIPAddr").invoke().content;
-            //     const hostPortNo = networkManager.method<number>("get_HostPortNo").invoke();
-            //     const rtt = gameConnection.method<number>("CurrentRtt").invoke();
-            //     Menu.toast(`Server: ${hostIPAddr}:${hostPortNo}. Ping: ${rtt}ms`, 0); // little secret, you can ddos these servers, and it's not too hard.
-            //     javaUtils.copyToClipboard(`${hostIPAddr}:${hostPortNo}`);
-            // } else {
-            //     Menu.toast(en.messages.not_in_the_game, 0);
-            // }
-        } catch (error: any) {
-            Logger.errorThrow(error);
-        }
-    };
-
-    const showGameDetails = () => {
-        try {
-            // if (ClientGameManager_Instance) {
-            //     const round = ClientGameManager_Instance.field<Il2Cpp.Object>("_round").value;
-            //     const roundID = round.method<Il2Cpp.String>("get_Id").invoke().content;
-            //     const seed = ClientGameManager_Instance.method<number>("get_RandomSeed").invoke();
-            //     const eliminatedPlayerCount = ClientGameManager_Instance.field<number>("_eliminatedPlayerCount").value;
-            //     // const initialNumParticipants = ClientGameManager_Instance.field<number>("_initialNumParticipants").value;
-            //     // const allPlayers = ClientGameManager_Instance.method<Il2Cpp.Array<Il2Cpp.Object>>("get_AllPlayers").invoke();
-            //     Menu.toast(`RoundID: ${roundID}, Seed: ${seed}, Eliminated: ${eliminatedPlayerCount}`, 0);
-            // } else {
-            //     Menu.toast(en.messages.not_in_the_game, 0);
-            // }
-        } catch (error: any) {
-            Logger.errorThrow(error);
-        }
     };
 
     const initMenu = () => {

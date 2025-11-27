@@ -1,18 +1,27 @@
 import { BaseModule } from "./baseModule.js";
 
-import { AntiAFKModule } from "../modules/antiAFK.js";
-import { BanBypassModule } from "../modules/banBypass.js";
-import { BuildInfoModule } from "../modules/buildInfo.js";
-import { CatapultModule } from "../modules/catapult.js";
-import { CharacterPhysicsModule } from "../modules/characterPhysics.js";
-import { DoorManagerModule } from "../modules/doorManager.js";
-import { FGDebugModule } from "../modules/fgDebug.js";
-import { GraphicsManagerModule } from "../modules/graphicsManager.js";
-import { NetworkModule } from "../modules/network.js";
-import { PopupManagerModule } from "../modules/popupManager.js";
-import { TeleportManagerModule } from "../modules/teleportManager.js";
-import { TipToeModule } from "../modules/tipToeManager.js";
-import { UICanvasModule } from "../modules/uiCanvas.js";
+// Game
+import { BanBypassModule } from "../modules/game/banBypass.js";
+import { BuildInfoModule } from "../modules/game/buildInfo.js";
+
+// Network
+import { CatapultModule } from "../modules/network/catapult.js";
+import { NetworkModule } from "../modules/network/network.js";
+
+// Player
+import { AntiAFKModule } from "../modules/player/antiAFK.js";
+import { CharacterPhysicsModule } from "../modules/player/characterPhysics.js";
+import { TeleportManagerModule } from "../modules/player/teleportManager.js";
+
+// Rounds
+import { DoorManagerModule } from "../modules/rounds/doorManager.js";
+import { TipToeModule } from "../modules/rounds/tipToeManager.js";
+
+// Visuals
+import { FGDebugModule } from "../modules/visuals/fgDebug.js";
+import { GraphicsManagerModule } from "../modules/visuals/graphicsManager.js";
+import { PopupManagerModule } from "../modules/visuals/popupManager.js";
+import { UICanvasModule } from "../modules/visuals/uiCanvas.js";
 
 import { Logger } from "../logger/logger.js";
 

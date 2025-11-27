@@ -1,6 +1,6 @@
-import { AssemblyHelper } from "../core/assemblyHelper.js";
-import { BaseModule } from "../core/baseModule.js";
-import { UnityUtils } from "../utils/unityUtils.js";
+import { AssemblyHelper } from "../../core/assemblyHelper.js";
+import { BaseModule } from "../../core/baseModule.js";
+import { UnityUtils } from "../../utils/unityUtils.js";
 
 export class UICanvasModule extends BaseModule {
     public name = "UICanvas";
