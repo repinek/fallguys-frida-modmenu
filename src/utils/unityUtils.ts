@@ -36,7 +36,17 @@ export class UnityUtils {
     }
 
     /** Wrapper over constructor.name */
-    public static getTypeName(object: any) {
+    public static getTypeName(object: any): string {
         return object.constructor.name;
+    }
+
+    /** Wrapper over get_gameObject */
+    public static getGameObject(component: Il2Cpp.Object): Il2Cpp.Object {
+        return component.method<Il2Cpp.Object>("get_gameObject").invoke();
+    }
+
+    /** Wrapper over SetActive */
+    public static setActive(gameObject: Il2Cpp.Object, active: boolean): void {
+        gameObject.method<void>("SetActive").invoke(active);
     }
 }
