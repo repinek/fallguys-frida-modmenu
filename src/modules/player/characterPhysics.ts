@@ -76,10 +76,10 @@ export class CharacterPhysicsModule extends BaseModule {
     private changeGravity(data: Il2Cpp.Object): void {
         let gravity = Config.DefaultValues.maxGravityVelocity;
 
-        if (Config.Toggles.toggleCustomVelocity) {
-            if (Config.Toggles.toggleNoVelocity) {
+        if (Config.Toggles.toggleCustomGravity) {
+            if (Config.Toggles.toggleNoGravity) {
                 gravity = 0;
-            } else if (Config.Toggles.toggleNegativeVelocity) {
+            } else if (Config.Toggles.toggleNegativeGravity) {
                 gravity = -Config.CustomValues.maxGravityVelocity;
             } else {
                 gravity = Config.CustomValues.maxGravityVelocity;

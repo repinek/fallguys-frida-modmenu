@@ -4,6 +4,7 @@ import * as JavaUtils from "./javaUtils.js";
 import { Logger } from "../logger/logger.js";
 
 export class UpdateUtils {
+    // TODO: just show popup if update is available
     public static checkForUpdate(): void {
         if (ModPreferences.ENV !== "release") {
             Logger.debug("Skipping mod menu version check in dev/staging");

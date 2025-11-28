@@ -3,7 +3,7 @@ import { BaseModule } from "../../core/baseModule.js";
 import { Logger } from "../../logger/logger.js";
 
 export class BuildInfoModule extends BaseModule {
-    public name = "Build Info";
+    public name = "BuildInfo";
 
     // Classes
     private BuildInfo!: Il2Cpp.Class;
@@ -35,6 +35,6 @@ export class BuildInfoModule extends BaseModule {
     }
 
     public getShortString(): string {
-        return `${this.gameVersion} / #${this.buildNumber} / ${this.buildDate}`;
+        return `Based on: ${this.gameVersion} / #${this.buildNumber} / ${this.buildDate}`;
     }
 }

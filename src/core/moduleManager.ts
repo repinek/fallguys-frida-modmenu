@@ -3,6 +3,7 @@ import { BaseModule } from "./baseModule.js";
 // Game
 import { BanBypassModule } from "../modules/game/banBypass.js";
 import { BuildInfoModule } from "../modules/game/buildInfo.js";
+//import { UwUifyModule } from "../modules/game/uwuify.js";
 
 // Network
 import { CatapultModule } from "../modules/network/catapult.js";
@@ -15,7 +16,7 @@ import { TeleportManagerModule } from "../modules/player/teleportManager.js";
 
 // Rounds
 import { DoorManagerModule } from "../modules/rounds/doorManager.js";
-import { TipToeModule } from "../modules/rounds/tipToeManager.js";
+import { TipToeManagerModule } from "../modules/rounds/tipToeManager.js";
 
 // Visuals
 import { FGDebugModule } from "../modules/visuals/fgDebug.js";
@@ -30,6 +31,7 @@ export class ModuleManager {
 
     // prettier-ignore
     private static modules: BaseModule[] = [
+        //new UwUifyModule(),
         new AntiAFKModule(),
         new BanBypassModule(),
         new BuildInfoModule(),
@@ -41,7 +43,7 @@ export class ModuleManager {
         new NetworkModule(),
         new PopupManagerModule(),
         new TeleportManagerModule(),
-        new TipToeModule(),
+        new TipToeManagerModule(),
         new UICanvasModule(),
     ];
 

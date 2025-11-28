@@ -45,9 +45,10 @@ export class PopupManagerModule extends BaseModule {
         this.OkButtonType = AssemblyHelper.MTFGClient.class("FGClient.UI.UIModalMessage/OKButtonType");
     }
 
+    // TODO: add custom size
     public showPopup(title: string, message: string, modalType: ModalType_enum, okButtonType: OkButtonType_enum): void {
         try {
-            Logger.info("Showing popup:", title, message, modalType, okButtonType);
+            Logger.info("Showing popup");
             const ShowModalMessageDataInstance = this.popupManagerInstance!.method<boolean>("Show", 3).overload(
                 "FGClient.UI.PopupInteractionType",
                 "FGClient.UI.ModalMessageData",

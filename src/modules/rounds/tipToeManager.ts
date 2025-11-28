@@ -9,8 +9,8 @@ import { Logger } from "../../logger/logger.js";
  * If it returns true, we disable the GameObject using SetActive
  */
 
-export class TipToeModule extends BaseModule {
-    public name = "TipToe Manager";
+export class TipToeManagerModule extends BaseModule {
+    public name = "TipToeManager";
 
     // Classes
     private TipToe_Platform!: Il2Cpp.Class;

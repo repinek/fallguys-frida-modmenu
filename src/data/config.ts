@@ -5,7 +5,7 @@ export const Config = {
     MOD_MENU_VERSION_URL: "https://repinek.github.io/fallguys-modmenu/latest_version.json",
     GITHUB_URL: "https://github.com/repinek/fallguys-frida-modmenu",
     GITHUB_RELEASES_URL: "https://github.com/repinek/fallguys-frida-modmenu/releases/latest",
-    DISCORD_INVITE_URL: "https://discord.gg/cNFJ73P6p3",
+    DISCORD_URL: "https://discord.gg/cNFJ73P6p3",
 
     TELEPORT_COOLDOWN: 500,
 
@@ -24,6 +24,7 @@ export const Config = {
     CUSTOM_ANALYTICS_PORT: 443,
     IS_ANALYTICS_SECURE: true,
 
+    // TODO: tabs separation
     Toggles: {
         // === Movement ===
         toggle360Dives: false,
@@ -31,9 +32,9 @@ export const Config = {
         toggleDontSendFallGuyState: false,
 
         toggleCustomSpeed: false,
-        toggleCustomVelocity: false,
-        toggleNegativeVelocity: false,
-        toggleNoVelocity: false,
+        toggleCustomGravity: false,
+        toggleNegativeGravity: false,
+        toggleNoGravity: false,
 
         toggleCustomJumpForce: false,
         toggleCustomDiveForce: false,
@@ -46,6 +47,7 @@ export const Config = {
         toggleShowQueuedPlayers: false
     },
 
+    // TODO: combine with toggles
     CustomValues: {
         normalMaxSpeed: 9.5,
         maxGravityVelocity: 40,

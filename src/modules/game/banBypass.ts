@@ -59,7 +59,7 @@ export class BanBypassModule extends BaseModule {
     private showBannedPopup(): void {
         const popupModule = ModuleManager.get(PopupManagerModule);
         const title = I18n.t("messages.account_banned");
-        const message = I18n.t("messages.account_banned_desc")
+        const message = I18n.t("messages.account_banned_desc");
         popupModule?.showPopup(title, message, ModalType_enum.MT_OK, OkButtonType_enum.Green);
     }
 }

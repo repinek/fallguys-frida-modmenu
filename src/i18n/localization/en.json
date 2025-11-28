@@ -2,66 +2,77 @@
     "hi": {
         "hi": "hello from i18n wheelchair"
     },
-    "toasts": {
-        "signature_not_fetched": "Actual server signature can't be fetched, spoof won't be working",
-        "mod_menu_version_not_fetched": "Actual mod menu version can't be fetched",
-        "mod_menu_version_actual": "Mod menu is up to date",
-        "mod_menu_version_outdated": "Mod menu version is outdated, redirecting to download page...",
-        "no_tiptoe": "No TipToe platforms found"
-    },
     "menu": {
         "info": {
             "title": "Fall Guys Mod Menu",
-            "desc": "",
-            "author": "",
-            "special_thanks": ""
+            "desc": ""
         },
         "tabs": {
             "movement": "<b>--- Movement ---</b>",
             "round": "<b>--- Round ---</b>",
             "teleports": "<b>--- Teleports ---</b>",
             "utility": "<b>--- Utility ---</b>",
-            "links": "<b>--- Links ---</b>",
-            "build_info": "<b>--- Build Info ---</b>"
+            "other": "<b>--- Other ---</b>"
         },
         "functions": {
-            "toggle_360_dives": "Enable 360 Dives",
-            "toggle_air_jump": "Air Jump",
-            "toggle_freeze_player": "Freeze Player",
-            "toggle_dont_send_fallguy_state": "Don't send Fall Guy state",
-            "toggle_custom_speed": "Use Custom Speed",
-            "custom_speed": "Custom Speed: {0} / 100",
-            "toggle_custom_velocity": "Enable Custom Velocity",
-            "vertical_gravity_velocity": "Vertical Gravity Velocity: {0} / 100",
-            "toggle_negative_velocity": "Negative Velocity",
-            "toggle_no_vertical_velocity": "No Vertical Velocity",
-            "toggle_custom_jump_strength": "Use Custom Jump Strength",
-            "jump_strength": "Jump Strength: {0} / 100",
-            "toggle_custom_dive_strength": "Use Custom Dive Strength",
-            "dive_strength": "Dive Strength: {0} / 100",
-            "hide_real_doors": "Hide Real Doors",
-            "show_tiptoe_path": "Show Tip Toe Path",
-            "teleport_to_finish_or_crown": "Teleport To Finish / Crown",
-            "teleport_to_score": "Teleport To Bubble / Active Button",
-            "toggle_view_names": "Toggle Player Names",
-            "toggle_custom_fov": "Use Custom FOV",
-            "custom_fov": "Custom FOV: {0}",
-            "toggle_disable_ui": "Disable UI (also hides touch controls)",
-            "toggle_fgdebug": "Display FGDebug",
-            "toggle_disable_analytics": "Disable Analytics",
-            "show_number_of_queued_players": "Show Number of Queued Players",
-            "custom_resolution": "Custom Resolution (will apply in next round): {0}% / 100%",
-            "show_game_details": "Show Game Details",
-            "show_and_copy_server_details": "Show and Copy Server Details"
+            "360_dives": "360 Dives",
+            "air_jump": "Air Jump",
+            "freeze_player": "Freeze Player",
+            "fallguy_state": "Don't send Fall Guy state",
+            "fallguy_state_warn": "Warning: You won't be able to Qualify or Grab objects while Don't send state is active",
+
+            "custom_speed": "Use Custom Speed",
+            "speed_val": "Custom Speed: {0} / 100",
+
+            "custom_gravity": "Use Custom Gravity",
+            "negative_gravity": "Negative Gravity",
+            "no_gravity": "No Gravity",
+            "gravity_val": "Custom Gravity: {0} / 100",
+
+            "custom_jump_force": "Use Custom Jump Strength",
+            "jump_force_val": "Jump Strength: {0} / 100",
+
+            "custom_dive_force": "Use Custom Dive Strength",
+            "seekbar_dive_strength": "Dive Strength: {0} / 100",
+
+            "hide_doors": "Hide Real Doors",
+            "hide_tiptoe": "Show Tip Toe Path",
+
+            "tp_finish_or_crown": "Teleport To Finish / Crown",
+            "tp_score": "Teleport To Bubble / Active Button",
+
+            "view_names": "Toggle Player Names",
+            "custom_fov": "Use Custom FOV",
+            "custom_fov_val": "Custom FOV: {0}",
+            "disable_ui": "Disable UI (also hides touch controls)",
+            "fgdebug": "Display FGDebug",
+            "disable_analytics": "Disable Analytics",
+            "queued_players": "Show Number of Queued Players",
+            "custom_resolution": "Custom Resolution (will apply in next round): {0}%",
+            "game_details": "Show Game Details",
+            "server_details": "Show and Copy Server Details"
+        },
+        "other": {
+            "github_url": "GitHub Repository (Leave a star!)",
+            "discord_url": "Discord Server",
+            "credits": "Open Credits"
         },
         "toasts": {
             "no_overlay_permission": "Overlay permission is needed to show the menu",
             "hide_button": "Hide",
             "close_button": "Close",
             "hide_callback": "Icon hidden",
-            "kill_callback": "Menu killed",
-            "menu_will_appear_later": "Menu will appear once you enter the main menu",
-            "display_menu": "Displaying the menu"
+            "kill_callback": "Menu killed"
+        }
+    },
+    "popups": {
+        "ban_bypass": {
+            "title": "Account Banned",
+            "message": "Your account is banned, but the mod allows you to play anyway.\nEnjoy!"
+        },
+        "credits": {
+            "title": "Credits",
+            "message": "<b>Developed by:</b>\nrepinek\n\n<b>Special Thanks:</b>\n• <b>Floyzi</b> — Help with how the game works, help with some features, localization.\n• <b>commonuserlol</b> — Help with code and menu\n• <b>Obed Guys Team</b> — Some Features\n\n<b>Built with:</b>\n• <b>frida.re</b> — An amazing dynamic instrumentation toolkit.\n• <b>frida-il2cpp-bridge</b> — The incredible frida module for IL2CPP"
         }
     },
     "info": {
@@ -95,5 +106,12 @@
         "ping": "Ping",
         "account_banned": "Account Banned",
         "account_banned_desc": "Your Fall Guys Account is permanently banned, but you can still play with mod menu.\nEnjoy!"
+    },
+    "toasts": {
+        "signature_not_fetched": "Actual server signature can't be fetched, spoof won't be working",
+        "mod_menu_version_not_fetched": "Actual mod menu version can't be fetched",
+        "mod_menu_version_actual": "Mod menu is up to date",
+        "mod_menu_version_outdated": "Mod menu version is outdated, redirecting to download page...",
+        "no_tiptoe": "No TipToe platforms found"
     }
 }
