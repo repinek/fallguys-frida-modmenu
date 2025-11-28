@@ -9,6 +9,9 @@ export const Config = {
 
     TELEPORT_COOLDOWN: 500,
 
+    // === Unity Logging ===
+    UNITY_LOGGING: false,
+
     // === Login Spoof ===
     USE_SPOOF: true,
 

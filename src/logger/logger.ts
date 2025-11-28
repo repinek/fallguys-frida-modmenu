@@ -9,7 +9,7 @@ export class Logger {
         CYAN: "\x1b[36m",
         YELLOW: "\x1b[33m",
         RED: "\x1b[31m"
-    } as const; 
+    } as const;
 
     private static getTime(): string {
         const date = new Date();
@@ -32,17 +32,22 @@ export class Logger {
         console.debug(`${this.getTime()} ${this.Colors.CYAN}[DEBUG]${this.Colors.RESET}`, ...messages);
     }
 
-    public static hook(...messages: any[]) {
-        if (ModPreferences.ENV === "release") return;
-        console.debug(`${this.getTime()} ${this.Colors.GRAY}[HOOK]`, ...messages, this.Colors.RESET);
-    }
-
     public static warn(...messages: any[]) {
         console.warn(`${this.getTime()} ${this.Colors.YELLOW}[WARN]${this.Colors.RESET}`, ...messages);
     }
 
     public static error(...messages: any[]) {
         console.error(`${this.getTime()} ${this.Colors.RED}[ERROR]${this.Colors.RESET}`, ...messages);
+    }
+
+    public static hook(...messages: any[]) {
+        if (ModPreferences.ENV === "release") return;
+        console.debug(`${this.getTime()} ${this.Colors.GRAY}[HOOK]`, ...messages, this.Colors.RESET);
+    }
+
+    public static unity(logType: "INFO" | "WARN" | "ERROR", ...messages: any[]) {
+        if (ModPreferences.ENV === "release") return;
+        console.debug(`${this.getTime()} ${this.Colors.GRAY}[${logType}:Unity]`, ...messages, this.Colors.RESET);
     }
 
     /**
@@ -61,10 +66,10 @@ export class Logger {
         this.toast(`${message} ${error.message}`, 1);
     }
 
-    /** 
+    /**
      * Creates toast
      * Wrapper over Menu.Toast
-     * 
+     *
      * @param [length=0] 0 - 2s, 1 - 3.5s, default is 2s
      */
     public static toast(text: string, length: 0 | 1 = 0) {

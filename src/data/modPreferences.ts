@@ -1,5 +1,5 @@
 export const ModPreferences = {
-    VERSION: "2.82", // Don't forget update after changes!
+    VERSION: "2.83", // Don't forget update after changes!
     ENV: "release", // dev, staging, release
     FOR_GAME_VERSION: "21.0.1"
 };
@@ -17,7 +17,6 @@ add changelog in menu
 create cool screenshots for readme
 improve logging at modules
 on screen logging
-unity logging
 made localization for other languages (i18n)
 refer changeResolutionScale()
 custom image on loading screen
@@ -33,6 +32,7 @@ maybe:
 fork menu and update it to frida 17
 
 DONE:
+[x] unity logging
 [x] move teleportmanager from utils
 [x] something with to global classes 
 [x] rename velocity to gravity and dive strenght to dive force or wtf im was doing

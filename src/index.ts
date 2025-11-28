@@ -9,7 +9,7 @@ import { ModPreferences } from "./data/modPreferences.js";
 import { I18n } from "./i18n/i18n.js";
 
 import { Logger } from "./logger/logger.js";
-
+import { UnityLogger } from "./logger/unityLogger.js";
 import { MenuBuilder } from "./ui/menu.js";
 
 import { UnityUtils } from "./utils/unityUtils.js";
@@ -18,13 +18,11 @@ import { UpdateUtils } from "./utils/updateUtils.js";
 function main() {
     Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
     UpdateUtils.checkForUpdate();
-
     I18n.init();
 
     AssemblyHelper.init();
-
+    UnityLogger.init();
     UnityUtils.init();
-
     ModuleManager.initAll();
 
     MenuBuilder.init();

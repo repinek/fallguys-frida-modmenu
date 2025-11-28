@@ -75,27 +75,6 @@
             "message": "<b>Developed by:</b>\nrepinek\n\n<b>Special Thanks:</b>\n• <b>Floyzi</b> — Help with how the game works, help with some features, localization.\n• <b>commonuserlol</b> — Help with code and menu\n• <b>Obed Guys Team</b> — Some Features\n\n<b>Built with:</b>\n• <b>frida.re</b> — An amazing dynamic instrumentation toolkit.\n• <b>frida-il2cpp-bridge</b> — The incredible frida module for IL2CPP"
         }
     },
-    "info": {
-        "name": "Fall Guys Mod Menu",
-        "warn": "IF YOU BOUGHT IT YOU WERE SCAMMED",
-        "author": "Created by repinek",
-        "special_thanks": "Special thanks to Floyzi102",
-        "fg_state_warn": "While you using Don't send Fall Guy state you won't be able to Qualify, Grab objects and do other server required actions\nFor others your Fall Guy will stay in state before enabling this feature",
-        "github_url": "GitHub Repository (Leave a star!)",
-        "discord_url": "Discord Server",
-        "mod_menu_version": "Mod Menu version:",
-        "mod_menu_env": "Mod Menu environment:",
-        "game_version": "Game Version:",
-        "is_spoofed": "Login spoof:",
-        "spoofed_game_version": "Used Game Version:",
-        "original_signature": "Build Signature:",
-        "spoofed_signature": "Used Signature:",
-        "platform": "Platform:",
-        "unity_version": "Unity Version:",
-        "game_build_number": "Game Build number:",
-        "game_build_date": "Game Build date:",
-        "package_name": "Package Name:"
-    },
     "messages": {
         "menu_will_appear_later": "Menu will appear once you enter the main menu",
         "display_menu": "Displaying the menu",
