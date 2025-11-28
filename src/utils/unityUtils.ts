@@ -49,4 +49,9 @@ export class UnityUtils {
     public static setActive(gameObject: Il2Cpp.Object, active: boolean): void {
         gameObject.method<void>("SetActive").invoke(active);
     }
+
+    /** Wrapper over Il2Cpp.perform(block, "main") */
+    public static runInMain<T>(block: () => T | Promise<T>): Promise<T> {
+        return Il2Cpp.perform(block, "main");
+    }
 }
