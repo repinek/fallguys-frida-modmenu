@@ -1,6 +1,6 @@
 {
     "hi": {
-        "hi": "hello from i18n"
+        "hi": "hello from i18n wheelchair"
     },
     "toasts": {
         "signature_not_fetched": "Actual server signature can't be fetched, spoof won't be working",
@@ -10,13 +10,19 @@
         "no_tiptoe": "No TipToe platforms found"
     },
     "menu": {
+        "info": {
+            "title": "Fall Guys Mod Menu",
+            "desc": "",
+            "author": "",
+            "special_thanks": ""
+        },
         "tabs": {
-            "movement_tab": "<b>--- Movement ---</b>",
-            "round_tab": "<b>--- Round ---</b>",
-            "teleports_tab": "<b>--- Teleports ---</b>",
-            "utility_tab": "<b>--- Utility ---</b>",
-            "links_tab": "<b>--- Links ---</b>",
-            "build_info_tab": "<b>--- Build Info ---</b>"
+            "movement": "<b>--- Movement ---</b>",
+            "round": "<b>--- Round ---</b>",
+            "teleports": "<b>--- Teleports ---</b>",
+            "utility": "<b>--- Utility ---</b>",
+            "links": "<b>--- Links ---</b>",
+            "build_info": "<b>--- Build Info ---</b>"
         },
         "functions": {
             "toggle_360_dives": "Enable 360 Dives",

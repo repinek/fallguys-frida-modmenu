@@ -1,12 +1,12 @@
 export const ModPreferences = {
-    VERSION: "2.75", // Don't forget update after changes!
+    VERSION: "2.78", // Don't forget update after changes!
     ENV: "release", // dev, staging, release
-    FOR_GAME_VERSION: "21.0.1" // 21.1.1 is not released for mobile LMAOМ
+    FOR_GAME_VERSION: "21.0.1"
 };
 
 /*
 !! TODO: 
-implement extensions.ts (.setActive, .getGameObject, safe execute wrapper) 
+implement extensions.ts (.setActive, .getGameObject) 
 i18n refactor
 logging refactor
 project structure
