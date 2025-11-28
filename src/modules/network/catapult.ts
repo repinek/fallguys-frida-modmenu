@@ -4,6 +4,30 @@ import { Config } from "../../data/config.js";
 import { Logger } from "../../logger/logger.js";
 import * as JavaUtils from "../../utils/javaUtils.js";
 
+/*
+ * 1. Login and Version Spoofing:
+ *    - Overrides clientVersion and clientVersionSignature to match the latest client
+ *    - Allows connecting with outdated APKs, data fetched from Config.VERSION_URL (thx floyzi) (You can find it yourself if you want) 
+ * 
+ * 
+ * 2. Platform Spoofing:
+ *    - We can also change the platform here, but make sure it exists (otherwise you won't be able to login, mediatonic fixed this)
+ *      Some existing platforms: 
+ *      ps5, ps4,
+ *      pc_steam, pc_standalone (no longer used for official clients), pc_egs, win (no longer used too)
+ *      ports3_2 (3_1) (testing platform for mobile devices)...
+ *      android_ega, ios_ega
+ * 
+ * 3. Custom Analytics server: 
+ *    - We hooks constructor of WebSocketNetworkHost, since we can't modify isSecure in CatapultAnalyticsService::Init_ClientOnly
+ * 	  - public void Init_ClientOnly(ServicesEnvironment.Server serverAddress, CatapultGatewayConnection.Config gatewayConnConfig, string platformServiceProvider) {
+ *          // ...blablabla
+ *			WebSocketNetworkHost networkHost = new WebSocketNetworkHost(serverAddress.Address, serverAddress.Port, true);
+ *          // ...blablabla
+ *          this._Init(config, sender);
+ *      }
+ */ 
+
 interface IClientDetails {
     clientVersion: string;
     clientVersionSignature: string;

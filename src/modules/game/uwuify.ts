@@ -2,6 +2,12 @@ import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 import { Config } from "../../data/config.js";
 
+/*
+ * Hooks LocalisedString::GetString and return UwUified result
+ *
+ * Thanks a lot: https://github.com/KieronQuinn/owoify
+ */
+
 export class UwUifyModule extends BaseModule {
     public name = "UwUify";
 
@@ -14,8 +20,8 @@ export class UwUifyModule extends BaseModule {
         this.LocalisedStrings = AssemblyHelper.TheMultiplayerGuys.class("LocalisedStrings");
 
         // System.String LocalisedStrings::GetString(System.String)
-        this.getString = this.LocalisedStrings.method("GetString");
-        this.getString2 = this.getString.overload("System.String", "System.Object[]");
+        this.getString = this.LocalisedStrings.method("GetString").overload("System.String");
+        this.getString2 = this.LocalisedStrings.method("GetString").overload("System.String", "System.Object[]");
     }
 
     public onEnable(): void {

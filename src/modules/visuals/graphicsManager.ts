@@ -45,7 +45,7 @@ export class GraphicsManagerModule extends BaseModule {
 
         this.get_TargetFrameRate.implementation = function (): number {
             Logger.hook("get_TargetFrameRate called");
-            return 1337; // litterally unlimited, because it's linked to the screen refresh rate
+            return 1337; // litterally unlimited, because it's linked to the screen refresh rate (you can't set -1 btw)
         };
 
         this.set_TargetFrameRate.implementation = function (fps): void {
@@ -84,14 +84,15 @@ export class GraphicsManagerModule extends BaseModule {
             /*
             i wanted to make this value changeable in the game, but unfortunately 
             calling ResolutionScaling::UpdateResolutionScaleStatus() just crashes the game for now.
-            */
+            UPD: IS IT CUZ WRONG THREAD?
+            */ 
         } catch (error: any) {
             Logger.errorThrow(error);
         }
     }
 
     /**
-     * Wrapper over PlayerInfoHUDBase::SetShowPlayerNamesByDefault()
+     * Wrapper over PlayerInfoHUDBase::SetShowPlayerNamesByDefault
      *
      * Reads state from PlayerInfoHUDBase::get_ShowNames
      */

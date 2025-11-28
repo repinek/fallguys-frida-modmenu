@@ -3,9 +3,16 @@ import { BaseModule } from "../../core/baseModule.js";
 import { Logger } from "../../logger/logger.js";
 import { UnityUtils } from "../../utils/unityUtils.js";
 
+/*
+ * Every door has Levels::DoorDash::FakeDoorController component or Levels::CrownMaze::CrownMazeDoor (if lost temple map)
+ * It has a boolean field IsFakeDoor or IsBreakable
+ * If it returns false or true, we disable the GameObject using SetActive
+ */
+
 export class DoorManagerModule extends BaseModule {
     public name = "DoorManager";
 
+    // Classes
     private FakeDoorController!: Il2Cpp.Class;
     private CrownMazeDoor!: Il2Cpp.Class;
 

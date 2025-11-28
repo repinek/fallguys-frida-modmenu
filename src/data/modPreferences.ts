@@ -7,7 +7,6 @@ export const ModPreferences = {
 /*
 !! TODO: 
 createmenu only when get build info (and fgdebug)
-implement uwuify
 implement extensions.ts (.setActive, .getGameObject) 
 i18n refactor
 project structure
@@ -23,7 +22,6 @@ login by token
 config file (?)
 log file
 all cosmetics lobby (?)
-comments over module
 separate configs
 check old commits for pre-installed value on seekbars
 
@@ -31,6 +29,8 @@ maybe:
 fork menu and update it to frida 17
 
 DONE:
+[x] comments over module
+[x] implement uwuify
 [x] logging refactor
 [x] unity logging
 [x] move teleportmanager from utils

@@ -16,8 +16,6 @@ export class I18n {
     public static init(): void {
         let targetLocale = "en";
 
-        // Current thread is not attached to the Java VM; please move this code inside a Java.perform() callback
-        // IM SO FUCKING STUPID OMG
         Java.perform(() => {
             if (Menu.sharedPreferences.contains("locale")) {
                 const savedLocale = Menu.sharedPreferences.getString("locale");
