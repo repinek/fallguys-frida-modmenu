@@ -50,7 +50,8 @@
             "queued_players": "Show Number of Queued Players",
             "custom_resolution": "Custom Resolution (will apply in next round): {0}%",
             "game_details": "Show Game Details",
-            "server_details": "Show and Copy Server Details"
+            "server_details": "Show and Copy Server Details",
+            "uwuify": "UwUify Mode"
         },
         "other": {
             "github_url": "GitHub Repository (Leave a star!)",

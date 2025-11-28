@@ -50,7 +50,7 @@ export class UnityUtils {
         gameObject.method<void>("SetActive").invoke(active);
     }
 
-    /** 
+    /**
      * Wrapper over Il2Cpp.perform(block, "main")
      *
      * From Java.scheduleOnMainThread you need call from main thread

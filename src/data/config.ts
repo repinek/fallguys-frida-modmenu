@@ -47,7 +47,9 @@ export const Config = {
         toggleFGDebug: false,
         toggleDisableAnalytics: false,
         toggleHideDoors: false,
-        toggleShowQueuedPlayers: false
+        toggleShowQueuedPlayers: false,
+
+        toggleUwUifyMode: false
     },
 
     // TODO: combine with toggles

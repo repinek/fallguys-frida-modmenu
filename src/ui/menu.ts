@@ -342,6 +342,12 @@ export class MenuBuilder {
                 m.matchInfo?.showGameDetails();
             })
         );
+
+        Menu.add(
+            layout.toggle(I18n.t("menu.functions.uwuify"), (state: boolean) => {
+                Config.Toggles.toggleUwUifyMode = state;
+            })
+        );
     }
 
     private static buildOtherTab(layout: Menu.ObsidianLayout): void {

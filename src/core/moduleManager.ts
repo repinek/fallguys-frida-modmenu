@@ -3,7 +3,7 @@ import { BaseModule } from "./baseModule.js";
 // Game
 import { BanBypassModule } from "../modules/game/banBypass.js";
 import { BuildInfoModule } from "../modules/game/buildInfo.js";
-//import { UwUifyModule } from "../modules/game/uwuify.js";
+import { UwUifyModule } from "../modules/game/uwuify.js";
 
 // Network
 import { CatapultModule } from "../modules/network/catapult.js";
@@ -31,19 +31,19 @@ export class ModuleManager {
 
     // prettier-ignore
     private static modules: BaseModule[] = [
-        //new UwUifyModule(),
-        new AntiAFKModule(),
         new BanBypassModule(),
         new BuildInfoModule(),
+        new UwUifyModule(),
         new CatapultModule(),
+        new NetworkModule(),
+        new AntiAFKModule(),
         new CharacterPhysicsModule(),
+        new TeleportManagerModule(),
         new DoorManagerModule(),
+        new TipToeManagerModule(),
         new FGDebugModule(),
         new GraphicsManagerModule(),
-        new NetworkModule(),
         new PopupManagerModule(),
-        new TeleportManagerModule(),
-        new TipToeManagerModule(),
         new UICanvasModule(),
     ];
 

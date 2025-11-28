@@ -1,6 +1,6 @@
 export const ModPreferences = {
-    VERSION: "2.83", // Don't forget update after changes!
-    ENV: "release", // dev, staging, release
+    VERSION: "2.84", // Don't forget update after changes!
+    ENV: "dev", // dev, staging, release
     FOR_GAME_VERSION: "21.0.1"
 };
 
@@ -10,7 +10,6 @@ createmenu only when get build info (and fgdebug)
 implement uwuify
 implement extensions.ts (.setActive, .getGameObject) 
 i18n refactor
-logging refactor
 project structure
 rename onEnable to initHooks
 add changelog in menu
@@ -32,6 +31,7 @@ maybe:
 fork menu and update it to frida 17
 
 DONE:
+[x] logging refactor
 [x] unity logging
 [x] move teleportmanager from utils
 [x] something with to global classes 
