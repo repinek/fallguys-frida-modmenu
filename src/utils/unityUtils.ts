@@ -9,7 +9,7 @@ export class UnityUtils {
     public static init() {
         this.Resources = AssemblyHelper.CoreModule.class("UnityEngine.Resources");
         this.Vector3 = AssemblyHelper.CoreModule.class("UnityEngine.Vector3");
-        Logger.info("[UnityUtils] Initialized");
+        Logger.info("[UnityUtils::init] Initialized");
     }
 
     /** Wrapper over UnityEngine::Resources::FindObjectsOfTypeAll */
@@ -21,7 +21,7 @@ export class UnityUtils {
     public static getInstance(klass: Il2Cpp.Class): Il2Cpp.Object | undefined {
         const instanceMethod = klass.tryMethod<Il2Cpp.Object>("get_Instance");
         if (!instanceMethod) {
-            Logger.error(`[UnityUtils] ${klass.name} is missing get_Instance`);
+            Logger.error(`[UnityUtils::getInstance] ${klass.name} is missing get_Instance`);
             return undefined;
         }
 
@@ -50,7 +50,8 @@ export class UnityUtils {
         gameObject.method<void>("SetActive").invoke(active);
     }
 
-    /** Wrapper over Il2Cpp.perform(block, "main")
+    /** 
+     * Wrapper over Il2Cpp.perform(block, "main")
      *
      * From Java.scheduleOnMainThread you need call from main thread
      */

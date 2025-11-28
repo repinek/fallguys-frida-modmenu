@@ -2,7 +2,7 @@ import { Logger } from "../logger/logger.js";
 
 export function exitFromApp() {
     Java.perform(() => {
-        Logger.debug("Exiting from app");
+        Logger.debug("[JavaUtils::exitFromApp] Exiting from app");
         const System = Java.use("java.lang.System");
         System.exit(0);
     });
@@ -12,14 +12,14 @@ export function exitFromApp() {
 export function getSystemLocale() {
     const Locale = Java.use("java.util.Locale");
     const lang = Locale.getDefault().getLanguage().toLowerCase();
-    Logger.debug("System Locale:", lang);
+    Logger.debug("[JavaUtils::getSystemLocale] Got locale from system:", lang);
     return lang;
 }
 
 export function openURL(targetUrl: string) {
     Java.perform(() => {
         try {
-            Logger.debug(`Opening URL: ${targetUrl}`);
+            Logger.debug("[JavaUtils::OpenURL] Opening URL:", targetUrl);
             const uri = Java.use("android.net.Uri").parse(targetUrl);
             const intent = Java.use("android.content.Intent");
             const activity = Java.use("android.app.ActivityThread").currentApplication().getApplicationContext();
@@ -36,6 +36,7 @@ export function openURL(targetUrl: string) {
 export function copyToClipboard(text: string) {
     Java.perform(() => {
         try {
+            Logger.debug("[JavaUtils::copyToClipboard] Copied to clipboard: ", text);
             const javaString = Java.use("java.lang.String");
             const ClipData = Java.use("android.content.ClipData");
             const context = Java.use("android.app.ActivityThread").currentApplication().getApplicationContext();
@@ -53,7 +54,7 @@ export function copyToClipboard(text: string) {
 export function httpGet(targetUrl: string, onReceive: (response: string | null) => void = () => {}) {
     Java.perform(() => {
         try {
-            Logger.debug(`HTTP GET: ${targetUrl}`);
+            Logger.debug("[JavaUtils::httpGet] HTTP GET:", targetUrl);
             const HttpURLConnection = Java.use("java.net.HttpURLConnection");
             const URL = Java.use("java.net.URL");
             const BufferedReader = Java.use("java.io.BufferedReader");
@@ -91,7 +92,7 @@ export function httpGet(targetUrl: string, onReceive: (response: string | null) 
             }
 
             connection.disconnect();
-            Logger.debug("HTTP GET response:", response);
+            Logger.debug("[JavaUtils::httpGet] HTTP GET response:", response);
             onReceive(response);
             return response;
         } catch (error: any) {
