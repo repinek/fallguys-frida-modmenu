@@ -58,4 +58,15 @@ export class UnityUtils {
     public static runInMain<T>(block: () => T | Promise<T>): Promise<T> {
         return Il2Cpp.perform(block, "main");
     }
+
+    /** 
+     * Wrapper over klass.alloc(), .ctor(...parameters) 
+     * 
+     * @param parameters args for .ctor()
+     */
+    public static createInstance(klass: Il2Cpp.Class, ...parameters: Il2Cpp.Parameter.Type[]): Il2Cpp.Object {
+        const instance = klass.alloc();
+        instance.method('.ctor').invoke(...parameters);
+        return instance;
+    }
 }

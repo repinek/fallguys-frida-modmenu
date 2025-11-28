@@ -3,6 +3,7 @@ import { BaseModule } from "../../core/baseModule.js";
 import { Config } from "../../data/config.js";
 import { Logger } from "../../logger/logger.js";
 import * as JavaUtils from "../../utils/javaUtils.js";
+import { UnityUtils } from "../../utils/unityUtils.js";
 
 /*
  * 1. Login and Version Spoofing:
@@ -81,11 +82,8 @@ export class CatapultModule extends BaseModule {
             }
 
             if (Config.USE_CUSTOM_SERVER) {
-                const LoginServerHost = module.HttpNetworkHost.alloc();
-                const GatewayServerHost = module.WebSocketNetworkHost.alloc();
-
-                LoginServerHost.method(".ctor").invoke(Il2Cpp.string(Config.CUSTOM_LOGIN_URL), Config.CUSTOM_LOGIN_PORT);
-                GatewayServerHost.method(".ctor").invoke(Il2Cpp.string(Config.CUSTOM_GATEWAY_URL), Config.CUSTOM_GATEWAY_PORT, Config.IS_GATEWAY_SECURE);
+                const LoginServerHost = UnityUtils.createInstance(module.HttpNetworkHost, Il2Cpp.string(Config.CUSTOM_LOGIN_URL), Config.CUSTOM_LOGIN_PORT);
+                const GatewayServerHost = UnityUtils.createInstance(module.WebSocketNetworkHost, Il2Cpp.string(Config.CUSTOM_GATEWAY_URL), Config.CUSTOM_GATEWAY_PORT, Config.IS_GATEWAY_SECURE);
 
                 catapultConfig.field("LoginServerHost").value = LoginServerHost;
                 catapultConfig.field("GatewayServerHost").value = GatewayServerHost;
@@ -97,7 +95,7 @@ export class CatapultModule extends BaseModule {
 
         //@ts-ignore
         this.WebSocketNetworkHostCtor.implementation = function (serverAddress: Il2Cpp.String, port: number, isSecure: boolean): void {
-            Logger.hook("WebSocketNetworkHost::.ctor called with args:", serverAddress, port, isSecure);
+            Logger.hook("WebSocketNetworkHost::1 called with args:", serverAddress, port, isSecure);
 
             if (Config.USE_CUSTOM_SERVER) {
                 if (serverAddress.content == "analytics-gateway.fallguys.oncatapult.com") {

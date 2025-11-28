@@ -8,6 +8,7 @@ import * as JavaUtils from "../../utils/javaUtils.js";
 export class MatchInfoModule extends BaseModule {
     public name = "MatchInfo";
 
+    // Classes
     private GlobalGameStateClient!: Il2Cpp.Class;
     private ClientGameManager!: Il2Cpp.Class;
 

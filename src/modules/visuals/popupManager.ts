@@ -56,8 +56,7 @@ export class PopupManagerModule extends BaseModule {
             );
 
             // 2 arg
-            const newModalMessageData = this.ModalMessageData.alloc();
-            newModalMessageData.method(".ctor").invoke();
+            const newModalMessageData = UnityUtils.createInstance(this.ModalMessageData);
 
             newModalMessageData.field<Il2Cpp.ValueType>("LocaliseTitle").value = this.notLocalised;
             newModalMessageData.field<Il2Cpp.ValueType>("LocaliseMessage").value = this.notLocalised;
