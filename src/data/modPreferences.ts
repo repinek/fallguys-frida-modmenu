@@ -1,5 +1,5 @@
 export const ModPreferences = {
-    VERSION: "2.81", // Don't forget update after changes!
+    VERSION: "2.82", // Don't forget update after changes!
     ENV: "release", // dev, staging, release
     FOR_GAME_VERSION: "21.0.1"
 };
@@ -16,7 +16,6 @@ rename onEnable to initHooks
 add changelog in menu
 create cool screenshots for readme
 improve logging at modules
-logcat logging
 on screen logging
 unity logging
 made localization for other languages (i18n)

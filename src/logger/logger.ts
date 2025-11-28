@@ -1,47 +1,48 @@
 import { ModPreferences } from "../data/modPreferences.js";
 
-// Maybe log it into logcat too (but it's useless I guess)
 export class Logger {
-    private static readonly RESET = "\x1b[0m";
-    private static readonly GRAY = "\x1b[90m";
-    private static readonly BLUE = "\x1b[34m";
-    private static readonly GREEN = "\x1b[32m";
-    private static readonly CYAN = "\x1b[36m";
-    private static readonly YELLOW = "\x1b[33m";
-    private static readonly RED = "\x1b[31m";
+    private static readonly Colors = {
+        RESET: "\x1b[0m",
+        GRAY: "\x1b[90m",
+        BLUE: "\x1b[34m",
+        GREEN: "\x1b[32m",
+        CYAN: "\x1b[36m",
+        YELLOW: "\x1b[33m",
+        RED: "\x1b[31m"
+    } as const; 
 
     private static getTime(): string {
         const date = new Date();
         const hh = date.getHours().toString().padStart(2, "0");
         const mm = date.getMinutes().toString().padStart(2, "0");
         const ss = date.getSeconds().toString().padStart(2, "0");
-        return `${this.GRAY}[${hh}:${mm}:${ss}]${this.RESET}`;
+        return `${this.Colors.GRAY}[${hh}:${mm}:${ss}]${this.Colors.RESET}`;
     }
 
-    public static info(...args: any[]) {
-        console.info(`${this.getTime()} ${this.BLUE}[INFO]${this.RESET}`, ...args);
+    public static info(...messages: any[]) {
+        console.info(`${this.getTime()} ${this.Colors.BLUE}[INFO]${this.Colors.RESET}`, ...messages);
     }
 
-    public static infoGreen(...args: any[]) {
-        console.info(`${this.getTime()} ${this.GREEN}[INFO]`, ...args, this.RESET);
+    public static infoGreen(...messages: any[]) {
+        console.info(`${this.getTime()} ${this.Colors.GREEN}[INFO]`, ...messages, this.Colors.RESET);
     }
 
-    public static debug(...args: any[]) {
+    public static debug(...messages: any[]) {
         if (ModPreferences.ENV === "release") return;
-        console.debug(`${this.getTime()} ${this.CYAN}[DEBUG]${this.RESET}`, ...args);
+        console.debug(`${this.getTime()} ${this.Colors.CYAN}[DEBUG]${this.Colors.RESET}`, ...messages);
     }
 
-    public static hook(...args: any[]) {
+    public static hook(...messages: any[]) {
         if (ModPreferences.ENV === "release") return;
-        console.debug(`${this.getTime()} ${this.GRAY}[HOOK]`, ...args, this.RESET);
+        console.debug(`${this.getTime()} ${this.Colors.GRAY}[HOOK]`, ...messages, this.Colors.RESET);
     }
 
-    public static warn(...args: any[]) {
-        console.warn(`${this.getTime()} ${this.YELLOW}[WARN]${this.RESET}`, ...args);
+    public static warn(...messages: any[]) {
+        console.warn(`${this.getTime()} ${this.Colors.YELLOW}[WARN]${this.Colors.RESET}`, ...messages);
     }
 
-    public static error(...args: any[]) {
-        console.error(`${this.getTime()} ${this.RED}[ERROR]${this.RESET}`, ...args);
+    public static error(...messages: any[]) {
+        console.error(`${this.getTime()} ${this.Colors.RED}[ERROR]${this.Colors.RESET}`, ...messages);
     }
 
     /**
@@ -57,6 +58,16 @@ export class Logger {
     // errortoast
     public static errorThrow(error: any, message: string = "") {
         this.error(`${message} ${error.stack}`);
-        Menu.toast(`${message} ${error.message}`, 1);
+        this.toast(`${message} ${error.message}`, 1);
+    }
+
+    /** 
+     * Creates toast
+     * Wrapper over Menu.Toast
+     * 
+     * @param [length=0] 0 - 2s, 1 - 3.5s, default is 2s
+     */
+    public static toast(text: string, length: 0 | 1 = 0) {
+        Menu.toast(text, length);
     }
 }
