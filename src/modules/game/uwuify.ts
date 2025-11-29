@@ -2,7 +2,6 @@ import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 import { ModSettings } from "../../data/modSettings.js";
 import { Logger } from "../../logger/logger.js";
-
 /*
  * Hooks TMP_Text::set_text and return UwUified result
  *
@@ -31,13 +30,18 @@ export class UwUifyModule extends BaseModule {
         const module = this;
 
         //@ts-ignore
-        this.set_text.implementation = function (String: Il2Cpp.String): void {
-            Logger.debug("set_text called")
-            if (ModSettings.uwuifyMode) {
-                String = Il2Cpp.string(module.uwuify(String.content!));
+        this.set_text.implementation = function (string: Il2Cpp.String): void {
+            if (string.isNull()) {
+                this.method<void>("set_text").invoke(string);
+                return;
             }
-            return this.method<void>("set_text").invoke(String);
-        }
+
+            if (ModSettings.uwuifyMode) {
+                string = Il2Cpp.string(module.uwuify(string.content!));
+            }
+            
+            this.method<void>("set_text").invoke(string);
+        };
     }
 
     private uwuify(text: string): string {
