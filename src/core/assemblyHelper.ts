@@ -5,6 +5,7 @@ export class AssemblyHelper {
     public static TheMultiplayerGuys: Il2Cpp.Image; // FG.Common
     public static MTFGClient: Il2Cpp.Image; // FGClient
     public static CoreModule: Il2Cpp.Image; // UnityEngine
+    public static TextMeshPro: Il2Cpp.Image; // TMPro
     // public static UI: Il2Cpp.Image; // UnityEngine
     // public static UIModule: Il2Cpp.Image; // UnityEngine
     // public static TextRenderingModule: Il2Cpp.Image; // UnityEngine
@@ -14,6 +15,7 @@ export class AssemblyHelper {
         this.TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
         this.MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image;
         this.CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
+        this.TextMeshPro = Il2Cpp.domain.assembly("Unity.TextMeshPro").image;
         // this.UI = Il2Cpp.domain.assembly("UnityEngine.UI").image;
         // this.UIModule = Il2Cpp.domain.assembly("UnityEngine.UIModule").image;
         // this.TextRenderingModule = Il2Cpp.domain.assembly("UnityEngine.TextRenderingModule").image;

@@ -1,49 +1,43 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 import { ModSettings } from "../../data/modSettings.js";
+import { Logger } from "../../logger/logger.js";
 
 /*
- * Hooks LocalisedString::GetString and return UwUified result
+ * Hooks TMP_Text::set_text and return UwUified result
+ *
+ * We can also hook LocalisedString::GetString, but it's not all strings
  *
  * Thanks a lot: https://github.com/KieronQuinn/owoify
  */
 
+// TODO: hook TMP_Text.get_text
 export class UwUifyModule extends BaseModule {
     public name = "UwUify";
 
-    private LocalisedStrings!: Il2Cpp.Class;
+    // Classes
+    private TMP_Text!: Il2Cpp.Class;
 
-    private getString!: Il2Cpp.Method;
-    private getString2!: Il2Cpp.Method;
+    // Methods
+    private set_text!: Il2Cpp.Method;
 
     public init(): void {
-        this.LocalisedStrings = AssemblyHelper.TheMultiplayerGuys.class("LocalisedStrings");
+        this.TMP_Text = AssemblyHelper.TextMeshPro.class("TMPro.TMP_Text");
 
-        // System.String LocalisedStrings::GetString(System.String)
-        this.getString = this.LocalisedStrings.method("GetString").overload("System.String");
-        this.getString2 = this.LocalisedStrings.method("GetString").overload("System.String", "System.Object[]");
+        this.set_text = this.TMP_Text.method<void>("set_text");
     }
 
     public initHooks(): void {
         const module = this;
 
         //@ts-ignore
-        this.getString.implementation = function (id: Il2Cpp.String): Il2Cpp.String {
-            let localisedString = this.method<Il2Cpp.String>("GetString", 1).invoke(id);
+        this.set_text.implementation = function (String: Il2Cpp.String): void {
+            Logger.debug("set_text called")
             if (ModSettings.uwuifyMode) {
-                localisedString = Il2Cpp.string(module.uwuify(localisedString.content!));
+                String = Il2Cpp.string(module.uwuify(String.content!));
             }
-            return localisedString;
-        };
-
-        //@ts-ignore
-        this.getString2.implementation = function (id: Il2Cpp.String, params): Il2Cpp.String {
-            let localisedString = this.method<Il2Cpp.String>("GetString", 2).invoke(id, params);
-            if (ModSettings.uwuifyMode) {
-                localisedString = Il2Cpp.string(module.uwuify(localisedString.content!));
-            }
-            return localisedString;
-        };
+            return this.method<void>("set_text").invoke(String);
+        }
     }
 
     private uwuify(text: string): string {
