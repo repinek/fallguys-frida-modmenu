@@ -22,7 +22,7 @@ export class NetworkModule extends BaseModule {
         this.ProcessMessageReceived = this.FNMMSClientRemoteService.method<void>("ProcessMessageReceived");
     }
 
-    public override onEnable(): void {
+    public override initHooks(): void {
         const module = this;
 
         this.SendEventBatch.implementation = function (): void {

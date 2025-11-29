@@ -8,8 +8,10 @@ import { ModPreferences } from "./data/modPreferences.js";
 
 import { I18n } from "./i18n/i18n.js";
 
+// import { InGameLogger } from "./logger/inGameLogger.js";
 import { Logger } from "./logger/logger.js";
 import { UnityLogger } from "./logger/unityLogger.js";
+
 import { MenuBuilder } from "./ui/menu.js";
 
 import { UnityUtils } from "./utils/unityUtils.js";
@@ -23,6 +25,7 @@ function main() {
     AssemblyHelper.init();
     UnityLogger.init();
     UnityUtils.init();
+    // InGameLogger.init();
     ModuleManager.initAll();
 
     MenuBuilder.init();

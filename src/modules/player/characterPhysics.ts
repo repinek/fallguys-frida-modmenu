@@ -31,7 +31,7 @@ export class CharacterPhysicsModule extends BaseModule {
         this.SendMessage = this.MPGNetMotorTasks.method<void>("SendMessage", 1);
     }
 
-    public override onEnable(): void {
+    public override initHooks(): void {
         const module = this;
 
         //@ts-ignore

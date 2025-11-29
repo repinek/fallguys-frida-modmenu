@@ -31,6 +31,7 @@ export class ModuleManager {
 
     // prettier-ignore
     private static modules: BaseModule[] = [
+        // sorted the same as imports
         new BanBypassModule(),
         new BuildInfoModule(),
         new UwUifyModule(),
@@ -54,7 +55,7 @@ export class ModuleManager {
         this.modules.forEach(module => {
             try {
                 module.init();
-                module.onEnable();
+                module.initHooks();
                 Logger.debug(`[${this.name}::InitAll] ${module.name} module loaded`);
             } catch (error: any) {
                 Logger.errorThrow(error, `[${this.name}::InitAll] Failed to load ${module.name} module`);

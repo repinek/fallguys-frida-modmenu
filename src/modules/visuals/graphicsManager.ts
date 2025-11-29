@@ -40,7 +40,7 @@ export class GraphicsManagerModule extends BaseModule {
         this.set_fieldOfView = this.Camera.method("set_fieldOfView", 1);
     }
 
-    public override onEnable(): void {
+    public override initHooks(): void {
         const module = this;
 
         this.get_TargetFrameRate.implementation = function (): number {

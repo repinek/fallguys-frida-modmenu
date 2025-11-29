@@ -62,7 +62,7 @@ export class CatapultModule extends BaseModule {
         this.fetchClientDetails();
     }
 
-    public override onEnable(): void {
+    public override initHooks(): void {
         const module = this;
 
         this.BuildCatapultConfig.implementation = function (): Il2Cpp.Object {

@@ -21,7 +21,7 @@ export class BuildInfoModule extends BaseModule {
         this.BuildInfoOnEnable = this.BuildInfo.method<void>("OnEnable");
     }
 
-    public override onEnable(): void {
+    public override initHooks(): void {
         const module = this;
 
         this.BuildInfoOnEnable.implementation = function (): void {

@@ -6,6 +6,7 @@ import { ModPreferences } from "../data/modPreferences.js";
 
 import { I18n } from "../i18n/i18n.js";
 
+// import { InGameLogger } from "../logger/inGameLogger.js";
 import { Logger } from "../logger/logger.js";
 
 import { BuildInfoModule } from "../modules/game/buildInfo.js";
@@ -123,12 +124,20 @@ export class MenuBuilder {
         );
 
         Menu.add(
-            layout.button("Debug", () => {
+            layout.button("Create Test Popup", () => {
                 UnityUtils.runInMain(() => {
                     m.popupManager?.showPopup("Test Popup", "Message of Test Popup", ModalType_enum.MT_OK, OkButtonType_enum.Green);
                 });
             })
         );
+
+        // yes i definitely need to other branch it but... sorry
+        // Menu.add(
+        //     layout.button(
+        //         "Create Logger", 
+        //         this.run(() => InGameLogger.createLogger())
+        //     )
+        // );
 
         Menu.add(layout.textView(I18n.t("hi.hi")));
     }

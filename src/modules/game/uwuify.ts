@@ -24,7 +24,7 @@ export class UwUifyModule extends BaseModule {
         this.getString2 = this.LocalisedStrings.method("GetString").overload("System.String", "System.Object[]");
     }
 
-    public onEnable(): void {
+    public initHooks(): void {
         const module = this;
 
         //@ts-ignore

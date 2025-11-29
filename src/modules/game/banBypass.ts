@@ -41,7 +41,7 @@ export class BanBypassModule extends BaseModule {
         this.ShowAntiCheatPopup = this.MainMenuViewModel.method<void>("ShowAntiCheatPopup", 2);
     }
 
-    public override onEnable(): void {
+    public override initHooks(): void {
         const module = this;
 
         this.CheckAntiCheatClientServiceForError.implementation = function (): boolean {
