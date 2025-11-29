@@ -1,6 +1,6 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
-import { Config } from "../../data/config.js";
+import { ModSettings } from "../../data/modSettings.js";
 import { Logger } from "../../logger/logger.js";
 
 export class NetworkModule extends BaseModule {
@@ -26,7 +26,7 @@ export class NetworkModule extends BaseModule {
         const module = this;
 
         this.SendEventBatch.implementation = function (): void {
-            if (Config.Toggles.toggleDisableAnalytics) {
+            if (ModSettings.disableAnalytics) {
                 return;
             }
             return this.method<void>("SendEventBatch").invoke();
@@ -34,7 +34,7 @@ export class NetworkModule extends BaseModule {
 
         //@ts-ignore
         this.ProcessMessageReceived.implementation = function (jsonMessage: Il2Cpp.String): void {
-            if (Config.Toggles.toggleShowQueuedPlayers) {
+            if (ModSettings.showQueuedPlayers) {
                 const json = JSON.parse(jsonMessage.content!); // .content because it's Il2cpp.String
                 Logger.debug(`[${module.name}] Received matchmaking message: ${jsonMessage.content!}`);
 

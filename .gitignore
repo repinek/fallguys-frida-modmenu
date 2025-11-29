@@ -4,6 +4,7 @@
 # Result of building
 /dist/
 
+/BackUpThisFolder_ButDontShipIt
 /data/
 /dump/
 

@@ -1,5 +1,5 @@
 import { AssemblyHelper } from "../core/assemblyHelper.js";
-import { Config } from "../data/config.js";
+import { Constants } from "../data/constants.js";
 import { Logger } from "./logger.js";
 
 /*
@@ -34,7 +34,7 @@ export class UnityLogger {
     public static initHooks(): void {
         const module = this;
 
-        if (Config.UNITY_LOGGING) {
+        if (Constants.UNITY_LOGGING) {
             //@ts-ignore
             this.Log.implementation = function (object: Il2Cpp.Object): void {
                 Logger.unity("INFO", object);

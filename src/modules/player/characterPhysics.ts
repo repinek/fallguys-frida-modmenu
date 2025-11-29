@@ -1,7 +1,8 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 
-import { Config } from "../../data/config.js";
+import { GameDefaults } from "../../data/gameDefaults.js";
+import { ModSettings } from "../../data/modSettings.js";
 import { Logger } from "../../logger/logger.js";
 
 export class CharacterPhysicsModule extends BaseModule {
@@ -51,14 +52,14 @@ export class CharacterPhysicsModule extends BaseModule {
         };
 
         this.CanJump.implementation = function (): boolean {
-            if (Config.Toggles.toggleAirJump) {
+            if (ModSettings.airjump) {
                 return true;
             }
             return this.method<boolean>("CanJump").invoke();
         };
 
         this.SendMessage.implementation = function (bypassNetworkLOD): void {
-            if (Config.Toggles.toggleDontSendFallGuyState) {
+            if (ModSettings.dontSendFallGuyState) {
                 return;
             }
             return this.method<void>("SendMessage", 1).invoke(bypassNetworkLOD);
@@ -66,7 +67,7 @@ export class CharacterPhysicsModule extends BaseModule {
     }
 
     private changeSpeed(data: Il2Cpp.Object): void {
-        const speed = Config.Toggles.toggleCustomSpeed ? Config.CustomValues.normalMaxSpeed : Config.DefaultValues.normalMaxSpeed;
+        const speed = ModSettings.customSpeed ? ModSettings.normalMaxSpeed : GameDefaults.normalMaxSpeed;
 
         data.field("normalMaxSpeed").value = speed;
         data.field("carryMaxSpeed").value = speed;
@@ -74,15 +75,15 @@ export class CharacterPhysicsModule extends BaseModule {
     }
 
     private changeGravity(data: Il2Cpp.Object): void {
-        let gravity = Config.DefaultValues.maxGravityVelocity;
+        let gravity = GameDefaults.maxGravityVelocity;
 
-        if (Config.Toggles.toggleCustomGravity) {
-            if (Config.Toggles.toggleNoGravity) {
+        if (ModSettings.customGravity) {
+            if (ModSettings.noGravity) {
                 gravity = 0;
-            } else if (Config.Toggles.toggleNegativeGravity) {
-                gravity = -Config.CustomValues.maxGravityVelocity;
+            } else if (ModSettings.negativeGravity) {
+                gravity = -ModSettings.maxGravityVelocity;
             } else {
-                gravity = Config.CustomValues.maxGravityVelocity;
+                gravity = ModSettings.maxGravityVelocity;
             }
         }
 
@@ -90,21 +91,21 @@ export class CharacterPhysicsModule extends BaseModule {
     }
 
     private changeDive(data: Il2Cpp.Object): void {
-        const diveSensitivity = Config.Toggles.toggle360Dives ? 69420 : Config.DefaultValues.divePlayerSensitivity;
+        const diveSensitivity = ModSettings.enable360Dives ? 69420 : GameDefaults.divePlayerSensitivity;
 
         data.field("divePlayerSensitivity").value = diveSensitivity;
 
-        if (Config.Toggles.toggleCustomDiveForce) {
-            data.field("diveForce").value = Config.CustomValues.diveForce;
-            data.field("airDiveForce").value = Config.CustomValues.diveForce / Config.DefaultValues.diveMultiplier;
+        if (ModSettings.customDiveForce) {
+            data.field("diveForce").value = ModSettings.diveForce;
+            data.field("airDiveForce").value = ModSettings.diveForce / GameDefaults.diveMultiplier;
         } else {
-            data.field("diveForce").value = Config.DefaultValues.diveForce;
-            data.field("airDiveForce").value = Config.DefaultValues.airDiveForce;
+            data.field("diveForce").value = GameDefaults.diveForce;
+            data.field("airDiveForce").value = GameDefaults.airDiveForce;
         }
     }
 
     private changeJump(jumpMotor: Il2Cpp.Object): void {
-        const targetJump = Config.Toggles.toggleCustomJumpForce ? Config.CustomValues.jumpForce : Config.DefaultValues.jumpForce;
+        const targetJump = ModSettings.customJumpForce ? ModSettings.jumpForce : GameDefaults.jumpForce;
 
         const jumpForce = jumpMotor.field<Il2Cpp.ValueType>("_jumpForce").value;
         jumpForce.field("y").value = targetJump;

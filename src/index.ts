@@ -8,7 +8,7 @@ import { ModPreferences } from "./data/modPreferences.js";
 
 import { I18n } from "./i18n/i18n.js";
 
-// import { InGameLogger } from "./logger/inGameLogger.js";
+//  import { InGameLogger } from "./logger/inGameLogger.js";
 import { Logger } from "./logger/logger.js";
 import { UnityLogger } from "./logger/unityLogger.js";
 

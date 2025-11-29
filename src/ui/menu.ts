@@ -1,8 +1,9 @@
 import { ModuleManager } from "../core/moduleManager.js";
 
-import { Config } from "../data/config.js";
+import { Constants } from "../data/constants.js";
 import { ObsidianConfig } from "../data/layoutConfig.js";
 import { ModPreferences } from "../data/modPreferences.js";
+import { ModSettings } from "../data/modSettings.js";
 
 import { I18n } from "../i18n/i18n.js";
 
@@ -54,7 +55,7 @@ export class MenuBuilder {
             const desc = `v${ModPreferences.VERSION} (${ModPreferences.ENV})`;
 
             const composer = new Menu.Composer(title, desc, layout);
-            composer.icon(Config.MOD_MENU_ICON_URL, "Web");
+            composer.icon(Constants.MOD_MENU_ICON_URL, "Web");
 
             MenuBuilder.buildContent(layout);
 
@@ -134,7 +135,7 @@ export class MenuBuilder {
         // yes i definitely need to other branch it but... sorry
         // Menu.add(
         //     layout.button(
-        //         "Create Logger", 
+        //         "Create Logger",
         //         this.run(() => InGameLogger.createLogger())
         //     )
         // );
@@ -150,13 +151,13 @@ export class MenuBuilder {
 
         Menu.add(
             layout.toggle(I18n.t("menu.functions.360_dives"), (state: boolean) => {
-                Config.Toggles.toggle360Dives = state;
+                ModSettings.enable360Dives = state;
             })
         );
 
         Menu.add(
             layout.toggle(I18n.t("menu.functions.air_jump"), (state: boolean) => {
-                Config.Toggles.toggleAirJump = state;
+                ModSettings.airjump = state;
             })
         );
 
@@ -168,7 +169,7 @@ export class MenuBuilder {
 
         Menu.add(
             layout.toggle(I18n.t("menu.functions.fallguy_state"), (state: boolean) => {
-                Config.Toggles.toggleDontSendFallGuyState = state;
+                ModSettings.dontSendFallGuyState = state;
             })
         );
 
@@ -176,61 +177,61 @@ export class MenuBuilder {
 
         Menu.add(
             layout.toggle(I18n.t("menu.functions.custom_speed"), (state: boolean) => {
-                Config.Toggles.toggleCustomSpeed = state;
+                ModSettings.customSpeed = state;
             })
         );
 
         Menu.add(
             layout.seekbar(I18n.t("menu.functions.speed_val"), 100, 1, (value: number) => {
-                Config.CustomValues.normalMaxSpeed = value;
+                ModSettings.normalMaxSpeed = value;
             })
         );
 
         Menu.add(
             layout.toggle(I18n.t("menu.functions.custom_gravity"), (state: boolean) => {
-                Config.Toggles.toggleCustomGravity = state;
+                ModSettings.customGravity = state;
             })
         );
 
         Menu.add(
             layout.toggle(I18n.t("menu.functions.negative_gravity"), (state: boolean) => {
-                Config.Toggles.toggleNegativeGravity = state;
+                ModSettings.negativeGravity = state;
             })
         );
 
         Menu.add(
             layout.toggle(I18n.t("menu.functions.no_gravity"), (state: boolean) => {
-                Config.Toggles.toggleNoGravity = state;
+                ModSettings.noGravity = state;
             })
         );
 
         Menu.add(
             layout.seekbar(I18n.t("menu.functions.gravity_val"), 100, 0, (value: number) => {
-                Config.CustomValues.maxGravityVelocity = value;
+                ModSettings.maxGravityVelocity = value;
             })
         );
 
         Menu.add(
             layout.toggle(I18n.t("menu.functions.custom_jump_force"), (state: boolean) => {
-                Config.Toggles.toggleCustomJumpForce = state;
+                ModSettings.customJumpForce = state;
             })
         );
 
         Menu.add(
             layout.seekbar(I18n.t("menu.functions.jump_force_val"), 100, 0, (value: number) => {
-                Config.CustomValues.jumpForce = value;
+                ModSettings.jumpForce = value;
             })
         );
 
         Menu.add(
             layout.toggle(I18n.t("menu.functions.custom_dive_force"), (state: boolean) => {
-                Config.Toggles.toggleCustomDiveForce = state;
+                ModSettings.customDiveForce = state;
             })
         );
 
         Menu.add(
             layout.seekbar(I18n.t("menu.functions.seekbar_dive_strength"), 100, 0, (value: number) => {
-                Config.CustomValues.diveForce = value;
+                ModSettings.diveForce = value;
             })
         );
     }
@@ -293,15 +294,13 @@ export class MenuBuilder {
 
         Menu.add(
             layout.toggle(I18n.t("menu.functions.custom_fov"), (state: boolean) => {
-                Config.Toggles.toggleCustomFov = state;
+                ModSettings.customFov = state;
             })
         );
 
         Menu.add(
             layout.seekbar(I18n.t("menu.functions.custom_fov_val"), 180, 1, (value: number) => {
-                if (Config.Toggles.toggleCustomFov) {
-                    m.graphicsManager?.changeFOV(value);
-                }
+                ModSettings.fov = value;
             })
         );
 
@@ -323,19 +322,19 @@ export class MenuBuilder {
 
         Menu.add(
             layout.toggle(I18n.t("menu.functions.disable_analytics"), (state: boolean) => {
-                Config.Toggles.toggleDisableAnalytics = state;
+                ModSettings.disableAnalytics = state;
             })
         );
 
         Menu.add(
             layout.toggle(I18n.t("menu.functions.queued_players"), (state: boolean) => {
-                Config.Toggles.toggleShowQueuedPlayers = state;
+                ModSettings.showQueuedPlayers = state;
             })
         );
 
         Menu.add(
             layout.seekbar(I18n.t("menu.functions.custom_resolution"), 100, 1, (value: number) => {
-                Config.CustomValues.ResolutionScale = value / 100;
+                ModSettings.resolutionScale = value / 100;
                 m.graphicsManager?.changeResolutionScale();
             })
         );
@@ -354,7 +353,7 @@ export class MenuBuilder {
 
         Menu.add(
             layout.toggle(I18n.t("menu.functions.uwuify"), (state: boolean) => {
-                Config.Toggles.toggleUwUifyMode = state;
+                ModSettings.uwuifyMode = state;
             })
         );
     }
@@ -365,13 +364,20 @@ export class MenuBuilder {
         other.gravity = Menu.Api.CENTER;
         Menu.add(other);
 
-        Menu.add(layout.button(I18n.t("menu.other.github_url"), () => javaUtils.openURL(Config.GITHUB_URL)));
-        Menu.add(layout.button(I18n.t("menu.other.discord_url"), () => javaUtils.openURL(Config.DISCORD_URL)));
+        Menu.add(layout.button(I18n.t("menu.other.github_url"), () => javaUtils.openURL(Constants.GITHUB_URL)));
+        Menu.add(layout.button(I18n.t("menu.other.discord_url"), () => javaUtils.openURL(Constants.DISCORD_URL)));
 
         Menu.add(
             layout.button(
                 I18n.t("menu.other.credits"),
                 this.run(() => this.showCreditsPopup())
+            )
+        );
+
+        Menu.add(
+            layout.button(
+                I18n.t("menu.other.changelog"),
+                this.run(() => this.showChangelogPopup())
             )
         );
 
@@ -386,5 +392,11 @@ export class MenuBuilder {
         const message = I18n.t("popups.credits.message");
 
         m.popupManager?.showPopup(title, message, ModalType_enum.MT_OK, OkButtonType_enum.Green);
+    }
+
+    private static showChangelogPopup(): void {
+        // const m = MenuBuilder.modules;
+        // const title = I18n.t("popups.credits.title");
+        // const message = javaUtils.httpGet();
     }
 }

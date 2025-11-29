@@ -2,13 +2,14 @@ import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 import { Logger } from "../../logger/logger.js";
 import { CharacterPhysicsModule } from "./characterPhysics.js";
-import { Config } from "../../data/config.js";
 import { UnityUtils } from "../../utils/unityUtils.js";
 
 // TODO: describe issue here
 
 export class TeleportManagerModule extends BaseModule {
     public name = "TeleportManager";
+
+    private readonly TELEPORT_COOLDOWN = 500;
 
     // Classes
     private ObjectiveReachEndZone!: Il2Cpp.Class;
@@ -37,8 +38,8 @@ export class TeleportManagerModule extends BaseModule {
         const currentTime = Date.now();
         const diff = currentTime - this.lastTeleportTime;
 
-        if (diff < Config.TELEPORT_COOLDOWN) {
-            const remaining = ((Config.TELEPORT_COOLDOWN - diff) / 1000).toFixed(1);
+        if (diff < this.TELEPORT_COOLDOWN) {
+            const remaining = ((this.TELEPORT_COOLDOWN - diff) / 1000).toFixed(1);
             Menu.toast(`Wait ${remaining}s`, 0);
             return false;
         }

@@ -1,6 +1,6 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
-import { Config } from "../../data/config.js";
+import { ModSettings } from "../../data/modSettings.js";
 import { Logger } from "../../logger/logger.js";
 
 export class GraphicsManagerModule extends BaseModule {
@@ -11,7 +11,6 @@ export class GraphicsManagerModule extends BaseModule {
     private GraphicsSettingsInstance?: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType;
     private PlayerInfoHUDBase!: Il2Cpp.Class;
     private Camera!: Il2Cpp.Class;
-    private CameraInstance?: Il2Cpp.Class | Il2Cpp.Object | Il2Cpp.ValueType;
 
     // Methods
     private get_TargetFrameRate!: Il2Cpp.Method;
@@ -56,18 +55,17 @@ export class GraphicsManagerModule extends BaseModule {
         this.get_ResolutionScale.implementation = function (): number {
             Logger.hook("get_ResolutionScale called");
             module.GraphicsSettingsInstance = this;
-            return Config.CustomValues.ResolutionScale;
+            return ModSettings.resolutionScale;
         };
 
         this.set_ResolutionScale.implementation = function (scale): void {
             Logger.hook("set_ResolutionScale called with args:", scale);
-            return this.method<void>("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale);
+            return this.method<void>("set_ResolutionScale", 1).invoke(ModSettings.resolutionScale);
         };
 
         this.set_fieldOfView.implementation = function (value): void {
-            module.CameraInstance = this;
-            if (Config.Toggles.toggleCustomFov) {
-                value = Config.CustomValues.FOV;
+            if (ModSettings.customFov) {
+                value = ModSettings.fov;
             }
             return this.method<void>("set_fieldOfView", 1).invoke(value);
         };
@@ -79,13 +77,13 @@ export class GraphicsManagerModule extends BaseModule {
                 return;
             }
 
-            Logger.debug("Changing resolution scale to:", Config.CustomValues.ResolutionScale);
-            this.GraphicsSettingsInstance.method("set_ResolutionScale", 1).invoke(Config.CustomValues.ResolutionScale);
+            Logger.debug("Changing resolution scale to:", ModSettings.resolutionScale);
+            this.GraphicsSettingsInstance.method("set_ResolutionScale", 1).invoke(ModSettings.resolutionScale);
             /*
             i wanted to make this value changeable in the game, but unfortunately 
             calling ResolutionScaling::UpdateResolutionScaleStatus() just crashes the game for now.
             UPD: IS IT CUZ WRONG THREAD?
-            */ 
+            */
         } catch (error: any) {
             Logger.errorThrow(error);
         }
@@ -99,13 +97,5 @@ export class GraphicsManagerModule extends BaseModule {
     public toggleNames(): void {
         const shouldShowPlayerNames = this.get_ShowNames.invoke() as boolean;
         this.SetShowPlayerNamesByDefault.invoke(!shouldShowPlayerNames);
-    }
-
-    /** Wrapper over Config.CustomValues.FOV */
-    public changeFOV(value: number): void {
-        if (this.CameraInstance) {
-            Config.CustomValues.FOV = value;
-            //this.CameraInstance.method("set_fieldOfView", 1).invoke(value);
-        }
     }
 }

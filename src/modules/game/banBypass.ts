@@ -24,7 +24,7 @@ import { Logger } from "../../logger/logger.js";
  */
 
 export class BanBypassModule extends BaseModule {
-    public name = "Ban Bypass";
+    public name = "BanBypass";
 
     // Classes
     private MainMenuViewModel!: Il2Cpp.Class;

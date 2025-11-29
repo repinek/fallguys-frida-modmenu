@@ -41,7 +41,7 @@ export class UnityUtils {
     public static createVector2(x: number, y: number): Il2Cpp.ValueType {
         const vector = this.Vector2.alloc().unbox();
         vector.method(".ctor", 2).invoke(x, y);
-        return vector
+        return vector;
     }
 
     /** Wrapper over constructor.name */
@@ -68,14 +68,14 @@ export class UnityUtils {
         return Il2Cpp.perform(block, "main");
     }
 
-    /** 
-     * Wrapper over klass.alloc(), .ctor(...parameters) 
-     * 
+    /**
+     * Wrapper over klass.alloc(), .ctor(...parameters)
+     *
      * @param parameters args for .ctor()
      */
     public static createInstance(klass: Il2Cpp.Class, ...parameters: Il2Cpp.Parameter.Type[]): Il2Cpp.Object {
         const instance = klass.alloc();
-        instance.method('.ctor').invoke(...parameters);
+        instance.method(".ctor").invoke(...parameters);
         return instance;
     }
 }

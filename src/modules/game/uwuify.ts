@@ -1,6 +1,6 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
-import { Config } from "../../data/config.js";
+import { ModSettings } from "../../data/modSettings.js";
 
 /*
  * Hooks LocalisedString::GetString and return UwUified result
@@ -30,7 +30,7 @@ export class UwUifyModule extends BaseModule {
         //@ts-ignore
         this.getString.implementation = function (id: Il2Cpp.String): Il2Cpp.String {
             let localisedString = this.method<Il2Cpp.String>("GetString", 1).invoke(id);
-            if (Config.Toggles.toggleUwUifyMode) {
+            if (ModSettings.uwuifyMode) {
                 localisedString = Il2Cpp.string(module.uwuify(localisedString.content!));
             }
             return localisedString;
@@ -39,7 +39,7 @@ export class UwUifyModule extends BaseModule {
         //@ts-ignore
         this.getString2.implementation = function (id: Il2Cpp.String, params): Il2Cpp.String {
             let localisedString = this.method<Il2Cpp.String>("GetString", 2).invoke(id, params);
-            if (Config.Toggles.toggleUwUifyMode) {
+            if (ModSettings.uwuifyMode) {
                 localisedString = Il2Cpp.string(module.uwuify(localisedString.content!));
             }
             return localisedString;

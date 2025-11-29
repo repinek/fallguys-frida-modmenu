@@ -1,16 +1,17 @@
 export const ModPreferences = {
-    VERSION: "2.86", // Don't forget update after changes!
-    ENV: "release", // dev, staging, release
+    VERSION: "2.87", // Don't forget update after changes!
+    ENV: "dev", // dev, staging, release
     FOR_GAME_VERSION: "21.0.1"
 };
 
 /*
 !! TODO: 
 createmenu only when get build info (and fgdebug)
+change language
 implement extensions.ts (.setActive, .getGameObject) 
 i18n refactor
 project structure
-rename onEnable to initHooks
+add changing platform & some other things
 add changelog in menu
 create cool screenshots for readme
 improve logging at modules
@@ -29,6 +30,7 @@ maybe:
 fork menu and update it to frida 17
 
 DONE:
+[x] rename onEnable to initHooks
 [x] comments over module
 [x] implement uwuify
 [x] logging refactor

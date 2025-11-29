@@ -1,4 +1,4 @@
-import { Config } from "../data/config.js";
+import { Constants } from "../data/constants.js";
 import { ModPreferences } from "../data/modPreferences.js";
 import * as JavaUtils from "./javaUtils.js";
 import { Logger } from "../logger/logger.js";
@@ -10,7 +10,7 @@ export class UpdateUtils {
             Logger.debug("Skipping mod menu version check in dev/staging");
             return;
         }
-        JavaUtils.httpGet(Config.MOD_MENU_VERSION_URL, response => {
+        JavaUtils.httpGet(Constants.MOD_MENU_VERSION_URL, response => {
             if (!response) {
                 Logger.warn("Actual mod menu version can't be fetched");
                 // Menu.toast(en.toasts.mod_menu_version_not_fetched, 1);
@@ -26,7 +26,7 @@ export class UpdateUtils {
             } else {
                 Logger.warn("Mod menu version is outdated, redirecting to download page...");
                 //Menu.toast(en.toasts.mod_menu_version_not_fetched, 1);
-                JavaUtils.openURL(Config.GITHUB_RELEASES_URL);
+                JavaUtils.openURL(Constants.GITHUB_RELEASES_URL);
             }
         });
     }
