@@ -32,4 +32,4 @@ export const ObsidianConfig: Menu.ObsidianConfig = {
         hideCallback: I18n.t("menu.toasts.hide_callback"),
         killCallback: I18n.t("menu.toasts.kill_callback") // hold hide to kill menu
     }
-};
+} as const;

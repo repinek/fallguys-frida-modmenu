@@ -1,10 +1,8 @@
-import { ModPreferences } from "./modPreferences.js";
-
 export const Constants = {
     // === Mod Menu URLs ===
     MOD_MENU_ICON_URL: "https://floyzi.github.io/images/obed-guys-present.png",
     MOD_MENU_VERSION_URL: "https://repinek.github.io/fallguys-modmenu/latest_version.json",
-    MOD_MENU_CHANGELOG_URL: `https://repinek.github.io/fallguys-modmenu/changelogs/${ModPreferences.VERSION}.json`,
+    MOD_MENU_CHANGELOG_URL: `https://repinek.github.io/fallguys-modmenu/changelogs.json`,
 
     // === Social URLs ===
     GITHUB_URL: "https://github.com/repinek/fallguys-frida-modmenu",
