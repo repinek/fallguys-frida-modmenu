@@ -1,11 +1,11 @@
 {
     "hi": {
-        "hi": "hello from i18n wheelchair"
+        "hi": "hello from i18n wheelchair {0}"
     },
     "menu": {
         "info": {
             "title": "Fall Guys Mod Menu",
-            "desc": ""
+            "desc": "v{0}, ({1}). Free & Open Source"
         },
         "tabs": {
             "movement": "<b>--- Movement ---</b>",

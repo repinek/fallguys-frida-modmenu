@@ -21,20 +21,24 @@ export class I18n {
                 const savedLocale = Menu.sharedPreferences.getString("locale");
                 if (this.isLocaleSupported(savedLocale)) {
                     targetLocale = savedLocale;
-                    Logger.info(`[I18n] Loaded locale from config: ${targetLocale}`);
-                } else {
-                    Logger.warn(`[I18n] Locale ${savedLocale} from config is not supported`);
-                }
+                    Logger.debug(`[I18n::init] Loaded locale from config: ${targetLocale}`);
+                } else 
+                    Logger.warn(`[I18n::init] Locale ${savedLocale} from config is not supported`);
             } else {
                 const systemLang = getSystemLocale();
 
-                if (this.isLocaleSupported(systemLang)) targetLocale = systemLang;
-                else Logger.warn(`[I18n] Locale ${systemLang} from system is not supported`);
+                // prettier-ignore
+                if (this.isLocaleSupported(systemLang)) 
+                    targetLocale = systemLang;
+                else 
+                    Logger.warn(`[I18n::init] Locale ${systemLang} from system is not supported`);
 
                 Menu.sharedPreferences.putString("locale", targetLocale);
-                Logger.info("[I18n] Saved system locale to config:", targetLocale);
+                Logger.info("[I18n::init] Saved system locale to config:", targetLocale);
             }
+
             this.currentLocale = targetLocale;
+            Logger.info(`[I18n::init] Initialized with ${targetLocale} locale`);
         });
     }
 
@@ -48,10 +52,18 @@ export class I18n {
         }, obj);
     }
 
-    public static t(key: string): string {
+    public static t(key: string, ...args: (string | number)[]): string {
         const value = this.resolveKey(TRANSLATIONS[this.currentLocale], key);
 
         if (!value) return `MISSING: ${key}`;
+
+        if (args.length > 0) {
+            // search for {n}
+            return value.replace(/{(\d+)}/g, (match, number) => {
+                const index = parseInt(number);
+                return args[index] !== undefined ? String(args[index]) : match;
+            });
+        }
 
         return value;
     }

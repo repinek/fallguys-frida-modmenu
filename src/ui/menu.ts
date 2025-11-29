@@ -47,24 +47,6 @@ export class MenuBuilder {
         }
     }
 
-    private static build(): void {
-        try {
-            const layout = new Menu.ObsidianLayout(ObsidianConfig);
-
-            const title = I18n.t("menu.info.title");
-            const desc = `v${ModPreferences.VERSION} (${ModPreferences.ENV})`;
-
-            const composer = new Menu.Composer(title, desc, layout);
-            composer.icon(Constants.MOD_MENU_ICON_URL, "Web");
-
-            MenuBuilder.buildContent(layout);
-
-            composer.show();
-        } catch (error: any) {
-            Logger.errorThrow(error);
-        }
-    }
-
     private static getModules(): void {
         // Game
         this.modules.buildInfo = ModuleManager.get(BuildInfoModule);
@@ -90,6 +72,24 @@ export class MenuBuilder {
         return (...args: T) => {
             UnityUtils.runInMain(() => action(...args));
         };
+    }
+
+    private static build(): void {
+        try {
+            const layout = new Menu.ObsidianLayout(ObsidianConfig);
+
+            const title = I18n.t("menu.info.title");
+            const desc = I18n.t("menu.info.desc", ModPreferences.VERSION, ModPreferences.ENV);
+
+            const composer = new Menu.Composer(title, desc, layout);
+            composer.icon(Constants.MOD_MENU_ICON_URL, "Web");
+
+            MenuBuilder.buildContent(layout);
+
+            composer.show();
+        } catch (error: any) {
+            Logger.errorThrow(error);
+        }
     }
 
     private static buildContent(layout: Menu.ObsidianLayout): void {
@@ -140,7 +140,7 @@ export class MenuBuilder {
         //     )
         // );
 
-        Menu.add(layout.textView(I18n.t("hi.hi")));
+        Menu.add(layout.textView(I18n.t("hi.hi", "koluska")));
     }
 
     private static buildMovementTab(layout: Menu.ObsidianLayout): void {

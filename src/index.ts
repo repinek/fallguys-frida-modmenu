@@ -18,18 +18,22 @@ import { UpdateUtils } from "./utils/updateUtils.js";
 
 class FallGuysFridaModMenu {
     static init() {
-        Il2Cpp.perform(() => {
-            Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
-            UpdateUtils.checkForUpdate();
-            I18n.init();
+        try {
+            Il2Cpp.perform(() => {
+                Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
+                UpdateUtils.checkForUpdate();
+                I18n.init();
 
-            AssemblyHelper.init();
-            UnityLogger.init();
-            UnityUtils.init();
-            ModuleManager.initAll();
+                AssemblyHelper.init();
+                UnityLogger.init();
+                UnityUtils.init();
+                ModuleManager.initAll();
 
-            MenuBuilder.init();
-        });
+                MenuBuilder.init();
+            });
+        } catch (error: any) {
+            //
+        }
     }
 }
 
