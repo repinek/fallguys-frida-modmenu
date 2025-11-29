@@ -7,11 +7,14 @@ export class UnityUtils {
     private static Vector3: Il2Cpp.Class;
     private static Vector2: Il2Cpp.Class;
 
+    public static SystemAction: Il2Cpp.Class;
+
     public static init() {
         this.Resources = AssemblyHelper.CoreModule.class("UnityEngine.Resources");
         this.Vector3 = AssemblyHelper.CoreModule.class("UnityEngine.Vector3");
         this.Vector2 = AssemblyHelper.CoreModule.class("UnityEngine.Vector2");
 
+        this.SystemAction = Il2Cpp.corlib.class("System.Action");
         Logger.info("[UnityUtils::init] Initialized");
     }
 
