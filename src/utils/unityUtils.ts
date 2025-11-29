@@ -5,10 +5,13 @@ export class UnityUtils {
     // Classes
     private static Resources: Il2Cpp.Class;
     private static Vector3: Il2Cpp.Class;
+    private static Vector2: Il2Cpp.Class;
 
     public static init() {
         this.Resources = AssemblyHelper.CoreModule.class("UnityEngine.Resources");
         this.Vector3 = AssemblyHelper.CoreModule.class("UnityEngine.Vector3");
+        this.Vector2 = AssemblyHelper.CoreModule.class("UnityEngine.Vector2");
+
         Logger.info("[UnityUtils::init] Initialized");
     }
 
@@ -33,6 +36,12 @@ export class UnityUtils {
         const vector = this.Vector3.alloc().unbox();
         vector.method(".ctor", 3).invoke(x, y, z);
         return vector;
+    }
+
+    public static createVector2(x: number, y: number): Il2Cpp.ValueType {
+        const vector = this.Vector2.alloc().unbox();
+        vector.method(".ctor", 2).invoke(x, y);
+        return vector
     }
 
     /** Wrapper over constructor.name */
