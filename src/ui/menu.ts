@@ -24,7 +24,7 @@ import { GraphicsManagerModule } from "../modules/visuals/graphicsManager.js";
 import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "../modules/visuals/popupManager.js";
 import { UICanvasModule } from "../modules/visuals/uiCanvas.js";
 
-import * as javaUtils from "../utils/javaUtils.js";
+import { JavaUtils} from "../utils/javaUtils.js";
 import { UnityUtils } from "../utils/unityUtils.js";
 import { UpdateUtils } from "../utils/updateUtils.js";
 
@@ -122,7 +122,7 @@ export class MenuBuilder {
                 },
                 () => {
                     // Long Callback
-                    javaUtils.exitFromApp();
+                    JavaUtils.exitFromApp();
                 }
             )
         );

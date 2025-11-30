@@ -4,7 +4,7 @@ import { ModPreferences } from "../data/modPreferences.js";
 import { I18n } from "../i18n/i18n.js";
 import { Logger } from "../logger/logger.js";
 import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "../modules/visuals/popupManager.js";
-import * as JavaUtils from "./javaUtils.js";
+import { JavaUtils } from "./javaUtils.js";
 import { UnityUtils } from "./unityUtils.js";
 
 interface IModMenuVersion {

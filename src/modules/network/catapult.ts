@@ -2,7 +2,7 @@ import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 import { Constants } from "../../data/constants.js";
 import { Logger } from "../../logger/logger.js";
-import * as JavaUtils from "../../utils/javaUtils.js";
+import { JavaUtils } from "../../utils/javaUtils.js";
 import { UnityUtils } from "../../utils/unityUtils.js";
 
 /*
