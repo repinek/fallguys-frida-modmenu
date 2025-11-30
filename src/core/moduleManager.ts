@@ -49,20 +49,20 @@ export class ModuleManager {
     ];
 
     /** Initializes all modules by calling init() in module */
-    public static initAll() {
-        Logger.info(`[${this.name}::InitAll] Initializing modules...`);
+    static initAll() {
+        Logger.info(`[${this.name}::initAll] Initializing modules...`);
 
         this.modules.forEach(module => {
             try {
                 module.init();
                 module.initHooks();
-                Logger.debug(`[${this.name}::InitAll] ${module.name} module loaded`);
+                Logger.debug(`[${this.name}::initAll] ${module.name} module loaded`);
             } catch (error: any) {
                 Logger.errorThrow(error, `[${this.name}::InitAll] Failed to load ${module.name} module`);
             }
         });
 
-        Logger.info(`[${this.name}::InitAll] All modules Initialized`);
+        Logger.info(`[${this.name}::initAll] All modules Initialized`);
     }
 
     /**
@@ -70,7 +70,7 @@ export class ModuleManager {
      *
      * @param moduleClass The class of the module
      */
-    public static get<T extends BaseModule>(moduleClass: new (...args: any[]) => T): T | undefined {
+    static get<T extends BaseModule>(moduleClass: new (...args: any[]) => T): T | undefined {
         return this.modules.find(module => module instanceof moduleClass) as T | undefined;
     }
 }

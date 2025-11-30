@@ -41,7 +41,9 @@ export class MenuBuilder {
         uiCanvas?: UICanvasModule;
     } = {};
 
-    public static init(): void {
+    private static layout: Menu.ObsidianLayout;
+
+    static init(): void {
         if (Java.available) {
             Menu.waitForInit(MenuBuilder.build);
         }
@@ -76,15 +78,15 @@ export class MenuBuilder {
 
     private static build(): void {
         try {
-            const layout = new Menu.ObsidianLayout(ObsidianConfig);
+            MenuBuilder.layout = new Menu.ObsidianLayout(ObsidianConfig);
 
             const title = I18n.t("menu.info.title");
             const desc = I18n.t("menu.info.desc", ModPreferences.VERSION, ModPreferences.ENV);
 
-            const composer = new Menu.Composer(title, desc, layout);
+            const composer = new Menu.Composer(title, desc, MenuBuilder.layout);
             composer.icon(Constants.MOD_MENU_ICON_URL, "Web");
 
-            MenuBuilder.buildContent(layout);
+            MenuBuilder.buildContent(MenuBuilder.layout);
 
             composer.show();
         } catch (error: any) {
@@ -359,7 +361,6 @@ export class MenuBuilder {
     }
 
     private static buildOtherTab(layout: Menu.ObsidianLayout): void {
-        const m = MenuBuilder.modules;
         const other = layout.textView(I18n.t("menu.tabs.other"));
         other.gravity = Menu.Api.CENTER;
         Menu.add(other);
@@ -381,9 +382,7 @@ export class MenuBuilder {
             )
         );
 
-        const buildInfo = layout.textView(m.buildInfo!.getShortString());
-        buildInfo.gravity = Menu.Api.CENTER;
-        Menu.add(buildInfo);
+        // TODO: add update text
     }
 
     private static showCreditsPopup(): void {
@@ -398,5 +397,12 @@ export class MenuBuilder {
         // const m = MenuBuilder.modules;
         // const title = I18n.t("popups.credits.title");
         // const message = javaUtils.httpGet();
+    }
+
+    static addBuildInfoText(): void {
+        const m = MenuBuilder.modules;
+        const buildInfo = this.layout.textView(m.buildInfo!.getShortString());
+        buildInfo.gravity = Menu.Api.CENTER;
+        Menu.add(buildInfo);
     }
 }

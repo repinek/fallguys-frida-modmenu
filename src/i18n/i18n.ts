@@ -13,7 +13,7 @@ export class I18n {
     private static supportedLocales: string[] = Object.keys(TRANSLATIONS);
     private static currentLocale: string = "en";
 
-    public static init(): void {
+    static init(): void {
         let targetLocale = "en";
 
         Java.perform(() => {
@@ -22,8 +22,7 @@ export class I18n {
                 if (this.isLocaleSupported(savedLocale)) {
                     targetLocale = savedLocale;
                     Logger.debug(`[I18n::init] Loaded locale from config: ${targetLocale}`);
-                } else 
-                    Logger.warn(`[I18n::init] Locale ${savedLocale} from config is not supported`);
+                } else Logger.warn(`[I18n::init] Locale ${savedLocale} from config is not supported`);
             } else {
                 const systemLang = getSystemLocale();
 
@@ -52,7 +51,7 @@ export class I18n {
         }, obj);
     }
 
-    public static t(key: string, ...args: (string | number)[]): string {
+    static t(key: string, ...args: (string | number)[]): string {
         const value = this.resolveKey(TRANSLATIONS[this.currentLocale], key);
 
         if (!value) return `MISSING: ${key}`;

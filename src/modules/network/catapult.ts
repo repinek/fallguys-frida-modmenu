@@ -104,7 +104,7 @@ export class CatapultModule extends BaseModule {
 
         //@ts-ignore
         this.WebSocketNetworkHostCtor.implementation = function (serverAddress: Il2Cpp.String, port: number, isSecure: boolean): void {
-            Logger.hook("WebSocketNetworkHost::1 called with args:", serverAddress, port, isSecure);
+            Logger.hook("WebSocketNetworkHost::.ctor called with args:", serverAddress, port, isSecure);
 
             if (Constants.USE_CUSTOM_SERVER) {
                 if (serverAddress.content == "analytics-gateway.fallguys.oncatapult.com") {

@@ -51,7 +51,8 @@ export function copyToClipboard(text: string) {
 }
 
 // Thanks a lot: https://github.com/frida/frida/issues/1158#issuecomment-1227967229
-export function httpGet(targetUrl: string, onReceive: (response: string | null) => void = () => {}) {
+// TODO do it await or promise instead ts
+export function httpGet(targetUrl: string, onReceive: (response: string | null) => void = () => {}): void {
     Java.perform(() => {
         try {
             Logger.debug("[JavaUtils::httpGet] HTTP GET:", targetUrl);

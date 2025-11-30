@@ -1,6 +1,7 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 import { Logger } from "../../logger/logger.js";
+import { MenuBuilder } from "../../ui/menu.js";
 
 export class BuildInfoModule extends BaseModule {
     public name = "BuildInfo";
@@ -29,7 +30,7 @@ export class BuildInfoModule extends BaseModule {
             module.gameVersion = Il2Cpp.application.version!;
             module.buildNumber = this.field<Il2Cpp.String>("buildNumber").value.content!;
             module.buildDate = this.field<Il2Cpp.String>("buildDate").value.content!;
-
+            MenuBuilder.addBuildInfoText();
             return this.method<void>("OnEnable").invoke();
         };
     }

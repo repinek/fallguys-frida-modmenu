@@ -39,7 +39,7 @@ export class UwUifyModule extends BaseModule {
             if (ModSettings.uwuifyMode) {
                 string = Il2Cpp.string(module.uwuify(string.content!));
             }
-            
+
             this.method<void>("set_text").invoke(string);
         };
     }

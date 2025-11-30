@@ -21,7 +21,7 @@ export class UnityLogger {
     private static LogWarning: Il2Cpp.Method;
     private static LogError: Il2Cpp.Method;
 
-    public static init(): void {
+    static init(): void {
         this.Debug = AssemblyHelper.CoreModule.class("UnityEngine.Debug");
 
         this.Log = this.Debug.method<void>("Log", 1);
@@ -31,7 +31,7 @@ export class UnityLogger {
         this.initHooks();
     }
 
-    public static initHooks(): void {
+    static initHooks(): void {
         const module = this;
 
         if (Constants.UNITY_LOGGING) {

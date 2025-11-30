@@ -1,6 +1,7 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 import { Logger } from "../../logger/logger.js";
+import { GameLocalization } from "../../utils/game/gameLocalization.js";
 import { UnityUtils } from "../../utils/unityUtils.js";
 
 export enum ModalType_enum {
@@ -46,7 +47,16 @@ export class PopupManagerModule extends BaseModule {
     }
 
     // TODO: add custom size
-    public showPopup(title: string, message: string, modalType: ModalType_enum, okButtonType: OkButtonType_enum): void {
+    // TODO: too many args, do smth with that
+    public showPopup(
+        title: string,
+        message: string,
+        modalType: ModalType_enum,
+        okButtonType: OkButtonType_enum,
+        onCloseButtonPressed: Il2Cpp.Object | NativePointer = NULL,
+        okTextOverride: string | null = null,
+        cancelTextOverride: string | null = null
+    ): void {
         try {
             Logger.info("Showing popup");
             const ShowModalMessageDataInstance = this.popupManagerInstance!.method<boolean>("Show", 3).overload(
@@ -64,7 +74,15 @@ export class PopupManagerModule extends BaseModule {
             newModalMessageData.field<Il2Cpp.ValueType>("OkButtonType").value = this.OkButtonType.field<Il2Cpp.ValueType>(okButtonType).value;
             newModalMessageData.field<Il2Cpp.String>("Title").value = Il2Cpp.string(title);
             newModalMessageData.field<Il2Cpp.String>("Message").value = Il2Cpp.string(message);
-            newModalMessageData.field("OnCloseButtonPressed").value = NULL;
+            newModalMessageData.field("OnCloseButtonPressed").value = onCloseButtonPressed;
+            if (okTextOverride) {
+                const okTextId = GameLocalization.getOrCreateKey(okTextOverride);
+                newModalMessageData.field<Il2Cpp.String>("OkTextOverrideId").value = Il2Cpp.string(okTextId);
+            }
+            if (cancelTextOverride) {
+                const cancelTextId = GameLocalization.getOrCreateKey(cancelTextOverride);
+                newModalMessageData.field<Il2Cpp.String>("CancelTextOverrideId").value = Il2Cpp.string(cancelTextId);
+            }
 
             // 3 arg is onFailedCallback delegate, which is default is null
             ShowModalMessageDataInstance.invoke(this.info, newModalMessageData, NULL);

@@ -1,12 +1,14 @@
 export const ModPreferences = {
-    VERSION: "2.89", // Don't forget update after changes!
-    ENV: "dev", // dev, staging, release
+    VERSION: "2.94", // Don't forget update after changes!
+    ENV: "release", // dev, staging, release
     FOR_GAME_VERSION: "21.0.1"
 };
 
 /*
 !! TODO: 
-createmenu only when get build info (and fgdebug)
+describe functions in javaUtil
+eula popup (cool)
+createmenu only when get build info (and fgdebug) [ERROR]  il2cpp: cannot get element at index 0 as the array length is 0
 change language
 implement extensions.ts (.setActive, .getGameObject) 
 i18n refactor

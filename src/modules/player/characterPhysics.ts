@@ -14,7 +14,7 @@ export class CharacterPhysicsModule extends BaseModule {
     private MPGNetMotorTasks!: Il2Cpp.Class;
 
     private character?: Il2Cpp.Object; // FallGuysCharacterController
-    public static _character?: Il2Cpp.Object;
+    static _character?: Il2Cpp.Object;
 
     // Methods
     private CheckCharacterControllerData!: Il2Cpp.Method;
@@ -121,7 +121,7 @@ export class CharacterPhysicsModule extends BaseModule {
         }
     }
 
-    public static get Character(): Il2Cpp.Object | undefined {
+    static get Character(): Il2Cpp.Object | undefined {
         return this._character;
     }
 }
