@@ -8,4 +8,4 @@ export const GameDefaults = {
     airDiveForce: 7,
     diveForce: 16.5,
     diveMultiplier: 16.5 / 7 // diveForce / airDiveForce
-};
+} as const;

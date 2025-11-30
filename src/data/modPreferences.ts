@@ -6,6 +6,7 @@ export const ModPreferences = {
 
 /*
 !! TODO: 
+switch case logger
 update to 21.1.1
 describe functions in javaUtils
 eula popup (cool)

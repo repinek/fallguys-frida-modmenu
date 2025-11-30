@@ -12,7 +12,7 @@ import { ModSettings } from "../../data/modSettings.js";
 
 // TODO: hook TMP_Text.get_text
 export class UwUifyModule extends BaseModule {
-    public name = "UwUify";
+    public readonly name = "UwUify";
 
     // Classes
     private TMP_Text!: Il2Cpp.Class;
@@ -38,8 +38,7 @@ export class UwUifyModule extends BaseModule {
 
             if (ModSettings.uwuifyMode) {
                 const content = string.content;
-                if (content && content.length > 0) 
-                    string = Il2Cpp.string(module.uwuify(content));
+                if (content && content.length > 0) string = Il2Cpp.string(module.uwuify(content));
             }
 
             this.method<void>("set_text").invoke(string);
@@ -103,9 +102,9 @@ export class UwUifyModule extends BaseModule {
             }
             return text;
         };
-        
+
         // no <cowow=#E937A2FF></cowow>
-        text = text.replace(/(<[^>]*>|[^<]+)/g, (match) => {
+        text = text.replace(/(<[^>]*>|[^<]+)/g, match => {
             if (match.startsWith("<") && match.endsWith(">")) {
                 return match;
             }

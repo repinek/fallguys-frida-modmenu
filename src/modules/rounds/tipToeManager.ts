@@ -10,7 +10,7 @@ import { Logger } from "../../logger/logger.js";
  */
 
 export class TipToeManagerModule extends BaseModule {
-    public name = "TipToeManager";
+    public readonly name = "TipToeManager";
 
     // Classes
     private TipToe_Platform!: Il2Cpp.Class;

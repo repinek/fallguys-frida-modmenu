@@ -1,5 +1,5 @@
 export abstract class BaseModule {
-    abstract name: string;
+    abstract readonly name: string;
 
     abstract init(): void;
 

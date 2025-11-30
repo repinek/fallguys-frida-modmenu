@@ -10,7 +10,7 @@ import { UnityUtils } from "../../utils/unityUtils.js";
  */
 
 export class DoorManagerModule extends BaseModule {
-    public name = "DoorManager";
+    public readonly name = "DoorManager";
 
     // Classes
     private FakeDoorController!: Il2Cpp.Class;

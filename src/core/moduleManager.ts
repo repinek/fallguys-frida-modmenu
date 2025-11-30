@@ -27,7 +27,7 @@ import { UICanvasModule } from "../modules/visuals/uiCanvas.js";
 import { Logger } from "../logger/logger.js";
 
 export class ModuleManager {
-    public name = "ModuleManager";
+    public readonly name = "ModuleManager";
 
     // prettier-ignore
     private static modules: BaseModule[] = [

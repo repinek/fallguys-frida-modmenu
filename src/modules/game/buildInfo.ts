@@ -5,7 +5,7 @@ import { Logger } from "../../logger/logger.js";
 import { MenuBuilder } from "../../ui/menu.js";
 
 export class BuildInfoModule extends BaseModule {
-    public name = "BuildInfo";
+    public readonly name = "BuildInfo";
 
     // Classes
     private BuildInfo!: Il2Cpp.Class;

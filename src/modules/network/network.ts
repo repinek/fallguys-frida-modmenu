@@ -4,7 +4,7 @@ import { ModSettings } from "../../data/modSettings.js";
 import { Logger } from "../../logger/logger.js";
 
 export class NetworkModule extends BaseModule {
-    public name = "Network";
+    public readonly name = "Network";
 
     // Classes
     private AnalyticsService!: Il2Cpp.Class;

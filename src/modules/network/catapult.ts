@@ -35,7 +35,7 @@ interface IClientDetails {
 }
 
 export class CatapultModule extends BaseModule {
-    public name = "Catapult";
+    public readonly name = "Catapult";
 
     // Classes
     private CatapultServicesManager!: Il2Cpp.Class;

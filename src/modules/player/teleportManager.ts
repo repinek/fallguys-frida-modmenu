@@ -7,7 +7,7 @@ import { UnityUtils } from "../../utils/unityUtils.js";
 // TODO: describe issue here
 
 export class TeleportManagerModule extends BaseModule {
-    public name = "TeleportManager";
+    public readonly name = "TeleportManager";
 
     private readonly TELEPORT_COOLDOWN = 500;
 

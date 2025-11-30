@@ -20,7 +20,7 @@ export enum OkButtonType_enum {
 }
 
 export class PopupManagerModule extends BaseModule {
-    public name = "PopupManagerManager";
+    public readonly name = "PopupManagerManager";
 
     // Classes and Instances
     private PopupManager!: Il2Cpp.Class;

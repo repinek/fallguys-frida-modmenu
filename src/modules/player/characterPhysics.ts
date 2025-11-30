@@ -6,7 +6,7 @@ import { ModSettings } from "../../data/modSettings.js";
 import { Logger } from "../../logger/logger.js";
 
 export class CharacterPhysicsModule extends BaseModule {
-    public name = "CharacterPhysics";
+    public readonly name = "CharacterPhysics";
 
     // Classes and Instances
     private CharacterDataMonitor!: Il2Cpp.Class;

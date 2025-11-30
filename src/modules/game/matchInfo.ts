@@ -6,7 +6,7 @@ import { I18n } from "../../i18n/i18n.js";
 import { JavaUtils } from "../../utils/javaUtils.js";
 
 export class MatchInfoModule extends BaseModule {
-    public name = "MatchInfo";
+    public readonly name = "MatchInfo";
 
     // Classes
     private GlobalGameStateClient!: Il2Cpp.Class;

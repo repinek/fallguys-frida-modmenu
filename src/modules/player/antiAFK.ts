@@ -4,7 +4,7 @@ import { BaseModule } from "../../core/baseModule.js";
 import { Logger } from "../../logger/logger.js";
 
 export class AntiAFKModule extends BaseModule {
-    public name = "AntiAFK";
+    public readonly name = "AntiAFK";
 
     // Classes
     private AFKManager!: Il2Cpp.Class;

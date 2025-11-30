@@ -11,7 +11,7 @@ import { UnityUtils } from "../../utils/unityUtils.js";
  */
 
 export class FGDebugModule extends BaseModule {
-    public name = "FGDebug";
+    public readonly name = "FGDebug";
 
     // Classes and Instances
     private GvrFPS!: Il2Cpp.Class;
