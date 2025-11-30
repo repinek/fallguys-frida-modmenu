@@ -1,16 +1,14 @@
 export const ModPreferences = {
-    VERSION: "2.104", // Don't forget update after changes!
+    VERSION: "2.107", // Don't forget update after changes!
     ENV: "release", // dev, staging, release
-    FOR_GAME_VERSION: "21.0.1"
+    FOR_GAME_VERSION: "21.1.1"
 };
 
 /*
 !! TODO: 
+minimalistic fps counter
 switch case logger
-update to 21.1.1
-describe functions in javaUtils
 eula popup (cool)
-fgdebug fix [ERROR]  il2cpp: cannot get element at index 0 as the array length is 0
 change language
 implement extensions.ts (.setActive, .getGameObject) 
 project structure
@@ -18,7 +16,7 @@ add changing platform & some other things
 create cool screenshots for readme
 improve logging at modules
 on screen logging
-made localization for other languages (i18n)
+made localization for other languages
 refer changeResolutionScale()
 custom image on loading screen
 login by token
@@ -32,6 +30,9 @@ maybe:
 fork menu and update it to frida 17
 
 DONE:
+[x] update to 21.1.1
+[x] describe functions in javaUtils
+[x] fgdebug fix [ERROR]  il2cpp: cannot get element at index 0 as the array length is 0
 [x] i18n refactor
 [x] add changelog in menu
 [x] build info text
