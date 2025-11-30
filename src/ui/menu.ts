@@ -26,6 +26,7 @@ import { UICanvasModule } from "../modules/visuals/uiCanvas.js";
 
 import * as javaUtils from "../utils/javaUtils.js";
 import { UnityUtils } from "../utils/unityUtils.js";
+import { UpdateUtils } from "../utils/updateUtils.js";
 
 export class MenuBuilder {
     private static modules: {
@@ -394,9 +395,15 @@ export class MenuBuilder {
     }
 
     private static showChangelogPopup(): void {
-        // const m = MenuBuilder.modules;
-        // const title = I18n.t("popups.credits.title");
-        // const message = javaUtils.httpGet();
+        const m = MenuBuilder.modules;
+        UpdateUtils.getChangelog(ModPreferences.VERSION, entry => {
+            const date = entry ? entry.date : I18n.t("changelog.unknown_date");
+            const text = entry ? entry.changelog : I18n.t("changelog.not_found");
+
+            const title = I18n.t("popups.changelog.title", ModPreferences.VERSION, date);
+            const message = I18n.t("popups.changelog.message", text);
+            m.popupManager?.showPopup(title, message, ModalType_enum.MT_OK, OkButtonType_enum.Green);
+        });
     }
 
     static addBuildInfoText(): void {

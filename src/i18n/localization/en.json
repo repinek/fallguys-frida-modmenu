@@ -77,7 +77,8 @@
             "message": "<b>Developed by:</b>\nrepinek\n\n<b>Special Thanks:</b>\n• <b>Floyzi</b> — Help with how the game works, help with some features, localization.\n• <b>commonuserlol</b> — Help with code and menu\n• <b>Obed Guys Team</b> — Some Features\n\n<b>Built with:</b>\n• <b>frida.re</b> — An amazing dynamic instrumentation toolkit.\n• <b>frida-il2cpp-bridge</b> — The incredible frida module for IL2CPP"
         },
         "changelog": {
-            "title": "Changelog for v{0} — {1}"
+            "title": "Changelog for v{0} — {1}",
+            "message": "{0}"
         },
         "update": {
             "title": "Mod Menu Update Available",
