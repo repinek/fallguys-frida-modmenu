@@ -18,34 +18,42 @@ interface IChangelogEntry {
     changelog: string;
 }
 
+export enum UpdateState {
+    Unknown = 0,
+    UpToDate = 1,
+    Outdated = 2,
+    Error = 3
+}
+
 // TODO: add logs
 export class UpdateUtils {
-    // 0 - can't be fetched, 1 - up to date, 2 - outdated
-    // TODO: add func to get localised string from state yes i can do it
-    static updateState = 0;
+    private static readonly tag = "UpdateUtils";
 
-    private static modMenuVersion: IModMenuVersion | null = null;
+    // TODO: add func to get localised string from state yes i can do it
+    static state: UpdateState = UpdateState.Unknown;
+
+    private static modMenuUpdateVersion: IModMenuVersion | null = null;
 
     static checkForUpdate(): void {
         // if (ModPreferences.ENV !== "release") {
-        //     Logger.debug("Skipping mod menu version check in dev/staging");
+        //     Logger.debug(`[${this.tag}::checkForUpdate] Skipping mod menu version check in dev/staging`);
         //     return;
         // }
 
         JavaUtils.httpGet(Constants.MOD_MENU_VERSION_URL, response => {
             if (!response) {
-                Logger.warn("Actual mod menu version can't be fetched");
+                Logger.warn(`[${this.tag}::checkForUpdate] Actual mod menu version can't be fetched`);
                 return;
             }
 
-            this.modMenuVersion = JSON.parse(response) as IModMenuVersion;
+            this.modMenuUpdateVersion = JSON.parse(response) as IModMenuVersion;
 
-            if (this.modMenuVersion.scriptVersion == ModPreferences.VERSION) {
-                this.updateState = 1;
-                Logger.info("Mod menu is up to date");
+            if (this.modMenuUpdateVersion.scriptVersion == ModPreferences.VERSION) {
+                this.state = UpdateState.UpToDate;
+                Logger.info(`[${this.tag}::checkForUpdate] Mod menu is up to date`);
             } else {
-                this.updateState = 2;
-                Logger.warn("Mod menu version is outdated");
+                this.state = UpdateState.Outdated;
+                Logger.warn(`[${this.tag}::checkForUpdate] Mod menu version is outdated`);
             }
         });
     }
@@ -53,21 +61,20 @@ export class UpdateUtils {
     // Called in CMSLoader::Awake
     static showUpdatePopup(): void {
         const popupManager = ModuleManager.get(PopupManagerModule);
-        const scriptVersion = this.modMenuVersion?.scriptVersion;
-        if (!scriptVersion) {
+        if (!this.modMenuUpdateVersion) {
             return;
         }
+        const scriptVersion = this.modMenuUpdateVersion.scriptVersion;
         this.getChangelog(scriptVersion, entry => {
-            const date = entry ? entry.date : I18n.t("changelog.unknown_date");
-            const text = entry ? entry.changelog : I18n.t("changelog.not_found");
+            const date = entry ? entry.date : I18n.t("update_utils.unknown_date");
+            const text = entry ? entry.changelog : I18n.t("update_utils.not_found");
 
             const title = I18n.t("popups.update.title");
             const message = I18n.t("popups.update.message", scriptVersion, date, text);
             const onClose = Il2Cpp.delegate(UnityUtils.SystemActionBool, (pressed: boolean) => {
                 if (pressed) JavaUtils.openURL(Constants.GITHUB_RELEASES_URL);
             });
-
-            const okText = I18n.t("changelog.download");
+            const okText = I18n.t("update_utils.download");
 
             popupManager?.showPopup(title, message, ModalType_enum.MT_OK_CANCEL, OkButtonType_enum.Yellow, onClose, okText);
         });
