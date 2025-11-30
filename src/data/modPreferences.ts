@@ -1,20 +1,19 @@
 export const ModPreferences = {
-    VERSION: "2.100", // Don't forget update after changes!
+    VERSION: "2.102", // Don't forget update after changes!
     ENV: "release", // dev, staging, release
     FOR_GAME_VERSION: "21.0.1"
 };
 
 /*
 !! TODO: 
-describe functions in javaUtil
+update to 21.1.1
+describe functions in javaUtils
 eula popup (cool)
-createmenu only when get build info (and fgdebug) [ERROR]  il2cpp: cannot get element at index 0 as the array length is 0
+fgdebug fix [ERROR]  il2cpp: cannot get element at index 0 as the array length is 0
 change language
 implement extensions.ts (.setActive, .getGameObject) 
-i18n refactor
 project structure
 add changing platform & some other things
-add changelog in menu
 create cool screenshots for readme
 improve logging at modules
 on screen logging
@@ -32,6 +31,9 @@ maybe:
 fork menu and update it to frida 17
 
 DONE:
+[x] i18n refactor
+[x] add changelog in menu
+[x] build info text
 [x] rename onEnable to initHooks
 [x] comments over module
 [x] implement uwuify

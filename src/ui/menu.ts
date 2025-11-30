@@ -24,11 +24,12 @@ import { GraphicsManagerModule } from "../modules/visuals/graphicsManager.js";
 import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "../modules/visuals/popupManager.js";
 import { UICanvasModule } from "../modules/visuals/uiCanvas.js";
 
-import { JavaUtils} from "../utils/javaUtils.js";
+import { JavaUtils } from "../utils/javaUtils.js";
 import { UnityUtils } from "../utils/unityUtils.js";
 import { UpdateUtils } from "../utils/updateUtils.js";
 
 export class MenuBuilder {
+    private static readonly tag = "MenuBuilder";
     private static modules: {
         buildInfo?: BuildInfoModule;
         matchInfo?: MatchInfoModule;
@@ -48,6 +49,7 @@ export class MenuBuilder {
         if (Java.available) {
             Menu.waitForInit(MenuBuilder.build);
         }
+        Logger.info(`[${this.tag}::init] Initialized`);
     }
 
     private static getModules(): void {
@@ -366,8 +368,8 @@ export class MenuBuilder {
         other.gravity = Menu.Api.CENTER;
         Menu.add(other);
 
-        Menu.add(layout.button(I18n.t("menu.other.github_url"), () => javaUtils.openURL(Constants.GITHUB_URL)));
-        Menu.add(layout.button(I18n.t("menu.other.discord_url"), () => javaUtils.openURL(Constants.DISCORD_URL)));
+        Menu.add(layout.button(I18n.t("menu.other.github_url"), () => JavaUtils.openURL(Constants.GITHUB_URL)));
+        Menu.add(layout.button(I18n.t("menu.other.discord_url"), () => JavaUtils.openURL(Constants.DISCORD_URL)));
 
         Menu.add(
             layout.button(
@@ -382,8 +384,6 @@ export class MenuBuilder {
                 this.run(() => this.showChangelogPopup())
             )
         );
-
-        // TODO: add update text
     }
 
     private static showCreditsPopup(): void {
@@ -397,8 +397,8 @@ export class MenuBuilder {
     private static showChangelogPopup(): void {
         const m = MenuBuilder.modules;
         UpdateUtils.getChangelog(ModPreferences.VERSION, entry => {
-            const date = entry ? entry.date : I18n.t("changelog.unknown_date");
-            const text = entry ? entry.changelog : I18n.t("changelog.not_found");
+            const date = entry ? entry.date : I18n.t("update_utils.unknown_date");
+            const text = entry ? entry.changelog : I18n.t("update_utils.not_found");
 
             const title = I18n.t("popups.changelog.title", ModPreferences.VERSION, date);
             const message = I18n.t("popups.changelog.message", text);
@@ -406,10 +406,12 @@ export class MenuBuilder {
         });
     }
 
-    static addBuildInfoText(): void {
-        const m = MenuBuilder.modules;
-        const buildInfo = this.layout.textView(m.buildInfo!.getShortString());
-        buildInfo.gravity = Menu.Api.CENTER;
-        Menu.add(buildInfo);
+    static addCenterText(text: string): void {
+        if (this.layout) {
+            const textToAdd = this.layout.textView(text);
+            textToAdd.gravity = Menu.Api.CENTER;
+            Menu.add(textToAdd);
+        }
     }
 }
+ 

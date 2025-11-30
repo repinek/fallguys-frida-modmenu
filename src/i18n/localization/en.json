@@ -57,7 +57,8 @@
             "github_url": "GitHub Repository (Leave a star!)",
             "discord_url": "Discord Server",
             "credits": "Open Credits",
-            "changelog": "Open Changelog"
+            "changelog": "Open Changelog",
+            "based_on": "Based on: {0}"
         },
         "toasts": {
             "no_overlay_permission": "Overlay permission is needed to show the menu",
@@ -85,8 +86,7 @@
             "message": "<b>A new version v{0} — {1} is available!</b>\n\nChangelog:\n{2}"
         }
     },
-    "changelog": {
-        "TODO": "add string from other UpdateUtils",
+    "update_utils": {
         "cant_retreive": "Failed to retrieve changelog data",
         "not_found": "Changelog for this version not found",
         "unknown_date": "Unknown Date",

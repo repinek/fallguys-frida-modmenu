@@ -2,6 +2,7 @@ import { Logger } from "../../logger/logger.js";
 import { CMSLoader } from "./CMSLoader.js";
 
 export class GameLocalization {
+    private static readonly tag = "GameLocalization";
     // Instances
     static LocalisedStringsInstance: Il2Cpp.Object;
 
@@ -10,7 +11,7 @@ export class GameLocalization {
 
     static init(): void {
         this.LocalisedStringsInstance = CMSLoader.CMSLoaderInstance!.field<Il2Cpp.Object>("_localisedStrings").value;
-        Logger.info("[GameLocalization::init] Initialized");
+        Logger.info(`[${this.tag}::init] Initialized`);
     }
 
     static Add(key: string, value: string): void {

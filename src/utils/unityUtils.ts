@@ -2,6 +2,7 @@ import { AssemblyHelper } from "../core/assemblyHelper.js";
 import { Logger } from "../logger/logger.js";
 
 export class UnityUtils {
+    private static readonly tag = "UnityUtils";
     // Classes
     private static Resources: Il2Cpp.Class;
     private static Vector3: Il2Cpp.Class;
@@ -18,7 +19,7 @@ export class UnityUtils {
         this.SystemBoolean = Il2Cpp.corlib.class("System.Boolean");
         this.SystemActionBool = Il2Cpp.corlib.class("System.Action`1").inflate(this.SystemBoolean);
 
-        Logger.info(`[${this.constructor.name}::init] Initialized`);
+        Logger.info(`[${this.tag}::init] Initialized`);
     }
 
     /** Wrapper over UnityEngine::Resources::FindObjectsOfTypeAll */
@@ -30,7 +31,7 @@ export class UnityUtils {
     static getInstance(klass: Il2Cpp.Class): Il2Cpp.Object | undefined {
         const instanceMethod = klass.tryMethod<Il2Cpp.Object>("get_Instance");
         if (!instanceMethod) {
-            Logger.error(`[UnityUtils::getInstance] ${klass.name} is missing get_Instance`);
+            Logger.error(`[${this.tag}::getInstance] ${klass.name} is missing get_Instance`);
             return undefined;
         }
 
@@ -44,6 +45,7 @@ export class UnityUtils {
         return vector;
     }
 
+    /** Wrapper over UnityEngine::Vector2::.ctor */
     static createVector2(x: number, y: number): Il2Cpp.ValueType {
         const vector = this.Vector2.alloc().unbox();
         vector.method(".ctor", 2).invoke(x, y);

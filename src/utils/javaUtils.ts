@@ -1,38 +1,38 @@
 import { Logger } from "../logger/logger.js";
 
 export class JavaUtils {
-    private static readonly name = "JavaUtils";
+    private static readonly tag = "JavaUtils";
 
     /** Exits the application with code 0 */
     static exitFromApp(): void {
         Java.perform(() => {
-            Logger.debug(`[${this.name}::exitFromApp] Exiting from app`);
+            Logger.debug(`[${this.tag}::exitFromApp] Exiting from app`);
             const System = Java.use("java.lang.System");
             System.exit(0);
         });
     }
 
-    /** 
+    /**
      * Returns system language (like, "en", "ru")
-     * 
+     *
      * @note Use with Java.perform
      */
     static getSystemLocale(): string {
         const Locale = Java.use("java.util.Locale");
         const lang = Locale.getDefault().getLanguage().toLowerCase();
-        Logger.debug(`[${this.name}::getSystemLocale] Got locale from system: ${lang}`);
+        Logger.debug(`[${this.tag}::getSystemLocale] Got locale from system: ${lang}`);
         return lang;
     }
 
     /**
      * Opens URL in default system browser
-     * 
+     *
      * @param targetUrl URL to open
      */
     static openURL(targetUrl: string): void {
         Java.perform(() => {
             try {
-                Logger.debug(`[${this.name}::OpenURL] Opening URL: ${targetUrl}`);
+                Logger.debug(`[${this.tag}::OpenURL] Opening URL: ${targetUrl}`);
                 const uri = Java.use("android.net.Uri").parse(targetUrl);
                 const intent = Java.use("android.content.Intent");
                 const context = Java.use("android.app.ActivityThread").currentApplication().getApplicationContext();
@@ -47,8 +47,8 @@ export class JavaUtils {
     }
 
     /**
-     * Copies text in system clipboard 
-     * 
+     * Copies text in system clipboard
+     *
      * @param text Text to copy
      */
     static copyToClipboard(text: string): void {
@@ -61,7 +61,7 @@ export class JavaUtils {
 
                 const clipData = ClipData.newPlainText(javaString.$new("label"), javaString.$new(text));
                 clipboardManager.setPrimaryClip(clipData);
-                Logger.debug(`[${this.name}::copyToClipboard] Copied to clipboard: ${text}`);
+                Logger.debug(`[${this.tag}::copyToClipboard] Copied to clipboard: ${text}`);
             } catch (error: any) {
                 Logger.errorThrow(error);
             }
@@ -72,14 +72,14 @@ export class JavaUtils {
     // TODO do it await or promise instead ts
     /**
      * Creates HTTP GET request using Java
-     * 
+     *
      * @param targetUrl URL to request
      * @param onReceive CallBack function to handle response
      */
     static httpGet(targetUrl: string, onReceive: (response: string | null) => void = () => {}): void {
         Java.perform(() => {
             try {
-                Logger.debug(`[${this.name}::httpGet] HTTP GET to: ${targetUrl}`);
+                Logger.debug(`[${this.tag}::httpGet] HTTP GET to: ${targetUrl}`);
                 const HttpURLConnection = Java.use("java.net.HttpURLConnection");
                 const URL = Java.use("java.net.URL");
                 const BufferedReader = Java.use("java.io.BufferedReader");
@@ -117,7 +117,7 @@ export class JavaUtils {
                 }
 
                 connection.disconnect();
-                Logger.debug(`[${this.name}::httpGet] HTTP GET response: ${response}`);
+                Logger.debug(`[${this.tag}::httpGet] HTTP GET response: ${response}`);
                 onReceive(response);
             } catch (error: any) {
                 Logger.errorThrow(error, "HTTP GET");

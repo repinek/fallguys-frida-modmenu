@@ -3,7 +3,7 @@ import { BaseModule } from "../../core/baseModule.js";
 import { Logger } from "../../logger/logger.js";
 import { UnityUtils } from "../../utils/unityUtils.js";
 import { I18n } from "../../i18n/i18n.js";
-import * as JavaUtils from "../../utils/javaUtils.js";
+import { JavaUtils } from "../../utils/javaUtils.js";
 
 export class MatchInfoModule extends BaseModule {
     public name = "MatchInfo";

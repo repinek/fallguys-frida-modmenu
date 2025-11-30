@@ -1,4 +1,4 @@
-import { getSystemLocale } from "../utils/javaUtils.js";
+import { JavaUtils } from "../utils/javaUtils.js";
 import { Logger } from "../logger/logger.js";
 
 import en from "./localization/en.json";
@@ -24,7 +24,7 @@ export class I18n {
                     Logger.debug(`[I18n::init] Loaded locale from config: ${targetLocale}`);
                 } else Logger.warn(`[I18n::init] Locale ${savedLocale} from config is not supported`);
             } else {
-                const systemLang = getSystemLocale();
+                const systemLang = JavaUtils.getSystemLocale();
 
                 // prettier-ignore
                 if (this.isLocaleSupported(systemLang)) 

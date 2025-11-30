@@ -32,10 +32,10 @@ class FallGuysFridaModMenu {
                 ModuleManager.initAll();
                 CMSLoader.init();
                 // Only after all that we can do your things
+                
+                MenuBuilder.init();
 
                 UpdateUtils.checkForUpdate();
-
-                MenuBuilder.init();
             });
         } catch (error: any) {
             //
