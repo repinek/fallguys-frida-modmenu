@@ -1,7 +1,7 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 import { ModSettings } from "../../data/modSettings.js";
-import { Logger } from "../../logger/logger.js";
+
 /*
  * Hooks TMP_Text::set_text and return UwUified result
  *
@@ -37,7 +37,9 @@ export class UwUifyModule extends BaseModule {
             }
 
             if (ModSettings.uwuifyMode) {
-                string = Il2Cpp.string(module.uwuify(string.content!));
+                const content = string.content;
+                if (content && content.length > 0) 
+                    string = Il2Cpp.string(module.uwuify(content));
             }
 
             this.method<void>("set_text").invoke(string);
@@ -50,10 +52,7 @@ export class UwUifyModule extends BaseModule {
         const suffixes = [
             " :3",
             " UwU",
-            " (✿ ♡‿♡)",
             " ÙωÙ",
-            " ʕʘ‿ʘʔ",
-            " ʕ•̫͡•ʔ",
             " >_>",
             " ^_^",
             "..",
@@ -72,9 +71,7 @@ export class UwUifyModule extends BaseModule {
             "（＾ｖ＾）",
             " x3",
             " ._.",
-            ' (　"◟ ")',
             " (；ω；)",
-            " (◠‿◠✿)",
             " >_<",
             " >w<",
             " ^w^",
@@ -99,9 +96,21 @@ export class UwUifyModule extends BaseModule {
             { reg: /N([AEIOU])/g, val: "NY$1" }
         ];
 
-        for (const replacement of replacements) {
-            text = text.replace(replacement.reg, replacement.val);
-        }
+        const processText = (str: string): string => {
+            let text = str;
+            for (const replacement of replacements) {
+                text = text.replace(replacement.reg, replacement.val);
+            }
+            return text;
+        };
+        
+        // no <cowow=#E937A2FF></cowow>
+        text = text.replace(/(<[^>]*>|[^<]+)/g, (match) => {
+            if (match.startsWith("<") && match.endsWith(">")) {
+                return match;
+            }
+            return processText(match);
+        });
 
         const getRandom = (arr: string[], chance: number): string => {
             if (Math.random() > chance) return "";
