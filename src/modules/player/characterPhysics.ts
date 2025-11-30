@@ -75,7 +75,7 @@ export class CharacterPhysicsModule extends BaseModule {
     }
 
     private changeGravity(data: Il2Cpp.Object): void {
-        let gravity = GameDefaults.maxGravityVelocity;
+        let gravity: number = GameDefaults.maxGravityVelocity;
 
         if (ModSettings.customGravity) {
             if (ModSettings.noGravity) {
