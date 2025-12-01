@@ -54,6 +54,7 @@
             "uwuify": "UwUify Mode"
         },
         "other": {
+            "language": "Select Language",
             "github_url": "GitHub Repository (Leave a star!)",
             "discord_url": "Discord Server",
             "credits": "Open Credits",
@@ -84,6 +85,10 @@
         "update": {
             "title": "Mod Menu Update Available",
             "message": "<b>A new version v{0} — {1} is available!</b>\n\nChangelog:\n{2}"
+        },
+        "language": {
+            "title": "Select Mod Menu Language",
+            "message": "It will only be applied after restarting the game"
         }
     },
     "update_utils": {
