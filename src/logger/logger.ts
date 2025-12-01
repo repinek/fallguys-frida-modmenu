@@ -18,7 +18,7 @@ export class Logger {
         const ss = date.getSeconds().toString().padStart(2, "0");
         return `${this.Colors.GRAY}[${hh}:${mm}:${ss}]${this.Colors.RESET}`;
     }
-    // TODO: add log with switchcase
+
     static info(...messages: any[]) {
         console.info(`${this.getTime()} ${this.Colors.BLUE}[INFO]${this.Colors.RESET}`, ...messages);
     }

@@ -10,7 +10,7 @@ const TRANSLATIONS: Record<string, any> = {
 };
 
 export class I18n {
-    private static supportedLocales: string[] = Object.keys(TRANSLATIONS);
+    static supportedLocales: string[] = Object.keys(TRANSLATIONS);
     private static currentLocale: string = "en";
 
     static init(): void {

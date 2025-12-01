@@ -8,8 +8,8 @@ import { UnityUtils } from "../../utils/unityUtils.js";
  *
  * Scale to 0.4 (default size is too big for mobile)
  * and enable GameObject using setActive
- * 
- * also we need Awake hook, since menu is loading faster than fgdebug instance in the game, and we got:
+ *
+ * also we need Awake hook, since our menu is loading faster than fgdebug instance in the game, and we got:
  * [ERROR]  il2cpp: cannot get element at index 0 as the array length is 0
  */
 
@@ -40,13 +40,12 @@ export class FGDebugModule extends BaseModule {
             Logger.hook("GvrFPS::Awake called");
             this.method<void>("Awake").invoke(); // <--- OnLeave
             module.isAwaked = true;
-            if (module.isToggled)
-                module.toggleFGDebug(true);
-        }
-    }   
+            if (module.isToggled) module.toggleFGDebug(true);
+        };
+    }
 
     public toggleFGDebug(value: boolean): void {
-        try {   
+        try {
             this.isToggled = true;
             if (this.isAwaked) {
                 this.setFGDebugScale();

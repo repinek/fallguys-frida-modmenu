@@ -1,6 +1,8 @@
 import { Logger } from "../../logger/logger.js";
 import { CMSLoader } from "./CMSLoader.js";
 
+// TODO: describe
+
 export class GameLocalization {
     private static readonly tag = "GameLocalization";
     // Instances
@@ -28,6 +30,7 @@ export class GameLocalization {
         this.Add(key, text);
         this.dynamicKeys.set(text, key);
 
+        Logger.debug(`Created localised string, key: ${key}, value: ${text}`)
         return key;
     }
 }

@@ -4,6 +4,8 @@ import { Logger } from "../../logger/logger.js";
 import { GameLocalization } from "../../utils/game/gameLocalization.js";
 import { UnityUtils } from "../../utils/unityUtils.js";
 
+// TODO: fix this
+
 export enum ModalType_enum {
     MT_OK = "MT_OK",
     MT_OK_CANCEL = "MT_OK_CANCEL",
@@ -26,6 +28,7 @@ export class PopupManagerModule extends BaseModule {
     private PopupManager!: Il2Cpp.Class;
     private _popupManagerInstance?: Il2Cpp.Object;
     private ModalMessageData!: Il2Cpp.Class;
+    private ModalMessageWithOptionSelectionData!: Il2Cpp.Class;
 
     // Enums
     private PopupInteractionType!: Il2Cpp.Class;
@@ -39,6 +42,7 @@ export class PopupManagerModule extends BaseModule {
     public init(): void {
         this.PopupManager = AssemblyHelper.MTFGClient.class("FGClient.UI.PopupManager");
         this.ModalMessageData = AssemblyHelper.MTFGClient.class("FGClient.UI.ModalMessageData");
+        this.ModalMessageWithOptionSelectionData = AssemblyHelper.MTFGClient.class("FGClient.UI.ModalMessageWithOptionSelectionData");
 
         this.PopupInteractionType = AssemblyHelper.MTFGClient.class("FGClient.UI.PopupInteractionType");
         this.LocaliseOption = AssemblyHelper.MTFGClient.class("FGClient.UI.UIModalMessage/LocaliseOption");
@@ -89,6 +93,46 @@ export class PopupManagerModule extends BaseModule {
         } catch (error: any) {
             Logger.errorThrow(error);
         }
+    }
+
+    public showSelectionOptionPopup(
+        title: string,
+        message: string,
+        options: string[],
+        onCloseButtonPressed: Il2Cpp.Object | NativePointer = NULL,
+        okTextOverride: string | null = null,
+    ) {
+        Logger.info("Showing popup with selection Option");
+        const ShowModalMessageDataInstance = this.popupManagerInstance!.method<boolean>("Show", 3).overload(
+            "FGClient.UI.PopupInteractionType",
+            "FGClient.UI.ModalMessageWithOptionSelectionData",
+            "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"
+        );
+
+        const newModalMessageData = UnityUtils.createInstance(this.ModalMessageWithOptionSelectionData);
+
+        newModalMessageData.field<Il2Cpp.ValueType>("LocaliseTitle").value = this.notLocalised;
+        newModalMessageData.field<Il2Cpp.ValueType>("LocaliseMessage").value = this.notLocalised;
+        newModalMessageData.field<Il2Cpp.String>("Title").value = Il2Cpp.string(title);
+        newModalMessageData.field<Il2Cpp.String>("Message").value = Il2Cpp.string(message);
+        newModalMessageData.field("OnOptionSelectionModalClosed").value = onCloseButtonPressed;
+        if (okTextOverride) {
+            const okTextId = GameLocalization.getOrCreateKey(okTextOverride);
+            newModalMessageData.field<Il2Cpp.String>("OkTextOverrideId").value = Il2Cpp.string(okTextId);
+        }
+        // ids in _localisedStrings
+        const StringsIds: string[] = [];
+
+        for (const string of options) {
+            const stringKey = GameLocalization.getOrCreateKey(string); // create localisedString 
+            StringsIds.push(stringKey);
+        }
+
+        // Create list with localised Ids
+        const optionsGenericList = UnityUtils.createStringList(StringsIds);
+        newModalMessageData.field("OptionStringIds").value = optionsGenericList;
+
+        ShowModalMessageDataInstance.invoke(this.info, newModalMessageData, NULL);
     }
 
     private get popupManagerInstance(): Il2Cpp.Object | undefined {

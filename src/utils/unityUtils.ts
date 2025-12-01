@@ -10,8 +10,10 @@ export class UnityUtils {
 
     private static SystemBoolean: Il2Cpp.Class;
     private static SystemString: Il2Cpp.Class;
+    private static SystemInt: Il2Cpp.Class;
 
     static SystemActionBool: Il2Cpp.Class;
+    static SystemActionBoolInt: Il2Cpp.Class;
 
     static GenericListString: Il2Cpp.Class;
 
@@ -22,8 +24,10 @@ export class UnityUtils {
 
         this.SystemBoolean = Il2Cpp.corlib.class("System.Boolean");
         this.SystemString = Il2Cpp.corlib.class("System.String");
+        this.SystemInt = Il2Cpp.corlib.class("System.Int32");
 
         this.SystemActionBool = Il2Cpp.corlib.class("System.Action`1").inflate(this.SystemBoolean)
+        this.SystemActionBoolInt = Il2Cpp.corlib.class("System.Action`2").inflate(this.SystemBoolean, this.SystemInt)
         
         this.GenericListString = Il2Cpp.corlib.class("System.Collections.Generic.List`1").inflate(this.SystemString);
 

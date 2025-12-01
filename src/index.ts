@@ -25,20 +25,21 @@ class FallGuysFridaModMenu {
                 Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
                 I18n.init();
 
-                // add EnvironmentManager or smth like that for loading this easily (or no??)
+                // Loading unity related things
                 AssemblyHelper.init();
                 UnityLogger.init();
                 UnityUtils.init();
                 ModuleManager.initAll();
                 CMSLoader.init();
-                // Only after all that we can do your things
 
+                // Only after all that we can do your things
                 MenuBuilder.init();
 
                 UpdateUtils.checkForUpdate();
             });
         } catch (error: any) {
-            //
+            // TODO: log file
+            Logger.toast(`Error while loading script: ${error.message}`, 1);
         }
     }
 }

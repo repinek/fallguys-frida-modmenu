@@ -1,11 +1,12 @@
 export const ModPreferences = {
-    VERSION: "2.107", // Don't forget update after changes!
+    VERSION: "2.110", // Don't forget update after changes!
     ENV: "release", // dev, staging, release
     FOR_GAME_VERSION: "21.1.1"
 };
 
 /*
 !! TODO: 
+move popup manager to ui
 minimalistic fps counter
 switch case logger
 eula popup (cool)

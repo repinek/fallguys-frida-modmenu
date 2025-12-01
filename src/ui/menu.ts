@@ -47,9 +47,11 @@ export class MenuBuilder {
 
     static init(): void {
         if (Java.available) {
-            Menu.waitForInit(MenuBuilder.build);
+            Java.perform(() => {
+                Menu.waitForInit(MenuBuilder.build);
+            })
+            Logger.info(`[${this.tag}::init] Initialized`);
         }
-        Logger.info(`[${this.tag}::init] Initialized`);
     }
 
     private static getModules(): void {
@@ -133,6 +135,14 @@ export class MenuBuilder {
             layout.button("Create Test Popup", () => {
                 UnityUtils.runInMain(() => {
                     m.popupManager?.showPopup("Test Popup", "Message of Test Popup", ModalType_enum.MT_OK, OkButtonType_enum.Green);
+                });
+            })
+        );
+
+        Menu.add(
+            layout.button("Create Test Selection Option Popup", () => {
+                UnityUtils.runInMain(() => {
+                    m.popupManager?.showSelectionOptionPopup("Test Selection Popup", "Message of Test Selection Popup", ["play", "abandon_show_message", "102", "uwu"]);
                 });
             })
         );
@@ -368,6 +378,8 @@ export class MenuBuilder {
         other.gravity = Menu.Api.CENTER;
         Menu.add(other);
 
+        Menu.add(layout.button(I18n.t("menu.other.language"), this.run(() => this.showLanguagePopup())))
+
         Menu.add(layout.button(I18n.t("menu.other.github_url"), () => JavaUtils.openURL(Constants.GITHUB_URL)));
         Menu.add(layout.button(I18n.t("menu.other.discord_url"), () => JavaUtils.openURL(Constants.DISCORD_URL)));
 
@@ -384,6 +396,20 @@ export class MenuBuilder {
                 this.run(() => this.showChangelogPopup())
             )
         );
+    }
+
+    private static showLanguagePopup(): void {
+        const m = MenuBuilder.modules;
+        const title = I18n.t("popups.language.title");
+        const message = I18n.t("popups.language.message");
+        const onClose = Il2Cpp.delegate(UnityUtils.SystemActionBoolInt, (pressed: boolean, indexLanguage: number) => {
+            if (pressed) {
+                const index = I18n.supportedLocales.at(indexLanguage);
+                Logger.debug(index);
+                // implement logic here
+            }
+        })
+        m.popupManager?.showSelectionOptionPopup(title, message, I18n.supportedLocales, onClose)
     }
 
     private static showCreditsPopup(): void {
