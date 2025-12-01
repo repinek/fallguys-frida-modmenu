@@ -9,7 +9,11 @@ export class UnityUtils {
     private static Vector2: Il2Cpp.Class;
 
     private static SystemBoolean: Il2Cpp.Class;
+    private static SystemString: Il2Cpp.Class;
+
     static SystemActionBool: Il2Cpp.Class;
+
+    static GenericListString: Il2Cpp.Class;
 
     static init() {
         this.Resources = AssemblyHelper.CoreModule.class("UnityEngine.Resources");
@@ -17,7 +21,11 @@ export class UnityUtils {
         this.Vector2 = AssemblyHelper.CoreModule.class("UnityEngine.Vector2");
 
         this.SystemBoolean = Il2Cpp.corlib.class("System.Boolean");
-        this.SystemActionBool = Il2Cpp.corlib.class("System.Action`1").inflate(this.SystemBoolean);
+        this.SystemString = Il2Cpp.corlib.class("System.String");
+
+        this.SystemActionBool = Il2Cpp.corlib.class("System.Action`1").inflate(this.SystemBoolean)
+        
+        this.GenericListString = Il2Cpp.corlib.class("System.Collections.Generic.List`1").inflate(this.SystemString);
 
         Logger.info(`[${this.tag}::init] Initialized`);
     }
@@ -50,6 +58,18 @@ export class UnityUtils {
         const vector = this.Vector2.alloc().unbox();
         vector.method(".ctor", 2).invoke(x, y);
         return vector;
+    }
+
+    static createStringList(items: string[]): Il2Cpp.Object {
+        const list = UnityUtils.createInstance(this.GenericListString);
+
+        const Add = list.method("Add");
+
+        for (const item of items) {
+            Add.invoke(Il2Cpp.string(item));
+        }
+
+        return list
     }
 
     /** Wrapper over constructor.name */
