@@ -30,7 +30,7 @@ export class GameLocalization {
         this.Add(key, text);
         this.dynamicKeys.set(text, key);
 
-        Logger.debug(`Created localised string, key: ${key}, value: ${text}`)
+        Logger.debug(`Created localised string, key: ${key}, value: ${text}`);
         return key;
     }
 }

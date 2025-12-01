@@ -11,6 +11,7 @@ import { I18n } from "./i18n/i18n.js";
 import { Logger } from "./logger/logger.js";
 import { UnityLogger } from "./logger/unityLogger.js";
 
+import { PopupManager } from "./ui/popup/popupManager.js";
 import { MenuBuilder } from "./ui/menu.js";
 
 import { CMSLoader } from "./utils/game/CMSLoader.js";
@@ -33,6 +34,7 @@ class FallGuysFridaModMenu {
                 CMSLoader.init();
 
                 // Only after all that we can do your things
+                PopupManager.init();
                 MenuBuilder.init();
 
                 UpdateUtils.checkForUpdate();

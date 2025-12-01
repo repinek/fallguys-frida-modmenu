@@ -24,6 +24,10 @@ import { GraphicsManagerModule } from "../modules/visuals/graphicsManager.js";
 import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "../modules/visuals/popupManager.js";
 import { UICanvasModule } from "../modules/visuals/uiCanvas.js";
 
+import { LocaliseOption } from "./popup/data/ModalMessageBaseData.js";
+import { ModalType, OkButtonType, ModalMessageData } from "./popup/data/ModalMessageData.js";
+import { PopupManager } from "./popup/popupManager.js";
+
 import { JavaUtils } from "../utils/javaUtils.js";
 import { UnityUtils } from "../utils/unityUtils.js";
 import { UpdateUtils } from "../utils/updateUtils.js";
@@ -49,7 +53,7 @@ export class MenuBuilder {
         if (Java.available) {
             Java.perform(() => {
                 Menu.waitForInit(MenuBuilder.build);
-            })
+            });
             Logger.info(`[${this.tag}::init] Initialized`);
         }
     }
@@ -134,7 +138,7 @@ export class MenuBuilder {
         Menu.add(
             layout.button("Create Test Popup", () => {
                 UnityUtils.runInMain(() => {
-                    m.popupManager?.showPopup("Test Popup", "Message of Test Popup", ModalType_enum.MT_OK, OkButtonType_enum.Green);
+                    this.showDebugPopup();
                 });
             })
         );
@@ -142,7 +146,12 @@ export class MenuBuilder {
         Menu.add(
             layout.button("Create Test Selection Option Popup", () => {
                 UnityUtils.runInMain(() => {
-                    m.popupManager?.showSelectionOptionPopup("Test Selection Popup", "Message of Test Selection Popup", ["play", "abandon_show_message", "102", "uwu"]);
+                    m.popupManager?.showSelectionOptionPopup("Test Selection Popup", "Message of Test Selection Popup", [
+                        "play",
+                        "abandon_show_message",
+                        "102",
+                        "uwu"
+                    ]);
                 });
             })
         );
@@ -378,7 +387,12 @@ export class MenuBuilder {
         other.gravity = Menu.Api.CENTER;
         Menu.add(other);
 
-        Menu.add(layout.button(I18n.t("menu.other.language"), this.run(() => this.showLanguagePopup())))
+        Menu.add(
+            layout.button(
+                I18n.t("menu.other.language"),
+                this.run(() => this.showLanguagePopup())
+            )
+        );
 
         Menu.add(layout.button(I18n.t("menu.other.github_url"), () => JavaUtils.openURL(Constants.GITHUB_URL)));
         Menu.add(layout.button(I18n.t("menu.other.discord_url"), () => JavaUtils.openURL(Constants.DISCORD_URL)));
@@ -398,6 +412,18 @@ export class MenuBuilder {
         );
     }
 
+    private static showDebugPopup(): void {
+        const data = ModalMessageData.create();
+        data.LocaliseOption = LocaliseOption.NotLocalised;
+        data.Title = "Popup wheelchair Test";
+        data.Message = "This popup created by koluska trost'";
+
+        data.ModalType = ModalType.MT_OK_CANCEL;
+        data.OkButtonType = OkButtonType.Green;
+
+        PopupManager.show(data);
+    }
+
     private static showLanguagePopup(): void {
         const m = MenuBuilder.modules;
         const title = I18n.t("popups.language.title");
@@ -408,8 +434,8 @@ export class MenuBuilder {
                 Logger.debug(index);
                 // implement logic here
             }
-        })
-        m.popupManager?.showSelectionOptionPopup(title, message, I18n.supportedLocales, onClose)
+        });
+        m.popupManager?.showSelectionOptionPopup(title, message, I18n.supportedLocales, onClose);
     }
 
     private static showCreditsPopup(): void {

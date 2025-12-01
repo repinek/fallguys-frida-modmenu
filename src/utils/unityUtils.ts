@@ -26,9 +26,9 @@ export class UnityUtils {
         this.SystemString = Il2Cpp.corlib.class("System.String");
         this.SystemInt = Il2Cpp.corlib.class("System.Int32");
 
-        this.SystemActionBool = Il2Cpp.corlib.class("System.Action`1").inflate(this.SystemBoolean)
-        this.SystemActionBoolInt = Il2Cpp.corlib.class("System.Action`2").inflate(this.SystemBoolean, this.SystemInt)
-        
+        this.SystemActionBool = Il2Cpp.corlib.class("System.Action`1").inflate(this.SystemBoolean);
+        this.SystemActionBoolInt = Il2Cpp.corlib.class("System.Action`2").inflate(this.SystemBoolean, this.SystemInt);
+
         this.GenericListString = Il2Cpp.corlib.class("System.Collections.Generic.List`1").inflate(this.SystemString);
 
         Logger.info(`[${this.tag}::init] Initialized`);
@@ -73,7 +73,7 @@ export class UnityUtils {
             Add.invoke(Il2Cpp.string(item));
         }
 
-        return list
+        return list;
     }
 
     /** Wrapper over constructor.name */

@@ -22,7 +22,7 @@ export enum OkButtonType_enum {
 }
 
 export class PopupManagerModule extends BaseModule {
-    public readonly name = "PopupManagerManager";
+    public readonly name = "PopupManager";
 
     // Classes and Instances
     private PopupManager!: Il2Cpp.Class;
@@ -100,7 +100,7 @@ export class PopupManagerModule extends BaseModule {
         message: string,
         options: string[],
         onCloseButtonPressed: Il2Cpp.Object | NativePointer = NULL,
-        okTextOverride: string | null = null,
+        okTextOverride: string | null = null
     ) {
         Logger.info("Showing popup with selection Option");
         const ShowModalMessageDataInstance = this.popupManagerInstance!.method<boolean>("Show", 3).overload(
@@ -124,7 +124,7 @@ export class PopupManagerModule extends BaseModule {
         const StringsIds: string[] = [];
 
         for (const string of options) {
-            const stringKey = GameLocalization.getOrCreateKey(string); // create localisedString 
+            const stringKey = GameLocalization.getOrCreateKey(string); // create localisedString
             StringsIds.push(stringKey);
         }
 
