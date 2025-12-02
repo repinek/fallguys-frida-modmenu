@@ -29,8 +29,7 @@ export enum UpdateState {
 export class UpdateUtils {
     private static readonly tag = "UpdateUtils";
 
-    // TODO: add func to get localised string from state yes i can do it
-    static state: UpdateState = UpdateState.Unknown;
+    private static state: UpdateState = UpdateState.Unknown;
 
     private static modMenuUpdateVersion: IModMenuVersion | null = null;
 
@@ -54,12 +53,12 @@ export class UpdateUtils {
             } else {
                 this.state = UpdateState.Outdated;
                 Logger.warn(`[${this.tag}::checkForUpdate] Mod menu version is outdated`);
+                this.showUpdatePopup();
             }
         });
     }
 
-    // Called in CMSLoader::Awake
-    static showUpdatePopup(): void {
+    private static showUpdatePopup(): void {
         const popupManager = ModuleManager.get(PopupManagerModule);
         if (!this.modMenuUpdateVersion) {
             return;
