@@ -21,7 +21,6 @@ import { TipToeManagerModule } from "../modules/rounds/tipToeManager.js";
 
 import { FGDebugModule } from "../modules/visuals/fgDebug.js";
 import { GraphicsManagerModule } from "../modules/visuals/graphicsManager.js";
-import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "../modules/visuals/popupManager.js";
 import { UICanvasModule } from "../modules/visuals/uiCanvas.js";
 
 import { LocaliseOption } from "./popup/data/ModalMessageBaseData.js";
@@ -44,7 +43,6 @@ export class MenuBuilder {
         tipToeManager?: TipToeManagerModule;
         fgDebug?: FGDebugModule;
         graphicsManager?: GraphicsManagerModule;
-        popupManager?: PopupManagerModule;
         uiCanvas?: UICanvasModule;
     } = {};
 
@@ -75,7 +73,6 @@ export class MenuBuilder {
         // Visuals
         this.modules.fgDebug = ModuleManager.get(FGDebugModule);
         this.modules.graphicsManager = ModuleManager.get(GraphicsManagerModule);
-        this.modules.popupManager = ModuleManager.get(PopupManagerModule);
         this.modules.uiCanvas = ModuleManager.get(UICanvasModule);
     }
 
@@ -467,22 +464,32 @@ export class MenuBuilder {
     }
 
     private static showCreditsPopup(): void {
-        const m = MenuBuilder.modules;
-        const title = I18n.t("popups.credits.title");
-        const message = I18n.t("popups.credits.message");
+        const data = ModalMessageData.create();
+        data.LocaliseOption = LocaliseOption.NotLocalised;
+        data.Title = I18n.t("popups.credits.title");
+        data.Message = I18n.t("popups.credits.message");
 
-        m.popupManager?.showPopup(title, message, ModalType_enum.MT_OK, OkButtonType_enum.Green);
+        data.ModalType = ModalType.MT_OK;
+        data.OkButtonType = OkButtonType.Green;
+
+        PopupManager.show(data);
     }
 
     private static showChangelogPopup(): void {
-        const m = MenuBuilder.modules;
         UpdateUtils.getChangelog(ModPreferences.VERSION, entry => {
-            const date = entry ? entry.date : I18n.t("update_utils.unknown_date");
-            const text = entry ? entry.changelog : I18n.t("update_utils.not_found");
+            const data = ModalMessageData.create();
 
-            const title = I18n.t("popups.changelog.title", ModPreferences.VERSION, date);
-            const message = I18n.t("popups.changelog.message", text);
-            m.popupManager?.showPopup(title, message, ModalType_enum.MT_OK, OkButtonType_enum.Green);
+            const date = entry ? entry.date : I18n.t("update_utils.unknown_date");
+            const changelog = entry ? entry.changelog : I18n.t("update_utils.not_found");
+
+            data.LocaliseOption = LocaliseOption.NotLocalised;
+            data.Title = I18n.t("popups.changelog.title", ModPreferences.VERSION, date);
+            data.Message = I18n.t("popups.changelog.message", changelog);
+
+            data.ModalType = ModalType.MT_OK;
+            data.OkButtonType = OkButtonType.Green;
+
+            PopupManager.show(data);
         });
     }
 

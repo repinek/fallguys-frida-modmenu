@@ -1,9 +1,10 @@
-import { ModuleManager } from "../core/moduleManager.js";
 import { Constants } from "../data/constants.js";
 import { ModPreferences } from "../data/modPreferences.js";
 import { I18n } from "../i18n/i18n.js";
 import { Logger } from "../logger/logger.js";
-import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "../modules/visuals/popupManager.js";
+import { LocaliseOption } from "../ui/popup/data/ModalMessageBaseData.js";
+import { ModalType, OkButtonType, ModalMessageData } from "../ui/popup/data/ModalMessageData.js";
+import { PopupManager } from "../ui/popup/popupManager.js";
 import { JavaUtils } from "./javaUtils.js";
 import { UnityUtils } from "./unityUtils.js";
 
@@ -48,23 +49,33 @@ export class UpdateUtils {
     }
 
     private static showUpdatePopup(): void {
-        const popupManager = ModuleManager.get(PopupManagerModule);
         if (!this.modMenuUpdateVersion) {
             return;
         }
-        const scriptVersion = this.modMenuUpdateVersion.scriptVersion;
-        this.getChangelog(scriptVersion, entry => {
-            const date = entry ? entry.date : I18n.t("update_utils.unknown_date");
-            const text = entry ? entry.changelog : I18n.t("update_utils.not_found");
 
-            const title = I18n.t("popups.update.title");
-            const message = I18n.t("popups.update.message", scriptVersion, date, text);
-            const onClose = Il2Cpp.delegate(UnityUtils.SystemActionBool, (pressed: boolean) => {
+        const scriptVersion = this.modMenuUpdateVersion.scriptVersion;
+
+        this.getChangelog(scriptVersion, entry => {
+            const data = ModalMessageData.create();
+
+            const date = entry ? entry.date : I18n.t("update_utils.unknown_date");
+            const changelog = entry ? entry.changelog : I18n.t("update_utils.not_found");
+
+            data.LocaliseOption = LocaliseOption.NotLocalised;
+            data.Title = I18n.t("popups.update.title");
+            data.Message = I18n.t("popups.update.message", scriptVersion, date, changelog);
+            data.OkTextOverrideId = I18n.t("update_utils.download");
+
+            data.ModalType = ModalType.MT_OK_CANCEL;
+            data.OkButtonType = OkButtonType.Yellow;
+
+            data.OnCloseButtonPressed = Il2Cpp.delegate(UnityUtils.SystemActionBool, (pressed: boolean) => {
                 if (pressed) JavaUtils.openURL(Constants.GITHUB_RELEASES_URL);
             });
-            const okText = I18n.t("update_utils.download");
 
-            popupManager?.showPopup(title, message, ModalType_enum.MT_OK_CANCEL, OkButtonType_enum.Yellow, onClose, okText);
+            data.ShowExternalLinkIcon = true;
+
+            PopupManager.show(data);
         });
     }
 

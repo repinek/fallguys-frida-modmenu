@@ -1,11 +1,12 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
-import { ModuleManager } from "../../core/moduleManager.js";
 import { BaseModule } from "../../core/baseModule.js";
 
 import { I18n } from "../../i18n/i18n.js";
 
-import { ModalType_enum, OkButtonType_enum, PopupManagerModule } from "../visuals/popupManager.js";
 import { Logger } from "../../logger/logger.js";
+
+import { ModalType, OkButtonType, ModalMessageData } from "../../ui/popup/data/ModalMessageData.js";
+import { PopupManager } from "../../ui/popup/popupManager.js";
 
 /*
  * Temporary bans can't be bypassed, but permament can be lol
@@ -57,9 +58,12 @@ export class BanBypassModule extends BaseModule {
     }
 
     private showBannedPopup(): void {
-        const popupModule = ModuleManager.get(PopupManagerModule);
-        const title = I18n.t("popups.ban_bypass.title");
-        const message = I18n.t("popups.ban_bypass.message");
-        popupModule?.showPopup(title, message, ModalType_enum.MT_OK, OkButtonType_enum.Green);
+        const data = ModalMessageData.create();
+        data.Title = I18n.t("popups.ban_bypass.title");
+        data.Message = I18n.t("popups.ban_bypass.message");
+        data.ModalType = ModalType.MT_OK;
+        data.OkButtonType = OkButtonType.Green;
+
+        PopupManager.show(data);
     }
 }

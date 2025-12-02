@@ -1,14 +1,12 @@
 export const ModPreferences = {
-    VERSION: "2.113", // Don't forget update after changes!
+    VERSION: "2.114", // Don't forget update after changes!
     ENV: "release", // dev, staging, release
     FOR_GAME_VERSION: "21.1.1"
 };
 
 /*
 !! TODO: 
-move popup manager to ui
 minimalistic fps counter
-switch case logger
 eula popup (cool)
 change language
 implement extensions.ts (.setActive, .getGameObject) 
@@ -31,6 +29,7 @@ maybe:
 fork menu and update it to frida 17
 
 DONE:
+[x] move popup manager to ui 
 [x] update to 21.1.1
 [x] describe functions in javaUtils
 [x] fgdebug fix [ERROR]  il2cpp: cannot get element at index 0 as the array length is 0

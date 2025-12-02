@@ -21,7 +21,6 @@ import { TipToeManagerModule } from "../modules/rounds/tipToeManager.js";
 // Visuals
 import { FGDebugModule } from "../modules/visuals/fgDebug.js";
 import { GraphicsManagerModule } from "../modules/visuals/graphicsManager.js";
-import { PopupManagerModule } from "../modules/visuals/popupManager.js";
 import { UICanvasModule } from "../modules/visuals/uiCanvas.js";
 
 import { Logger } from "../logger/logger.js";
@@ -44,7 +43,6 @@ export class ModuleManager {
         new TipToeManagerModule(),
         new FGDebugModule(),
         new GraphicsManagerModule(),
-        new PopupManagerModule(),
         new UICanvasModule(),
     ];
 

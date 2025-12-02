@@ -55,8 +55,9 @@ export class PopupManager {
 
     public static show(ModalMessageWithOptionSelectionData: ModalMessageWithOptionSelectionData): void;
 
+    // TODO: instance have ActivePopup, I can scale it if Show return true
     public static show(data: ModalMessageData | ModalMessageWithOptionSelectionData): void {
-        const Show = this.PopupManagerInstance!.method("Show", 3).overload(
+        const Show = this.PopupManagerInstance!.method<boolean>("Show", 3).overload(
             "FGClient.UI.PopupInteractionType",
             "FGClient.UI.ModalMessageBaseData",
             "FGClient.UI.UIModalMessage.ModalMessageFailedToShow"
