@@ -10,21 +10,23 @@ const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = function (env) {
     let targetEnv = "release";
-    if (env.dev) targetEnv = "dev"
-    if (env.staging) targetEnv = "staging"
+    if (env.dev) targetEnv = "dev";
+    if (env.staging) targetEnv = "staging";
 
     const isDev = targetEnv === "dev" || targetEnv === "staging";
-    const isRelease = targetEnv === 'release';
+    const isRelease = targetEnv === "release";
 
     console.log(`Building script with ${targetEnv}`);
 
     let plugins = [];
 
-    plugins.push(new webpack.DefinePlugin({
-        'process.env.BUILD_ENV': JSON.stringify(targetEnv)
-    }));
+    plugins.push(
+        new webpack.DefinePlugin({
+            "process.env.BUILD_ENV": JSON.stringify(targetEnv)
+        })
+    );
 
-    // No reason to add obfuscator here idk 
+    // No reason to add obfuscator here idk
 
     return {
         mode: isDev ? "development" : "production",
@@ -34,15 +36,15 @@ module.exports = function (env) {
             rules: [
                 {
                     test: /\.ts$/,
-                    include: path.resolve(__dirname, 'src'), 
-                    use: "ts-loader",
+                    include: path.resolve(__dirname, "src"),
+                    use: "ts-loader"
                 }
             ]
         },
         resolve: {
-            extensions: ['.ts', '.js'],
+            extensions: [".ts", ".js"],
             extensionAlias: {
-                '.js': ['.ts', '.js']
+                ".js": [".ts", ".js"]
             }
         },
         output: {
@@ -55,20 +57,22 @@ module.exports = function (env) {
 
         optimization: {
             minimize: !isDev,
-            minimizer: !isDev ? [
-                new TerserPlugin({
-                    terserOptions: {
-                        format: {
-                            comments: false,
-                        },
-                        compress: {
-                            drop_console: isRelease, 
-                            dead_code: true,
-                        },
-                    },
-                    extractComments: false,
-                }),
-            ]: [],
+            minimizer: !isDev
+                ? [
+                      new TerserPlugin({
+                          terserOptions: {
+                              format: {
+                                  comments: false
+                              },
+                              compress: {
+                                  drop_console: isRelease,
+                                  dead_code: true
+                              }
+                          },
+                          extractComments: false
+                      })
+                  ]
+                : []
         },
         plugins: plugins,
         stats: "normal"

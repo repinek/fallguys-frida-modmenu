@@ -63,7 +63,7 @@ export class UpdateUtils {
             data.LocaliseOption = LocaliseOption.NotLocalised;
             data.Title = I18n.t("popups.update.title");
             data.Message = I18n.t("popups.update.message", scriptVersion, date, changelog);
-            data.OkTextOverrideId = I18n.t("popups.update.download");
+            data.OkTextOverrideId = I18n.t("popups.update.ok");
 
             data.ModalType = ModalType.MT_OK_CANCEL;
             data.OkButtonType = OkButtonType.Yellow;
