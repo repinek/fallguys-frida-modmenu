@@ -16,7 +16,8 @@ export class Logger {
         const hh = date.getHours().toString().padStart(2, "0");
         const mm = date.getMinutes().toString().padStart(2, "0");
         const ss = date.getSeconds().toString().padStart(2, "0");
-        return `${this.Colors.GRAY}[${hh}:${mm}:${ss}]${this.Colors.RESET}`;
+        const ms = date.getMilliseconds().toString().padStart(3, "0");
+        return `${this.Colors.GRAY}[${hh}:${mm}:${ss}.${ms}]${this.Colors.RESET}`;
     }
 
     static info(...messages: any[]) {
