@@ -8,6 +8,8 @@ export class UnityUtils {
     private static Vector3: Il2Cpp.Class;
     private static Vector2: Il2Cpp.Class;
 
+    private static Object: Il2Cpp.Class;
+
     private static SystemBoolean: Il2Cpp.Class;
     private static SystemString: Il2Cpp.Class;
     private static SystemInt: Il2Cpp.Class;
@@ -21,6 +23,8 @@ export class UnityUtils {
         this.Resources = AssemblyHelper.CoreModule.class("UnityEngine.Resources");
         this.Vector3 = AssemblyHelper.CoreModule.class("UnityEngine.Vector3");
         this.Vector2 = AssemblyHelper.CoreModule.class("UnityEngine.Vector2");
+
+        this.Object = AssemblyHelper.CoreModule.class("UnityEngine.Object");
 
         this.SystemBoolean = Il2Cpp.corlib.class("System.Boolean");
         this.SystemString = Il2Cpp.corlib.class("System.String");
@@ -37,6 +41,11 @@ export class UnityUtils {
     /** Wrapper over UnityEngine::Resources::FindObjectsOfTypeAll */
     static findObjectsOfTypeAll(klass: Il2Cpp.Class): Il2Cpp.Array<Il2Cpp.Object> {
         return this.Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
+    }
+
+    /** Wrapper over UnityEngine::Object::FindObjectsOfType */
+    static FindObjectsOfType(klass: Il2Cpp.Class): Il2Cpp.Array<Il2Cpp.Object> {
+        return this.Object.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfType", 1).invoke(klass.type.object);
     }
 
     /** Wrapper over get_Instance */
