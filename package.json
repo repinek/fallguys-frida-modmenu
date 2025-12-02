@@ -16,7 +16,7 @@
   "bugs": {
     "url": "https://github.com/repinek/fallguys-frida-modmenu/issues"
   },
-  "license": "MIT",
+  "license": "GPL-3.0",
   "author": "repinek",
   "main": "src/index.js",
   "scripts": {
