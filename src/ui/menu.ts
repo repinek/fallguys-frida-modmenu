@@ -454,7 +454,7 @@ export class MenuBuilder {
 
         const languageNames = I18n.getLocalisedLanguages();
         data.OptionStringIds = UnityUtils.createStringList(languageNames);
-        
+
         data.OnOptionSelectionModalClosed = Il2Cpp.delegate(UnityUtils.SystemActionBoolInt, (pressed: boolean, indexLanguage: number) => {
             if (pressed) {
                 const selectedLocale = I18n.supportedLocales[indexLanguage];

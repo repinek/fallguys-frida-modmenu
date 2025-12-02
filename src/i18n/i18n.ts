@@ -72,15 +72,15 @@ export class I18n {
     static getLocalisedLanguages(): string[] {
         return this.supportedLocales.map(locale => {
             return this.t(`languages.${locale}`);
-        })
-    } 
+        });
+    }
 
     static changeLocale(newLocale: string): void {
         if (!this.isLocaleSupported(newLocale)) {
             Logger.warn(`[${this.tag}::changeLocale] Trying to apply unsupported locale ${newLocale}`);
             return;
-        }        
-        
+        }
+
         Java.perform(() => {
             Menu.sharedPreferences.putString("locale", newLocale);
         });

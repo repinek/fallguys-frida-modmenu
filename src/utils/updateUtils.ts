@@ -18,18 +18,9 @@ interface IChangelogEntry {
     changelog: string;
 }
 
-export enum UpdateState {
-    Unknown = 0,
-    UpToDate = 1,
-    Outdated = 2,
-    Error = 3
-}
-
 // TODO: add logs
 export class UpdateUtils {
     private static readonly tag = "UpdateUtils";
-
-    private static state: UpdateState = UpdateState.Unknown;
 
     private static modMenuUpdateVersion: IModMenuVersion | null = null;
 
@@ -48,10 +39,8 @@ export class UpdateUtils {
             this.modMenuUpdateVersion = JSON.parse(response) as IModMenuVersion;
 
             if (this.modMenuUpdateVersion.scriptVersion == ModPreferences.VERSION) {
-                this.state = UpdateState.UpToDate;
                 Logger.info(`[${this.tag}::checkForUpdate] Mod menu is up to date`);
             } else {
-                this.state = UpdateState.Outdated;
                 Logger.warn(`[${this.tag}::checkForUpdate] Mod menu version is outdated`);
                 this.showUpdatePopup();
             }
