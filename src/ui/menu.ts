@@ -421,6 +421,9 @@ export class MenuBuilder {
         data.ModalType = ModalType.MT_OK_CANCEL;
         data.OkButtonType = OkButtonType.Green;
 
+        data.OkTextOverrideId = "wheelchair";
+        data.CancelTextOverrideId = "OBeds: False";
+
         PopupManager.show(data);
     }
 

@@ -14,9 +14,11 @@ import { UnityLogger } from "./logger/unityLogger.js";
 import { PopupManager } from "./ui/popup/popupManager.js";
 import { MenuBuilder } from "./ui/menu.js";
 
-import { CMSLoader } from "./utils/game/CMSLoader.js";
+import { CMSLoader } from "./utils/game/CMSLoader.js"; // TODO: remove
+import { LocalisedStrings } from "./utils/game/gameLocalization.js";
 import { UnityUtils } from "./utils/unityUtils.js";
 import { UpdateUtils } from "./utils/updateUtils.js";
+
 
 // This project is litterally fking race condition i'm crying
 class FallGuysFridaModMenu {
@@ -32,7 +34,8 @@ class FallGuysFridaModMenu {
                 UnityUtils.init();
                 ModuleManager.initAll();
                 CMSLoader.init();
-
+                LocalisedStrings.init();
+                
                 // Only after all that we can do your things
                 PopupManager.init();
                 MenuBuilder.init();

@@ -1,7 +1,7 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 import { Logger } from "../../logger/logger.js";
-import { GameLocalization } from "../../utils/game/gameLocalization.js";
+// import { GameLocalization } from "../../utils/game/gameLocalization.js";
 import { UnityUtils } from "../../utils/unityUtils.js";
 
 // TODO: fix this
@@ -80,12 +80,12 @@ export class PopupManagerModule extends BaseModule {
             newModalMessageData.field<Il2Cpp.String>("Message").value = Il2Cpp.string(message);
             newModalMessageData.field("OnCloseButtonPressed").value = onCloseButtonPressed;
             if (okTextOverride) {
-                const okTextId = GameLocalization.getOrCreateKey(okTextOverride);
-                newModalMessageData.field<Il2Cpp.String>("OkTextOverrideId").value = Il2Cpp.string(okTextId);
+                // const okTextId = GameLocalization.getOrCreateKey(okTextOverride);
+                newModalMessageData.field<Il2Cpp.String>("OkTextOverrideId").value = Il2Cpp.string(okTextOverride);
             }
             if (cancelTextOverride) {
-                const cancelTextId = GameLocalization.getOrCreateKey(cancelTextOverride);
-                newModalMessageData.field<Il2Cpp.String>("CancelTextOverrideId").value = Il2Cpp.string(cancelTextId);
+                // const cancelTextId = GameLocalization.getOrCreateKey(cancelTextOverride);
+                newModalMessageData.field<Il2Cpp.String>("CancelTextOverrideId").value = Il2Cpp.string(cancelTextOverride);
             }
 
             // 3 arg is onFailedCallback delegate, which is default is null
@@ -117,19 +117,19 @@ export class PopupManagerModule extends BaseModule {
         newModalMessageData.field<Il2Cpp.String>("Message").value = Il2Cpp.string(message);
         newModalMessageData.field("OnOptionSelectionModalClosed").value = onCloseButtonPressed;
         if (okTextOverride) {
-            const okTextId = GameLocalization.getOrCreateKey(okTextOverride);
-            newModalMessageData.field<Il2Cpp.String>("OkTextOverrideId").value = Il2Cpp.string(okTextId);
+            // const okTextId = GameLocalization.getOrCreateKey(okTextOverride);
+            newModalMessageData.field<Il2Cpp.String>("OkTextOverrideId").value = Il2Cpp.string(okTextOverride);
         }
         // ids in _localisedStrings
-        const StringsIds: string[] = [];
+        // const StringsIds: string[] = [];
 
-        for (const string of options) {
-            const stringKey = GameLocalization.getOrCreateKey(string); // create localisedString
-            StringsIds.push(stringKey);
-        }
+        // for (const string of options) {
+        //     const stringKey = GameLocalization.getOrCreateKey(string); // create localisedString
+        //     StringsIds.push(stringKey);
+        // }
 
-        // Create list with localised Ids
-        const optionsGenericList = UnityUtils.createStringList(StringsIds);
+        // // Create list with localised Ids
+        const optionsGenericList = UnityUtils.createStringList(options);
         newModalMessageData.field("OptionStringIds").value = optionsGenericList;
 
         ShowModalMessageDataInstance.invoke(this.info, newModalMessageData, NULL);

@@ -1,6 +1,6 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { Logger } from "../../logger/logger.js";
-import { GameLocalization } from "./gameLocalization.js";
+// import { GameLocalization } from "./gameLocalization.js";
 import { UpdateState, UpdateUtils } from "../updateUtils.js";
 
 // TODO: describe a lot of stuff here
@@ -36,7 +36,7 @@ export class CMSLoader {
             Logger.hook("InitItemsFromContent called");
             this.method<void>("InitItemsFromContent", 3).invoke(cmsData, platofrm, cmsBranchUrl); // <--- OnLeave
             module.CMSLoaderInstance = this;
-            GameLocalization.init();
+            // GameLocalization.init();
             if (UpdateUtils.state == UpdateState.Outdated) {
                 UpdateUtils.showUpdatePopup();
             }
