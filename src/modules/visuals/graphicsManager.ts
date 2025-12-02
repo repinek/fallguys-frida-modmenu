@@ -44,7 +44,7 @@ export class GraphicsManagerModule extends BaseModule {
 
         this.get_TargetFrameRate.implementation = function (): number {
             Logger.hook("get_TargetFrameRate called");
-            return 1337; // litterally unlimited, because it's linked to the screen refresh rate (you can't set -1 btw)
+            return 1337; // litterally unlimited, because it's linked to the screen refresh rate (you can't set -1 or 0)
         };
 
         this.set_TargetFrameRate.implementation = function (fps): void {

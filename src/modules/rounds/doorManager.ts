@@ -1,5 +1,6 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
+import { I18n } from "../../i18n/i18n.js";
 import { Logger } from "../../logger/logger.js";
 import { UnityUtils } from "../../utils/unityUtils.js";
 
@@ -22,16 +23,22 @@ export class DoorManagerModule extends BaseModule {
     }
 
     public removeRealDoors(): void {
-        this.processDoors(this.FakeDoorController, "get_IsFakeDoor", false);
-        this.processDoors(this.CrownMazeDoor, "get_IsBreakable", true);
+        if (this.processDoors(this.FakeDoorController, "get_IsFakeDoor", false)) {
+            return;
+        }
+        if (this.processDoors(this.CrownMazeDoor, "get_IsBreakable", true)) {
+            return;
+        }
+
+        Logger.toast(I18n.t("rounds_toasts.no_doors"));
     }
 
-    private processDoors(doorClass: Il2Cpp.Class, methodName: string, methodShouldReturn: boolean): void {
+    private processDoors(doorClass: Il2Cpp.Class, methodName: string, methodShouldReturn: boolean): boolean {
         const doors = UnityUtils.findObjectsOfTypeAll(doorClass);
 
         if (doors.length === 0) {
             Logger.debug(`[${this.name}::removeFakeDoors] No doors of ${doorClass.name}`);
-            return;
+            return false;
         }
 
         for (const door of doors) {
@@ -42,5 +49,6 @@ export class DoorManagerModule extends BaseModule {
                 UnityUtils.setActive(doorObject, false);
             }
         }
+        return true;
     }
 }

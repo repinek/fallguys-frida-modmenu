@@ -19,7 +19,6 @@ interface IChangelogEntry {
     changelog: string;
 }
 
-// TODO: add logs
 export class UpdateUtils {
     private static readonly tag = "UpdateUtils";
 
@@ -64,7 +63,7 @@ export class UpdateUtils {
             data.LocaliseOption = LocaliseOption.NotLocalised;
             data.Title = I18n.t("popups.update.title");
             data.Message = I18n.t("popups.update.message", scriptVersion, date, changelog);
-            data.OkTextOverrideId = I18n.t("update_utils.download");
+            data.OkTextOverrideId = I18n.t("popups.update.download");
 
             data.ModalType = ModalType.MT_OK_CANCEL;
             data.OkButtonType = OkButtonType.Yellow;

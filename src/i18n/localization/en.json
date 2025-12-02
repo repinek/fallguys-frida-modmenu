@@ -89,7 +89,8 @@
         },
         "update": {
             "title": "Mod Menu Update Available",
-            "message": "<b>A new version v{0} — {1} is available!</b>\n\nChangelog:\n{2}"
+            "message": "A new version v{0} — {1} is available!\n\nChangelog:\n{2}",
+            "ok": "Download"
         },
         "language": {
             "title": "Select Mod Menu Language",
@@ -100,7 +101,19 @@
     "update_utils": {
         "cant_retreive": "Failed to retrieve changelog data",
         "not_found": "Changelog for this version not found",
-        "unknown_date": "Unknown Date",
-        "download": "Download"
+        "unknown_date": "Unknown Date"
+    },
+    "game_toasts": {
+        "not_in_match": "You are not in a match!",
+        "match_info": "Round: {0}\nSeed: {1}\nEliminated: {2}",
+        "server_info": "Server: {0}:{1}\nPing: {2}ms"
+    },
+    "network_toasts": {
+        "signature_fetch_fail": "Failed to fetch server signature. Spoofing disabled.",
+        "queued_players": "Queued Players: {0}"
+    },
+    "rounds_toasts": {
+        "no_tiptoe": "No tip toe platforms found",
+        "no_doors": "No doors found"
     }
 }

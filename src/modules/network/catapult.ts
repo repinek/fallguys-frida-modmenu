@@ -1,6 +1,7 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 import { Constants } from "../../data/constants.js";
+import { I18n } from "../../i18n/i18n.js";
 import { Logger } from "../../logger/logger.js";
 import { JavaUtils } from "../../utils/javaUtils.js";
 import { UnityUtils } from "../../utils/unityUtils.js";
@@ -125,7 +126,7 @@ export class CatapultModule extends BaseModule {
             JavaUtils.httpGet(Constants.SPOOF_VERSION_URL, response => {
                 if (!response) {
                     Logger.warn(`[${this.name}::fetchSpoofData] Actual server signature can't be fetched, spoof won't be working`);
-                    //Menu.toast(en.toasts.signature_not_fetched, 1);
+                    Logger.toast(I18n.t("network_toasts.signature_fetch_fail"), 1);
                     return;
                 }
                 this.clientDetails = JSON.parse(response) as IClientDetails;

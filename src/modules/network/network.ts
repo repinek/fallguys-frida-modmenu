@@ -1,6 +1,7 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 import { ModSettings } from "../../data/modSettings.js";
+import { I18n } from "../../i18n/i18n.js";
 import { Logger } from "../../logger/logger.js";
 
 export class NetworkModule extends BaseModule {
@@ -40,7 +41,7 @@ export class NetworkModule extends BaseModule {
 
                 // payload example: {"payload":{"queuedPlayers":6,"state":"Queued"},"name":"StatusUpdate"}
                 if (json.payload.state == "Queued") {
-                    Menu.toast(`Queued Players: ${json.payload.queuedPlayers.toString()}`, 0); // TODO: add localization
+                    Logger.toast(I18n.t("network_toasts.queued_players", json.payload.queuedPlayers.toString()));
                 }
             }
             return this.method<void>("ProcessMessageReceived", 1).invoke(jsonMessage);

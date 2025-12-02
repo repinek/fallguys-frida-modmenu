@@ -9,38 +9,12 @@ export class MatchInfoModule extends BaseModule {
     public readonly name = "MatchInfo";
 
     // Classes
-    private GlobalGameStateClient!: Il2Cpp.Class;
     private ClientGameManager!: Il2Cpp.Class;
+    private GlobalGameStateClient!: Il2Cpp.Class;
 
     public init(): void {
-        this.GlobalGameStateClient = AssemblyHelper.MTFGClient.class("FGClient.GlobalGameStateClient");
         this.ClientGameManager = AssemblyHelper.MTFGClient.class("FGClient.ClientGameManager");
-    }
-
-    public showServerDetails(): void {
-        try {
-            const gameState = UnityUtils.getInstance(this.GlobalGameStateClient);
-
-            if (!gameState) {
-                Logger.debug(`[${this.name}::showServerDetails] Not in the game`);
-                //menu.toast
-                return;
-            }
-
-            const networkManager = gameState.method<Il2Cpp.Object>("get_NetworkManager").invoke();
-            const gameConnection = networkManager.method<Il2Cpp.Object>("get_ConnectionToServer").invoke();
-
-            const hostIPAddr = networkManager.method<Il2Cpp.String>("get_HostIPAddr").invoke().content;
-            const hostPortNo = networkManager.method<number>("get_HostPortNo").invoke();
-            const rtt = gameConnection.method<number>("CurrentRtt").invoke();
-
-            const infoString = `Server: ${hostIPAddr}:${hostPortNo}\nPing: ${rtt}ms`;
-
-            // Menu.Toast(infoString, 0);
-            JavaUtils.copyToClipboard(`${hostIPAddr}:${hostPortNo}`);
-        } catch (error: any) {
-            Logger.errorThrow(error);
-        }
+        this.GlobalGameStateClient = AssemblyHelper.MTFGClient.class("FGClient.GlobalGameStateClient");
     }
 
     public showGameDetails(): void {
@@ -49,15 +23,42 @@ export class MatchInfoModule extends BaseModule {
 
             if (!gameManager) {
                 Logger.debug(`[${this.name}::showGameDetails] Not in the game`);
+                Logger.toast(I18n.t("game_toasts.not_in_match"));
                 return;
             }
 
             const round = gameManager.field<Il2Cpp.Object>("_round").value;
-            const roundID = round.method<Il2Cpp.String>("get_Id").invoke().content;
+            const roundID = round.method<Il2Cpp.String>("get_Id").invoke().content!;
             const seed = gameManager.method<number>("get_RandomSeed").invoke();
             const eliminatedCount = gameManager.field<number>("_eliminatedPlayerCount").value;
 
-            //Menu.toast(`RoundID: ${roundID}\nSeed: ${seed}\nEliminated: ${eliminatedCount}`, 1);
+            const infoString = I18n.t("game_toasts.match_info", roundID, seed, eliminatedCount);
+            Logger.toast(infoString, 1);
+        } catch (error: any) {
+            Logger.errorThrow(error);
+        }
+    }
+
+    public showServerDetails(): void {
+        try {
+            const gameState = UnityUtils.getInstance(this.GlobalGameStateClient);
+
+            if (!gameState) {
+                Logger.warn(`[${this.name}::showServerDetails] Not in the game`);
+                Logger.toast(I18n.t("game_toasts.not_in_match"));
+                return;
+            }
+
+            const networkManager = gameState.method<Il2Cpp.Object>("get_NetworkManager").invoke();
+            const gameConnection = networkManager.method<Il2Cpp.Object>("get_ConnectionToServer").invoke();
+
+            const hostIPAddr = networkManager.method<Il2Cpp.String>("get_HostIPAddr").invoke().content!;
+            const hostPortNo = networkManager.method<number>("get_HostPortNo").invoke();
+            const rtt = gameConnection.method<number>("CurrentRtt").invoke();
+
+            const infoString = I18n.t("game_toasts.server_info", hostIPAddr, hostPortNo, rtt);
+            Logger.toast(infoString, 1);
+            JavaUtils.copyToClipboard(`${hostIPAddr}:${hostPortNo}`);
         } catch (error: any) {
             Logger.errorThrow(error);
         }

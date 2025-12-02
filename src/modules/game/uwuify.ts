@@ -10,7 +10,6 @@ import { ModSettings } from "../../data/modSettings.js";
  * Thanks a lot: https://github.com/KieronQuinn/owoify
  */
 
-// TODO: hook TMP_Text.get_text
 export class UwUifyModule extends BaseModule {
     public readonly name = "UwUify";
 
@@ -103,7 +102,7 @@ export class UwUifyModule extends BaseModule {
             return text;
         };
 
-        // no <cowow=#E937A2FF></cowow>
+        // no uwuify tags <cowow=#E937A2FF></cowow>
         text = text.replace(/(<[^>]*>|[^<]+)/g, match => {
             if (match.startsWith("<") && match.endsWith(">")) {
                 return match;
