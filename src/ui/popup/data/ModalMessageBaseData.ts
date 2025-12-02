@@ -29,6 +29,7 @@ export abstract class ModalMessageBaseData {
         this.instance.field("CancelTextOverrideId").value = Il2Cpp.string(value);
     }
 
+    /** kinda useless since we have localised Strings patch */
     set LocaliseOption(value: LocaliseOption) {
         const OptionEnum = AssemblyHelper.MTFGClient.class("FGClient.UI.UIModalMessage/LocaliseOption");
 

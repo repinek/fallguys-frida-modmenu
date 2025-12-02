@@ -31,6 +31,7 @@ import { PopupManager } from "./popup/popupManager.js";
 import { JavaUtils } from "../utils/javaUtils.js";
 import { UnityUtils } from "../utils/unityUtils.js";
 import { UpdateUtils } from "../utils/updateUtils.js";
+import { ModalMessageWithOptionSelectionData } from "./popup/data/ModalMessageWithOptionSelectionData.js";
 
 export class MenuBuilder {
     private static readonly tag = "MenuBuilder";
@@ -146,12 +147,7 @@ export class MenuBuilder {
         Menu.add(
             layout.button("Create Test Selection Option Popup", () => {
                 UnityUtils.runInMain(() => {
-                    m.popupManager?.showSelectionOptionPopup("Test Selection Popup", "Message of Test Selection Popup", [
-                        "play",
-                        "abandon_show_message",
-                        "102",
-                        "uwu"
-                    ]);
+                    this.showDebugOptionsPopup();
                 });
             })
         );
@@ -424,6 +420,26 @@ export class MenuBuilder {
         data.OkTextOverrideId = "wheelchair";
         data.CancelTextOverrideId = "OBeds: False";
 
+        PopupManager.show(data);
+    }
+
+    private static showDebugOptionsPopup(): void {
+        const data = ModalMessageWithOptionSelectionData.create();
+        data.LocaliseOption = LocaliseOption.NotLocalised;
+        data.Title = "Selection Popup Test";
+        data.Message = "This selection popup created by koluska trost'";
+
+        data.ModalType = ModalType.MT_OK_CANCEL;
+        data.OkButtonType = OkButtonType.Yellow;
+
+        data.OkTextOverrideId = "Select language";
+        data.CancelTextOverrideId = "DOWNLOAD";
+
+        const stringList = ["hi", "Test", "WheelChair", "Update", "play", "1337"];
+        data.OptionStringIds = UnityUtils.createStringList(stringList);
+        data.OnOptionSelectionModalClosed = Il2Cpp.delegate(UnityUtils.SystemActionBoolInt, (pressed: boolean, selectedIndex: number) => {
+            Logger.debug(`pressed: ${pressed}, selected Index ${selectedIndex}, It's a ${stringList.at(selectedIndex)}`);
+        });
         PopupManager.show(data);
     }
 

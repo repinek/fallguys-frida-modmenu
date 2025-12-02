@@ -43,6 +43,11 @@ export class ModalMessageData extends ModalMessageBaseData {
         this.instance.field("OkButtonType").value = enumClass.field(type).value;
     }
 
+    /**
+     * delegate _onCloseButtonPressed(bool wasOk);
+     *
+     * @param callback Il2Cpp.delegate with System::Action infalted by System::Boolean
+     */
     set OnCloseButtonPressed(callback: Il2Cpp.Object) {
         this.instance.field("OnCloseButtonPressed").value = callback;
     }
