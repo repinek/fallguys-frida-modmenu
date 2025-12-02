@@ -6,13 +6,17 @@
     "module": "NodeNext",
     "moduleResolution": "nodenext",
     "resolveJsonModule": true,
-    "allowJs": false,
+    "allowJs": true,
+    "checkJs": false,
     "noEmit": false,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "sourceMap": true,
     "skipLibCheck": true
-  }
+  },
+  "include": [
+    "src/**/*"
+  ]
 }

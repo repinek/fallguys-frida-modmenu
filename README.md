@@ -167,4 +167,5 @@ Obed Guys Team - Some features powered by **Obed Guys Team**
 [FloyzI](https://github.com/FloyzI) - For how the game works, help with some features, localization  
 [commonuserlol](https://github.com/commonuserlol) - For help with code and [menu](https://github.com/commonuserlol/frida-java-menu)  
 [Dynasty-Dev](https://github.com/Dynasty-Dev) - For testing & contribution  
-[igamegod](https://github.com/igamegod) - For help with some features
+[igamegod](https://github.com/igamegod) - For help with some features  
+[Gene Brawl](https://github.com/RomashkaTea/genebrawl-public) - For the Webpack build configuration 
