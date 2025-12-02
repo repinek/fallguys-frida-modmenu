@@ -118,7 +118,6 @@ export class MenuBuilder {
     }
 
     private static buildDebugTab(layout: Menu.ObsidianLayout): void {
-        const m = MenuBuilder.modules;
         const debugtab = layout.textView("Debug");
         debugtab.gravity = Menu.Api.CENTER;
         Menu.add(debugtab);
@@ -438,23 +437,33 @@ export class MenuBuilder {
         const stringList = ["hi", "Test", "WheelChair", "Update", "play", "1337"];
         data.OptionStringIds = UnityUtils.createStringList(stringList);
         data.OnOptionSelectionModalClosed = Il2Cpp.delegate(UnityUtils.SystemActionBoolInt, (pressed: boolean, selectedIndex: number) => {
-            Logger.debug(`pressed: ${pressed}, selected Index ${selectedIndex}, It's a ${stringList.at(selectedIndex)}`);
+            Logger.debug(`pressed: ${pressed}, selected Index ${selectedIndex}, It's a ${stringList[selectedIndex]}`);
         });
         PopupManager.show(data);
     }
 
     private static showLanguagePopup(): void {
-        const m = MenuBuilder.modules;
-        const title = I18n.t("popups.language.title");
-        const message = I18n.t("popups.language.message");
-        const onClose = Il2Cpp.delegate(UnityUtils.SystemActionBoolInt, (pressed: boolean, indexLanguage: number) => {
+        const data = ModalMessageWithOptionSelectionData.create();
+        data.LocaliseOption = LocaliseOption.NotLocalised;
+        data.Title = I18n.t("popups.language.title");
+        data.Message = I18n.t("popups.language.message");
+        data.OkTextOverrideId = I18n.t("popups.language.ok");
+
+        data.ModalType = ModalType.MT_OK_CANCEL;
+        data.OkButtonType = OkButtonType.Green;
+
+        const languageNames = I18n.getLocalisedLanguages();
+        data.OptionStringIds = UnityUtils.createStringList(languageNames);
+        
+        data.OnOptionSelectionModalClosed = Il2Cpp.delegate(UnityUtils.SystemActionBoolInt, (pressed: boolean, indexLanguage: number) => {
             if (pressed) {
-                const index = I18n.supportedLocales.at(indexLanguage);
-                Logger.debug(index);
-                // implement logic here
+                const selectedLocale = I18n.supportedLocales[indexLanguage];
+                I18n.changeLocale(selectedLocale);
+                Logger.toast(I18n.t("menu.toasts.on_locale_changed", languageNames[indexLanguage]), 0);
             }
         });
-        m.popupManager?.showSelectionOptionPopup(title, message, I18n.supportedLocales, onClose);
+
+        PopupManager.show(data);
     }
 
     private static showCreditsPopup(): void {

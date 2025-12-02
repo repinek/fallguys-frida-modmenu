@@ -18,7 +18,6 @@ import { LocalisedStrings } from "./utils/game/localisedStrings.js";
 import { UnityUtils } from "./utils/unityUtils.js";
 import { UpdateUtils } from "./utils/updateUtils.js";
 
-// This project is litterally fking race condition i'm crying
 class FallGuysFridaModMenu {
     static init() {
         try {
@@ -26,14 +25,14 @@ class FallGuysFridaModMenu {
                 Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
                 I18n.init();
 
-                // Loading unity related things
+                // Init Unity related
                 AssemblyHelper.init();
                 UnityLogger.init();
                 UnityUtils.init();
                 ModuleManager.initAll();
                 LocalisedStrings.init();
 
-                // Only after all that we can do your things
+                // Init UI
                 PopupManager.init();
                 MenuBuilder.init();
 

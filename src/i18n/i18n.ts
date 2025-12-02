@@ -10,6 +10,8 @@ const TRANSLATIONS: Record<string, any> = {
 };
 
 export class I18n {
+    private static readonly tag = "I18n";
+
     static supportedLocales: string[] = Object.keys(TRANSLATIONS);
     private static currentLocale: string = "en";
 
@@ -21,8 +23,8 @@ export class I18n {
                 const savedLocale = Menu.sharedPreferences.getString("locale");
                 if (this.isLocaleSupported(savedLocale)) {
                     targetLocale = savedLocale;
-                    Logger.debug(`[I18n::init] Loaded locale from config: ${targetLocale}`);
-                } else Logger.warn(`[I18n::init] Locale ${savedLocale} from config is not supported`);
+                    Logger.debug(`[${this.tag}::init] Loaded locale from config: ${targetLocale}`);
+                } else Logger.warn(`[${this.tag}::init] Locale ${savedLocale} from config is not supported`);
             } else {
                 const systemLang = JavaUtils.getSystemLocale();
 
@@ -30,14 +32,14 @@ export class I18n {
                 if (this.isLocaleSupported(systemLang)) 
                     targetLocale = systemLang;
                 else 
-                    Logger.warn(`[I18n::init] Locale ${systemLang} from system is not supported`);
+                    Logger.warn(`[${this.tag}::init] Locale ${systemLang} from system is not supported`);
 
                 Menu.sharedPreferences.putString("locale", targetLocale);
-                Logger.info("[I18n::init] Saved system locale to config:", targetLocale);
+                Logger.info(`[${this.tag}::init] Saved ${targetLocale} locale to config`);
             }
 
             this.currentLocale = targetLocale;
-            Logger.info(`[I18n::init] Initialized with ${targetLocale} locale`);
+            Logger.info(`[${this.tag}::init] Initialized with ${targetLocale} locale`);
         });
     }
 
@@ -65,5 +67,24 @@ export class I18n {
         }
 
         return value;
+    }
+
+    static getLocalisedLanguages(): string[] {
+        return this.supportedLocales.map(locale => {
+            return this.t(`languages.${locale}`);
+        })
+    } 
+
+    static changeLocale(newLocale: string): void {
+        if (!this.isLocaleSupported(newLocale)) {
+            Logger.warn(`[${this.tag}::changeLocale] Trying to apply unsupported locale ${newLocale}`);
+            return;
+        }        
+        
+        Java.perform(() => {
+            Menu.sharedPreferences.putString("locale", newLocale);
+        });
+
+        Logger.info(`[${this.tag}::changeLocale] Locale changed to: ${newLocale}`);
     }
 }

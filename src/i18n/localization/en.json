@@ -2,6 +2,10 @@
     "hi": {
         "hi": "hello from i18n wheelchair {0}"
     },
+    "languages": {
+        "en": "English",
+        "ru": "Russian"
+    },
     "menu": {
         "info": {
             "title": "Fall Guys Mod Menu",
@@ -66,7 +70,8 @@
             "hide_button": "Hide",
             "close_button": "Close",
             "hide_callback": "Icon hidden",
-            "kill_callback": "Menu killed"
+            "kill_callback": "Menu killed",
+            "on_locale_changed": "Changed mod menu language to {0}"
         }
     },
     "popups": {
@@ -88,7 +93,8 @@
         },
         "language": {
             "title": "Select Mod Menu Language",
-            "message": "It will only be applied after restarting the game"
+            "message": "It will only be applied after restarting the game",
+            "ok": "Select Language"
         }
     },
     "update_utils": {
