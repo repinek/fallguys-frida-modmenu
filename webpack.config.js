@@ -16,7 +16,7 @@ module.exports = function (env) {
     const isDev = targetEnv === "dev" || targetEnv === "staging";
     const isRelease = targetEnv === "release";
 
-    console.log(`Building script with ${targetEnv}`);
+    console.log(`Building script with ${targetEnv} env`);
 
     let plugins = [];
 
@@ -75,6 +75,6 @@ module.exports = function (env) {
                 : []
         },
         plugins: plugins,
-        stats: "normal"
+        stats: "minimal"
     };
 };

@@ -1,6 +1,8 @@
 import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 import { ModSettings } from "../../data/modSettings.js";
+import { UnityUtils } from "../../utils/unityUtils.js";
+import { Logger } from "../../logger/logger.js";
 
 /*
  * Hooks TMP_Text::set_text and return UwUified result
@@ -42,6 +44,19 @@ export class UwUifyModule extends BaseModule {
 
             this.method<void>("set_text").invoke(string);
         };
+    }
+
+    // TODO: deuwuify
+    public toggleUwUify(state: boolean): void {
+        if (state) {
+            // it takes 2.2s with FindObjectOfTypeAll :broken_heart:
+            const texts = UnityUtils.FindObjectsOfType(this.TMP_Text);
+
+            for (const text of texts) {
+                const string = text.method<Il2Cpp.String>("get_text").invoke()
+                text.method<void>("set_text", 1).invoke(string);
+            }
+        } 
     }
 
     private uwuify(text: string): string {

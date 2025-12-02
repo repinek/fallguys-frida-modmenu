@@ -12,6 +12,7 @@ import { Logger } from "../logger/logger.js";
 
 import { BuildInfoModule } from "../modules/game/buildInfo.js";
 import { MatchInfoModule } from "../modules/game/matchInfo.js";
+import { UwUifyModule } from "../modules/game/uwuify.js";
 
 import { CharacterPhysicsModule } from "../modules/player/characterPhysics.js";
 import { TeleportManagerModule } from "../modules/player/teleportManager.js";
@@ -37,6 +38,7 @@ export class MenuBuilder {
     private static modules: {
         buildInfo?: BuildInfoModule;
         matchInfo?: MatchInfoModule;
+        uwuify?: UwUifyModule
         characterPhysics?: CharacterPhysicsModule;
         teleportManager?: TeleportManagerModule;
         doorManager?: DoorManagerModule;
@@ -61,6 +63,7 @@ export class MenuBuilder {
         // Game
         this.modules.buildInfo = ModuleManager.get(BuildInfoModule);
         this.modules.matchInfo = ModuleManager.get(MatchInfoModule);
+        this.modules.uwuify = ModuleManager.get(UwUifyModule);
 
         // Player
         this.modules.characterPhysics = ModuleManager.get(CharacterPhysicsModule);
@@ -368,9 +371,10 @@ export class MenuBuilder {
         );
 
         Menu.add(
-            layout.toggle(I18n.t("menu.functions.uwuify"), (state: boolean) => {
+            layout.toggle(I18n.t("menu.functions.uwuify"), this.run((state: boolean) => {
                 ModSettings.uwuifyMode = state;
-            })
+                m.uwuify?.toggleUwUify(state);
+            }))
         );
     }
 
