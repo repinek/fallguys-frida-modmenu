@@ -41,6 +41,7 @@
     "eslint-config-prettier": "^10.1.8",
     "frida-compile": "^16.4.1",
     "globals": "^16.5.0",
+    "ifdef-loader": "^2.3.2",
     "jiti": "^2.6.1",
     "prettier": "^3.6.2",
     "terser-webpack-plugin": "^5.3.14",

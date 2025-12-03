@@ -18,6 +18,14 @@ module.exports = function (env) {
 
     console.log(`Building script with ${targetEnv} env`);
 
+    const opts = {
+        DEV: isDev,
+        RELEASE: isRelease,
+        version: 3,
+        "ifdef-verbose": true,
+        "ifdef-triple-slash": true
+    };
+
     let plugins = [];
 
     plugins.push(
@@ -37,7 +45,10 @@ module.exports = function (env) {
                 {
                     test: /\.ts$/,
                     include: path.resolve(__dirname, "src"),
-                    use: "ts-loader"
+                    use: [
+                        { loader: "ts-loader" },
+                        { loader: "ifdef-loader", options: opts }
+                    ]
                 }
             ]
         },

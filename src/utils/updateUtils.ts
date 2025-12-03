@@ -25,10 +25,10 @@ export class UpdateUtils {
     private static modMenuUpdateVersion: IModMenuVersion | null = null;
 
     static checkForUpdate(): void {
-        // if (ModPreferences.ENV !== "release") {
-        //     Logger.debug(`[${this.tag}::checkForUpdate] Skipping mod menu version check in dev/staging`);
-        //     return;
-        // }
+        if (ModPreferences.ENV !== "release") {
+            Logger.debug(`[${this.tag}::checkForUpdate] Skipping mod menu version check in dev/staging`);
+            return;
+        }
 
         JavaUtils.httpGet(Constants.MOD_MENU_VERSION_URL, response => {
             if (!response) {

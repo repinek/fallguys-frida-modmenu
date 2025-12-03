@@ -1,7 +1,7 @@
 declare const process: { env: { BUILD_ENV: string } };
 
 export const ModPreferences = {
-    VERSION: "2.115", // Don't forget update after changes!
+    VERSION: "2.116", // Don't forget update after changes!
     ENV: (process.env.BUILD_ENV || "dev") as "dev" | "staging" | "release",
     FOR_GAME_VERSION: "21.1.1"
 } as const;
@@ -10,7 +10,6 @@ export const ModPreferences = {
 !! TODO: 
 minimalistic fps counter
 eula popup (cool)
-change language
 implement extensions.ts (.setActive, .getGameObject) 
 project structure
 add changing platform & some other things
@@ -31,6 +30,7 @@ maybe:
 fork menu and update it to frida 17
 
 DONE:
+[x] change language
 [x] move popup manager to ui 
 [x] update to 21.1.1
 [x] describe functions in javaUtils

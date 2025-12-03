@@ -107,9 +107,7 @@ export class MenuBuilder {
     private static buildContent(layout: Menu.ObsidianLayout): void {
         MenuBuilder.getModules();
 
-        if (ModPreferences.ENV === "dev" || ModPreferences.ENV === "staging") {
-            MenuBuilder.buildDebugTab(layout);
-        }
+        MenuBuilder.buildDebugTab(layout);
         MenuBuilder.buildMovementTab(layout);
         MenuBuilder.buildRoundTab(layout);
         MenuBuilder.buildTeleportsTab(layout);
@@ -118,6 +116,7 @@ export class MenuBuilder {
     }
 
     private static buildDebugTab(layout: Menu.ObsidianLayout): void {
+        /// #if DEV
         const debugtab = layout.textView("Debug");
         debugtab.gravity = Menu.Api.CENTER;
         Menu.add(debugtab);
@@ -160,6 +159,7 @@ export class MenuBuilder {
         // );
 
         Menu.add(layout.textView(I18n.t("hi.hi", "koluska")));
+        /// #endif
     }
 
     private static buildMovementTab(layout: Menu.ObsidianLayout): void {

@@ -41,7 +41,7 @@ export class UwUifyModule extends BaseModule {
         const module = this;
 
         //@ts-ignore
-        this.set_text.implementation = function (string: Il2Cpp.String): void {
+        this.set_text.implementation = function (this: Il2Cpp.Object, string: Il2Cpp.String): void {
             if (string.isNull()) {
                 this.method<void>("set_text").invoke(string);
                 return;
@@ -49,8 +49,7 @@ export class UwUifyModule extends BaseModule {
 
             if (ModSettings.uwuifyMode) {
                 const content = string.content;
-                const textObject = this as Il2Cpp.Object;
-                if (content && content.length > 0) string = Il2Cpp.string(module.createUwUifiedString(textObject, content));
+                if (content && content.length > 0) string = Il2Cpp.string(module.createUwUifiedString(this, content));
             }
 
             this.method<void>("set_text").invoke(string);

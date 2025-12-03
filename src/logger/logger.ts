@@ -1,5 +1,3 @@
-import { ModPreferences } from "../data/modPreferences.js";
-
 export class Logger {
     private static readonly Colors = {
         RESET: "\x1b[0m",
@@ -28,9 +26,11 @@ export class Logger {
         console.info(`${this.getTime()} ${this.Colors.GREEN}[INFO]`, ...messages, this.Colors.RESET);
     }
 
+    // we anyway exclude any console logs from release build, but for sure 
     static debug(...messages: any[]) {
-        if (ModPreferences.ENV === "release") return;
+        /// #if DEV
         console.debug(`${this.getTime()} ${this.Colors.CYAN}[DEBUG]${this.Colors.RESET}`, ...messages);
+        /// #endif
     }
 
     static warn(...messages: any[]) {
@@ -42,13 +42,15 @@ export class Logger {
     }
 
     static hook(...messages: any[]) {
-        if (ModPreferences.ENV === "release") return;
+        /// #if DEV
         console.debug(`${this.getTime()} ${this.Colors.GRAY}[HOOK]`, ...messages, this.Colors.RESET);
+        /// #endif
     }
 
     static unity(logType: "INFO" | "WARN" | "ERROR", ...messages: any[]) {
-        if (ModPreferences.ENV === "release") return;
+        /// #if DEV
         console.debug(`${this.getTime()} ${this.Colors.GRAY}[${logType}:Unity]`, ...messages, this.Colors.RESET);
+        /// #endif
     }
 
     /**
