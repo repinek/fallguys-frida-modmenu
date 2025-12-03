@@ -38,7 +38,7 @@ export class MenuBuilder {
     private static modules: {
         buildInfo?: BuildInfoModule;
         matchInfo?: MatchInfoModule;
-        uwuify?: UwUifyModule
+        uwuify?: UwUifyModule;
         characterPhysics?: CharacterPhysicsModule;
         teleportManager?: TeleportManagerModule;
         doorManager?: DoorManagerModule;
@@ -371,10 +371,13 @@ export class MenuBuilder {
         );
 
         Menu.add(
-            layout.toggle(I18n.t("menu.functions.uwuify"), this.run((state: boolean) => {
-                ModSettings.uwuifyMode = state;
-                m.uwuify?.toggleUwUify(state);
-            }))
+            layout.toggle(
+                I18n.t("menu.functions.uwuify"),
+                this.run((state: boolean) => {
+                    ModSettings.uwuifyMode = state;
+                    m.uwuify?.toggleUwUify(state);
+                })
+            )
         );
     }
 

@@ -2,14 +2,21 @@ import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 import { ModSettings } from "../../data/modSettings.js";
 import { UnityUtils } from "../../utils/unityUtils.js";
-import { Logger } from "../../logger/logger.js";
 
 /*
  * Hooks TMP_Text::set_text and return UwUified result
  *
+ * When we turn it ON via toggleUwUify:
+ * We find all text objects and re-set their text, so the set_text hook does all the work
+ *
+ * When we turn it OFF:
+ * We use our OriginalStrings dict (GameObjectInstanceID, String)
+ * to restore the original text for every object.
+ *
  * We can also hook LocalisedString::GetString, but it's not all strings
  *
- * Thanks a lot: https://github.com/KieronQuinn/owoify
+ * Source: https://github.com/KieronQuinn/owoify
+ * Special Thanks: https://github.com/floyzi/FGToolsMobile/blob/master/Src/FLZ_Common/Owoify.cs
  */
 
 export class UwUifyModule extends BaseModule {
@@ -20,6 +27,9 @@ export class UwUifyModule extends BaseModule {
 
     // Methods
     private set_text!: Il2Cpp.Method;
+
+    // GameObjectInstanceID, string
+    private originalStrings: Record<number, string> = {};
 
     public init(): void {
         this.TMP_Text = AssemblyHelper.TextMeshPro.class("TMPro.TMP_Text");
@@ -39,24 +49,40 @@ export class UwUifyModule extends BaseModule {
 
             if (ModSettings.uwuifyMode) {
                 const content = string.content;
-                if (content && content.length > 0) string = Il2Cpp.string(module.uwuify(content));
+                const textObject = this as Il2Cpp.Object;
+                if (content && content.length > 0) string = Il2Cpp.string(module.createUwUifiedString(textObject, content));
             }
 
             this.method<void>("set_text").invoke(string);
         };
     }
 
-    // TODO: deuwuify
     public toggleUwUify(state: boolean): void {
         if (state) {
             // it takes 2.2s with FindObjectOfTypeAll :broken_heart:
             const texts = UnityUtils.FindObjectsOfType(this.TMP_Text);
 
             for (const text of texts) {
-                const string = text.method<Il2Cpp.String>("get_text").invoke()
+                const string = text.method<Il2Cpp.String>("get_text").invoke();
                 text.method<void>("set_text", 1).invoke(string);
             }
-        } 
+        } else if (!state) {
+            for (const [objectID, originalText] of Object.entries(this.originalStrings)) {
+                const id = Number(objectID); // since entries return strings
+                const textObject = UnityUtils.FindObjectFromInstanceID(id);
+
+                if (textObject) {
+                    textObject.method("set_text").invoke(Il2Cpp.string(originalText));
+                }
+            }
+        }
+    }
+
+    private createUwUifiedString(TMP_Text: Il2Cpp.Object, string: string): string {
+        const objectID = UnityUtils.GetInstanceID(TMP_Text);
+        this.originalStrings[objectID] = string;
+
+        return this.uwuify(string);
     }
 
     private uwuify(text: string): string {
