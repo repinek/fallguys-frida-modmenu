@@ -72,7 +72,7 @@ export class FGDebugModule extends BaseModule {
 
     private get GvrFPSInstance(): Il2Cpp.Object {
         if (!this._gvrFPSInstance) {
-            this._gvrFPSInstance = UnityUtils.findObjectsOfTypeAll(this.GvrFPS).get(0);
+            this._gvrFPSInstance = UnityUtils.FindObjectsOfTypeAll(this.GvrFPS).get(0);
         }
         return this._gvrFPSInstance;
     }

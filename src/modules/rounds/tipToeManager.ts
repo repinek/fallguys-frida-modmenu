@@ -21,7 +21,7 @@ export class TipToeManagerModule extends BaseModule {
     }
 
     public removeFakeTipToe(): void {
-        const platforms = UnityUtils.findObjectsOfTypeAll(this.TipToe_Platform);
+        const platforms = UnityUtils.FindObjectsOfTypeAll(this.TipToe_Platform);
 
         if (platforms.length === 0) {
             Logger.debug(`[${this.name}::removeFakeTipToe] No TipToe`);

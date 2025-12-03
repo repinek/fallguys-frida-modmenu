@@ -34,7 +34,7 @@ export class DoorManagerModule extends BaseModule {
     }
 
     private processDoors(doorClass: Il2Cpp.Class, methodName: string, methodShouldReturn: boolean): boolean {
-        const doors = UnityUtils.findObjectsOfTypeAll(doorClass);
+        const doors = UnityUtils.FindObjectsOfTypeAll(doorClass);
 
         if (doors.length === 0) {
             Logger.debug(`[${this.name}::removeFakeDoors] No doors of ${doorClass.name}`);
@@ -46,7 +46,7 @@ export class DoorManagerModule extends BaseModule {
 
             if (methodRetuned === methodShouldReturn) {
                 const doorObject = UnityUtils.getGameObject(door);
-                UnityUtils.setActive(doorObject, false);
+                UnityUtils.SetActive(doorObject, false);
             }
         }
         return true;

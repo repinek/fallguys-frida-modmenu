@@ -39,7 +39,7 @@ export class UnityUtils {
     }
 
     /** Wrapper over UnityEngine::Resources::FindObjectsOfTypeAll */
-    static findObjectsOfTypeAll(klass: Il2Cpp.Class): Il2Cpp.Array<Il2Cpp.Object> {
+    static FindObjectsOfTypeAll(klass: Il2Cpp.Class): Il2Cpp.Array<Il2Cpp.Object> {
         return this.Resources.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfTypeAll", 1).invoke(klass.type.object);
     }
 
@@ -48,7 +48,20 @@ export class UnityUtils {
         return this.Object.method<Il2Cpp.Array<Il2Cpp.Object>>("FindObjectsOfType", 1).invoke(klass.type.object);
     }
 
-    /** Wrapper over get_Instance */
+    /** Wrapper over UnityEngine::Object::GetInstanceID */
+    static GetInstanceID(object: Il2Cpp.Object): number {
+        return object.method<number>("GetInstanceID").invoke();
+    }
+
+    /** Wrapper over UnityEngine::Object::FindObjectFromInstanceID */
+    static FindObjectFromInstanceID(id: number): Il2Cpp.Object | null {
+        const object = this.Object.method<Il2Cpp.Object>("FindObjectFromInstanceID", 1).invoke(id);
+        Logger.debug(object.size);
+        if (object.isNull()) return null;
+        return object;
+    }
+
+    /** Wrapper over klass::get_Instance */
     static getInstance(klass: Il2Cpp.Class): Il2Cpp.Object | undefined {
         const instanceMethod = klass.tryMethod<Il2Cpp.Object>("get_Instance");
         if (!instanceMethod) {
@@ -73,6 +86,7 @@ export class UnityUtils {
         return vector;
     }
 
+    /** Wrapper over System.Collections.Generic.List<Il2Cpp.String> */
     static createStringList(items: string[]): Il2Cpp.Object {
         const list = UnityUtils.createInstance(this.GenericListString);
 
@@ -90,13 +104,13 @@ export class UnityUtils {
         return object.constructor.name;
     }
 
-    /** Wrapper over get_gameObject */
+    /** Wrapper over UnityEngine::Compontent::get_gameObject */
     static getGameObject(component: Il2Cpp.Object): Il2Cpp.Object {
         return component.method<Il2Cpp.Object>("get_gameObject").invoke();
     }
 
-    /** Wrapper over SetActive */
-    static setActive(gameObject: Il2Cpp.Object, active: boolean): void {
+    /** Wrapper over UnityEngine::GameObject::SetActive */
+    static SetActive(gameObject: Il2Cpp.Object, active: boolean): void {
         gameObject.method<void>("SetActive").invoke(active);
     }
 

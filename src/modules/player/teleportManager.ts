@@ -85,7 +85,7 @@ export class TeleportManagerModule extends BaseModule {
         const targetClasses = [this.ObjectiveReachEndZone, this.GrabToQualify];
 
         for (const targetClass of targetClasses) {
-            const objects = UnityUtils.findObjectsOfTypeAll(targetClass);
+            const objects = UnityUtils.FindObjectsOfTypeAll(targetClass);
 
             if (objects.length > 0) {
                 this.teleportTo(this.character, objects.get(0));
@@ -124,7 +124,7 @@ export class TeleportManagerModule extends BaseModule {
     }
 
     private findUnityBubbles(): Il2Cpp.Object | undefined {
-        const unityBubbles = UnityUtils.findObjectsOfTypeAll(this.SpawnableCollectable);
+        const unityBubbles = UnityUtils.FindObjectsOfTypeAll(this.SpawnableCollectable);
         for (const bubble of unityBubbles) {
             if (bubble.method<boolean>("get_Spawned").invoke()) {
                 return bubble;
@@ -134,7 +134,7 @@ export class TeleportManagerModule extends BaseModule {
     }
 
     private findCreativeBubbles(): Il2Cpp.Object | undefined {
-        const creativeBubbles = UnityUtils.findObjectsOfTypeAll(this.ScoringBubble);
+        const creativeBubbles = UnityUtils.FindObjectsOfTypeAll(this.ScoringBubble);
         for (const bubble of creativeBubbles) {
             // if award is negative points: skip
             if (bubble.field<number>("_pointsAwarded").value <= 0) continue;
@@ -147,7 +147,7 @@ export class TeleportManagerModule extends BaseModule {
     }
 
     private findScoredButton(): Il2Cpp.Object | undefined {
-        const scoredButtons = UnityUtils.findObjectsOfTypeAll(this.ScoredButton);
+        const scoredButtons = UnityUtils.FindObjectsOfTypeAll(this.ScoredButton);
         for (const button of scoredButtons) {
             if (button.field<boolean>("_isAnActiveTarget").value) return button;
         }

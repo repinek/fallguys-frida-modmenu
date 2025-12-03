@@ -19,7 +19,7 @@ export class UICanvasModule extends BaseModule {
 
     private get UICanvasInstance(): Il2Cpp.Object {
         if (!this._uiCanvasInstance) {
-            this._uiCanvasInstance = UnityUtils.findObjectsOfTypeAll(this.UICanvas).get(0);
+            this._uiCanvasInstance = UnityUtils.FindObjectsOfTypeAll(this.UICanvas).get(0);
         }
         return this._uiCanvasInstance;
     }
