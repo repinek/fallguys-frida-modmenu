@@ -19,18 +19,19 @@ export class MatchInfoModule extends BaseModule {
 
     public showGameDetails(): void {
         try {
-            const gameManager = UnityUtils.getInstance(this.ClientGameManager);
+            const gameManagerInstance = UnityUtils.getInstance(this.ClientGameManager);
 
-            if (!gameManager) {
+            // TODO: fix, doesn't work
+            if (!gameManagerInstance) {
                 Logger.debug(`[${this.name}::showGameDetails] Not in the game`);
                 Logger.toast(I18n.t("game_toasts.not_in_match"));
                 return;
             }
 
-            const round = gameManager.field<Il2Cpp.Object>("_round").value;
+            const round = gameManagerInstance.field<Il2Cpp.Object>("_round").value;
             const roundID = round.method<Il2Cpp.String>("get_Id").invoke().content!;
-            const seed = gameManager.method<number>("get_RandomSeed").invoke();
-            const eliminatedCount = gameManager.field<number>("_eliminatedPlayerCount").value;
+            const seed = gameManagerInstance.method<number>("get_RandomSeed").invoke();
+            const eliminatedCount = gameManagerInstance.field<number>("_eliminatedPlayerCount").value;
 
             const infoString = I18n.t("game_toasts.match_info", roundID, seed, eliminatedCount);
             Logger.toast(infoString, 1);
@@ -41,15 +42,16 @@ export class MatchInfoModule extends BaseModule {
 
     public showServerDetails(): void {
         try {
-            const gameState = UnityUtils.getInstance(this.GlobalGameStateClient);
+            const gameStateInstance = UnityUtils.getInstance(this.GlobalGameStateClient);
 
-            if (!gameState) {
+            // TODO: fix, doesn't work
+            if (!gameStateInstance) {
                 Logger.warn(`[${this.name}::showServerDetails] Not in the game`);
                 Logger.toast(I18n.t("game_toasts.not_in_match"));
                 return;
             }
 
-            const networkManager = gameState.method<Il2Cpp.Object>("get_NetworkManager").invoke();
+            const networkManager = gameStateInstance.method<Il2Cpp.Object>("get_NetworkManager").invoke();
             const gameConnection = networkManager.method<Il2Cpp.Object>("get_ConnectionToServer").invoke();
 
             const hostIPAddr = networkManager.method<Il2Cpp.String>("get_HostIPAddr").invoke().content!;

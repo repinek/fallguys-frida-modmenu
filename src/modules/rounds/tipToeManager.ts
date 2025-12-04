@@ -34,7 +34,7 @@ export class TipToeManagerModule extends BaseModule {
 
             if (isFake) {
                 const tiptoeObject = tiptoe.method<Il2Cpp.Object>("get_gameObject").invoke();
-                tiptoeObject.method("SetActive").invoke(false);
+                UnityUtils.SetActive(tiptoeObject, false);
             }
         }
     }

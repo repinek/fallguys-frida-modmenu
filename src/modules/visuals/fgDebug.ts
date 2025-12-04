@@ -50,7 +50,7 @@ export class FGDebugModule extends BaseModule {
             if (this.isAwaked) {
                 this.setFGDebugScale();
                 const gameObject = this.GvrFPSInstance.method<Il2Cpp.Object>("get_gameObject").invoke();
-                gameObject.method("SetActive").invoke(value);
+                UnityUtils.SetActive(gameObject, value);
             }
         } catch (error: any) {
             Logger.errorThrow(error);
@@ -62,9 +62,8 @@ export class FGDebugModule extends BaseModule {
             const localScale = UnityUtils.createVector3(0.4, 0.4, 0.4);
 
             // prettier-ignore
-            this.GvrFPSInstance
-            .method<Il2Cpp.Object>("get_transform").invoke()
-            .method<Il2Cpp.Object>("set_localScale").invoke(localScale);
+            const transform = UnityUtils.getTransform(this.GvrFPSInstance);
+            UnityUtils.setLocalScale(transform, localScale);
             this.isScaled = true;
         }
         return;

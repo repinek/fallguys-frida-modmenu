@@ -57,14 +57,12 @@ export class TeleportManagerModule extends BaseModule {
     private teleportTo(playerInstance: Il2Cpp.Object, targetInstance: Il2Cpp.Object): void {
         try {
             // prettier-ignore
-            const targetPos = targetInstance
-            .method<Il2Cpp.Object>("get_transform").invoke()
-            .method<Il2Cpp.Object>("get_position").invoke();
+            const targetTransform = UnityUtils.getTransform(targetInstance);
+            const targetPos = targetTransform.method<Il2Cpp.Object>("get_position").invoke();
 
             // prettier-ignore
-            playerInstance
-            .method<Il2Cpp.Object>("get_transform").invoke()
-            .method<Il2Cpp.Object>("set_position").invoke(targetPos);
+            const playerTransform = UnityUtils.getTransform(playerInstance);
+            playerTransform.method<Il2Cpp.Object>("set_position").invoke(targetPos);
         } catch (error: any) {
             Logger.warn(`[${this.name}::teleportTo] No character, ${error.name}`);
         }
@@ -77,6 +75,7 @@ export class TeleportManagerModule extends BaseModule {
     public teleportToFinish(): void {
         if (!this.checkCooldown()) return;
 
+        // TODO: fix, doesn't work
         if (!this.character) {
             Logger.debug(`[${this.name}::teleportToFinish] No character`);
             return;
