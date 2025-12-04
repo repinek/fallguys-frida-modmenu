@@ -412,21 +412,25 @@ export class MenuBuilder {
     }
 
     private static showDebugPopup(): void {
+        /// #if DEV
         const data = ModalMessageData.create();
         data.LocaliseOption = LocaliseOption.NotLocalised;
-        data.Title = "Popup wheelchair Test";
-        data.Message = "This popup created by koluska trost'";
+        data.Title = "Switchgear";
+        data.Message =
+            "Вы используете крякнутую версию мода. Вы не уважаете мои трусы и старания которые я приложил чтобы создать этот мод. В качестве наказания мод потратил все ваши шмяксы и изменил ваш ник. Ваш аккаунт зарепорчен.";
 
         data.ModalType = ModalType.MT_OK_CANCEL;
-        data.OkButtonType = OkButtonType.Green;
+        data.OkButtonType = OkButtonType.Red;
 
-        data.OkTextOverrideId = "wheelchair";
-        data.CancelTextOverrideId = "OBeds: False";
+        data.OkTextOverrideId = "OK";
+        data.CancelTextOverrideId = "Нет, спасибо";
 
-        PopupManager.show(data);
+        PopupManager.show(data, 1.5);
+        /// #endif
     }
 
     private static showDebugOptionsPopup(): void {
+        /// #if DEV
         const data = ModalMessageWithOptionSelectionData.create();
         data.LocaliseOption = LocaliseOption.NotLocalised;
         data.Title = "Selection Popup Test";
@@ -443,7 +447,8 @@ export class MenuBuilder {
         data.OnOptionSelectionModalClosed = Il2Cpp.delegate(UnityUtils.SystemActionBoolInt, (pressed: boolean, selectedIndex: number) => {
             Logger.debug(`pressed: ${pressed}, selected Index ${selectedIndex}, It's a ${stringList[selectedIndex]}`);
         });
-        PopupManager.show(data);
+        PopupManager.show(data, 1.5);
+        /// #endif
     }
 
     private static showLanguagePopup(): void {
@@ -467,7 +472,7 @@ export class MenuBuilder {
             }
         });
 
-        PopupManager.show(data);
+        PopupManager.show(data, 1.5);
     }
 
     private static showCreditsPopup(): void {

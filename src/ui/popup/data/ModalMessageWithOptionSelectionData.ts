@@ -2,7 +2,7 @@ import { AssemblyHelper } from "../../../core/assemblyHelper.js";
 import { ModalMessageData } from "./ModalMessageData.js";
 import { UnityUtils } from "../../../utils/unityUtils.js";
 
-/** Wrapper over FGClient.UI.ModalMessageWithOptionSelectionData */
+/** Wrapper over FGClient::UI::ModalMessageWithOptionSelectionData */
 export class ModalMessageWithOptionSelectionData extends ModalMessageData {
     private static _selectionClass: Il2Cpp.Class;
 

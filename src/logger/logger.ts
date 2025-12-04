@@ -26,7 +26,7 @@ export class Logger {
         console.info(`${this.getTime()} ${this.Colors.GREEN}[INFO]`, ...messages, this.Colors.RESET);
     }
 
-    // we anyway exclude any console logs from release build, but for sure 
+    // we anyway exclude any console logs from release build, but for sure
     static debug(...messages: any[]) {
         /// #if DEV
         console.debug(`${this.getTime()} ${this.Colors.CYAN}[DEBUG]${this.Colors.RESET}`, ...messages);

@@ -17,7 +17,7 @@ export enum OkButtonType {
     Yellow = "CallToAction"
 }
 
-/** Wrapper over FGClient.UI.ModalMessageData */
+/** Wrapper over FGClient::UI::ModalMessageData */
 export class ModalMessageData extends ModalMessageBaseData {
     private static _class: Il2Cpp.Class;
 

@@ -1,7 +1,7 @@
 declare const process: { env: { BUILD_ENV: string } };
 
 export const ModPreferences = {
-    VERSION: "2.116", // Don't forget update after changes!
+    VERSION: "2.119", // Don't forget update after changes!
     ENV: (process.env.BUILD_ENV || "dev") as "dev" | "staging" | "release",
     FOR_GAME_VERSION: "21.1.1"
 } as const;
