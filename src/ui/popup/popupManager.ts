@@ -7,7 +7,7 @@ import { ModalMessageWithOptionSelectionData } from "./data/ModalMessageWithOpti
 /*
  * Wrapper over FGClient::UI::PopupManager
  * Easily extendable to add other popups
- * 
+ *
  * About scaling:
  * I tried to just change transform::localScale, but it was useless
  * Game uses TweenOnPopup component which animates opening using DOTween
@@ -58,7 +58,6 @@ export class PopupManager {
         this.DOScale.implementation = function (transform: Il2Cpp.Object, endValueVector3: Il2Cpp.ValueType, duration: number) {
             Logger.hook("DOScale called with args:", transform, endValueVector3, duration);
             if (module.waitingForScaling) {
-                Logger.debug("Scaling something popup");
                 const scale = module.scale;
                 endValueVector3 = UnityUtils.createVector3(scale, scale, scale);
             }
@@ -85,7 +84,12 @@ export class PopupManager {
 
     public static show(ModalMessageWithOptionSelectionData: ModalMessageWithOptionSelectionData, scale?: number): void;
 
-    // TODO: instance have ActivePopup, I can scale it if Show return true
+    /**
+     * Shows in-game Popup (Modal Message)
+     *
+     * @param data Configuration object containing Title, Message, Buttons, etc. (use .create() to make one)
+     * @param scale (Optional) Custom size of popup
+     */
     public static show(data: ModalMessageData | ModalMessageWithOptionSelectionData, scale?: number): void {
         const Show = this.PopupManagerInstance!.method<boolean>("Show", 3).overload(
             "FGClient.UI.PopupInteractionType",

@@ -32,6 +32,7 @@ import { JavaUtils } from "../utils/javaUtils.js";
 import { UnityUtils } from "../utils/unityUtils.js";
 import { UpdateUtils } from "../utils/updateUtils.js";
 import { ModalMessageWithOptionSelectionData } from "./popup/data/ModalMessageWithOptionSelectionData.js";
+import { Z_UNKNOWN } from "zlib";
 
 export class MenuBuilder {
     private static readonly tag = "MenuBuilder";
@@ -425,6 +426,10 @@ export class MenuBuilder {
         data.OkTextOverrideId = "OK";
         data.CancelTextOverrideId = "Нет, спасибо";
 
+        data.OnCloseButtonPressed = Il2Cpp.delegate(UnityUtils.SystemActionBool, (pressed: boolean) => {
+            Logger.debug(`pressed: ${pressed}`);
+        });
+
         PopupManager.show(data, 1.5);
         /// #endif
     }
@@ -472,7 +477,7 @@ export class MenuBuilder {
             }
         });
 
-        PopupManager.show(data, 1.5);
+        PopupManager.show(data, 1.4);
     }
 
     private static showCreditsPopup(): void {
