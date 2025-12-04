@@ -2,6 +2,7 @@ import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { Logger } from "../../logger/logger.js";
 import { UnityUtils } from "../../utils/unityUtils.js";
 import { ModalMessageData } from "./data/ModalMessageData.js";
+import { ModalMessageWithInputFieldData } from "./data/ModalMessageWithInputFieldData.js";
 import { ModalMessageWithOptionSelectionData } from "./data/ModalMessageWithOptionSelectionData.js";
 
 /*
@@ -25,6 +26,7 @@ export class PopupManager {
     private static ShortcutExtensions: Il2Cpp.Class;
 
     private static ModalMessagePopupViewModel: Il2Cpp.Class;
+    private static ModalMessageWithInputFieldViewModel: Il2Cpp.Class;
     private static ModalMessageWithOptionSelectionPopupViewModel: Il2Cpp.Class;
 
     // Enums
@@ -42,6 +44,7 @@ export class PopupManager {
         this.ShortcutExtensions = AssemblyHelper.DOTween.class("DG.Tweening.ShortcutExtensions");
 
         this.ModalMessagePopupViewModel = AssemblyHelper.MTFGClient.class("FGClient.UI.ModalMessagePopupViewModel");
+        this.ModalMessageWithInputFieldViewModel = AssemblyHelper.MTFGClient.class("FGClient.UI.ModalMessageWithInputFieldViewModel");
         this.ModalMessageWithOptionSelectionPopupViewModel = AssemblyHelper.MTFGClient.class("FGClient.UI.ModalMessageWithOptionSelectionPopupViewModel");
 
         this.PopupInteractionType = AssemblyHelper.MTFGClient.class("FGClient.UI.PopupInteractionType");
@@ -82,6 +85,8 @@ export class PopupManager {
 
     public static show(ModalMessageData: ModalMessageData, scale?: number): void;
 
+    public static show(ModalMessageWithInputFieldData: ModalMessageWithInputFieldData, scale?: number): void;
+
     public static show(ModalMessageWithOptionSelectionData: ModalMessageWithOptionSelectionData, scale?: number): void;
 
     /**
@@ -90,7 +95,7 @@ export class PopupManager {
      * @param data Configuration object containing Title, Message, Buttons, etc. (use .create() to make one)
      * @param scale (Optional) Custom size of popup
      */
-    public static show(data: ModalMessageData | ModalMessageWithOptionSelectionData, scale?: number): void {
+    public static show(data: ModalMessageData | ModalMessageWithInputFieldData | ModalMessageWithOptionSelectionData, scale?: number): void {
         const Show = this.PopupManagerInstance!.method<boolean>("Show", 3).overload(
             "FGClient.UI.PopupInteractionType",
             "FGClient.UI.ModalMessageBaseData",
@@ -102,7 +107,10 @@ export class PopupManager {
             this.scale = scale;
         }
 
-        if (data instanceof ModalMessageWithOptionSelectionData) {
+        if (data instanceof ModalMessageWithInputFieldData) {
+            Logger.debug(`[${this.tag}::show] Showing ModalMessageWithInputFieldData Popup`);
+            Show.inflate(this.ModalMessageWithInputFieldViewModel).invoke(this.Info, data.instance, NULL);
+        } else if (data instanceof ModalMessageWithOptionSelectionData) {
             Logger.debug(`[${this.tag}::show] Showing ModalMessageWithOptionSelectionData Popup`);
             Show.inflate(this.ModalMessageWithOptionSelectionPopupViewModel).invoke(this.Info, data.instance, NULL);
         } else if (data instanceof ModalMessageData) {
@@ -112,11 +120,6 @@ export class PopupManager {
 
         this.waitingForScaling = false;
 
-        // const viewModelComponent = this.PopupManagerInstance!.method<Il2Cpp.Object>("get_ActivePopup").invoke();
-        // const OnTweenComponent = UnityUtils.getComponentFromObject(viewModelComponent, this.TweenOnPopup);
-        // UnityUtils.setEnabledComponent(OnTweenComponent!, false);
-        // // const modalObject = UnityUtils.getGameObject(viewModelComponent);
-        // const vector3 = UnityUtils.createVector3(scale, scale, scale)
-        // UnityUtils.setLocalScale(UnityUtils.getTransform(viewModelComponent), vector3);
+        // There's was some commented stuff about scaling, but it's removed in commit <paste>
     }
 }

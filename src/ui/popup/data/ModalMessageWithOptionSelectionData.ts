@@ -2,6 +2,13 @@ import { AssemblyHelper } from "../../../core/assemblyHelper.js";
 import { ModalMessageData } from "./ModalMessageData.js";
 import { UnityUtils } from "../../../utils/unityUtils.js";
 
+/*
+ * There's also
+ * public int? OptionTextWidthOverride;
+ *
+ * but I'm too lazy & It's useless to implement
+ */
+
 /** Wrapper over FGClient::UI::ModalMessageWithOptionSelectionData */
 export class ModalMessageWithOptionSelectionData extends ModalMessageData {
     private static _selectionClass: Il2Cpp.Class;

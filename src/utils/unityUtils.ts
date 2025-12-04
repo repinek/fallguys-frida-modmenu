@@ -16,6 +16,7 @@ export class UnityUtils {
 
     static SystemActionBool: Il2Cpp.Class;
     static SystemActionBoolInt: Il2Cpp.Class;
+    static SystemActionBoolString: Il2Cpp.Class;
 
     static GenericListString: Il2Cpp.Class;
 
@@ -32,6 +33,7 @@ export class UnityUtils {
 
         this.SystemActionBool = Il2Cpp.corlib.class("System.Action`1").inflate(this.SystemBoolean);
         this.SystemActionBoolInt = Il2Cpp.corlib.class("System.Action`2").inflate(this.SystemBoolean, this.SystemInt);
+        this.SystemActionBoolString = Il2Cpp.corlib.class("System.Action`2").inflate(this.SystemBoolean, this.SystemString);
 
         this.GenericListString = Il2Cpp.corlib.class("System.Collections.Generic.List`1").inflate(this.SystemString);
 

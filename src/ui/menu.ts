@@ -26,14 +26,15 @@ import { UICanvasModule } from "../modules/visuals/uiCanvas.js";
 
 import { LocaliseOption } from "./popup/data/ModalMessageBaseData.js";
 import { ModalType, OkButtonType, ModalMessageData } from "./popup/data/ModalMessageData.js";
+import { ModalMessageWithInputFieldData } from "./popup/data/ModalMessageWithInputFieldData.js";
+import { ModalMessageWithOptionSelectionData } from "./popup/data/ModalMessageWithOptionSelectionData.js";
 import { PopupManager } from "./popup/popupManager.js";
 
 import { JavaUtils } from "../utils/javaUtils.js";
 import { UnityUtils } from "../utils/unityUtils.js";
 import { UpdateUtils } from "../utils/updateUtils.js";
-import { ModalMessageWithOptionSelectionData } from "./popup/data/ModalMessageWithOptionSelectionData.js";
-import { Z_UNKNOWN } from "zlib";
 
+// TODO: move builder and content in different classes
 export class MenuBuilder {
     private static readonly tag = "MenuBuilder";
     private static modules: {
@@ -147,6 +148,14 @@ export class MenuBuilder {
             layout.button("Create Test Selection Option Popup", () => {
                 UnityUtils.runInMain(() => {
                     this.showDebugOptionsPopup();
+                });
+            })
+        );
+
+        Menu.add(
+            layout.button("Create Test Input Field Popup", () => {
+                UnityUtils.runInMain(() => {
+                    this.showDebugInputPopup();
                 });
             })
         );
@@ -453,6 +462,25 @@ export class MenuBuilder {
             Logger.debug(`pressed: ${pressed}, selected Index ${selectedIndex}, It's a ${stringList[selectedIndex]}`);
         });
         PopupManager.show(data, 1.5);
+        /// #endif
+    }
+
+    private static showDebugInputPopup(): void {
+        /// #if DEV
+        const data = ModalMessageWithInputFieldData.create();
+        data.LocaliseOption = LocaliseOption.NotLocalised;
+        data.Title = "Input Popup Test";
+        data.Message = 'Debug.log("Bye GD, Hello C#")';
+
+        data.InputText = "koluska";
+        data.InputTextPlaceholder = "insert trost'"
+        data.RequiredStringLength = 15;
+        data.MessageAdditional = "Additional message of input popup";
+        data.OnInputFieldModalClosed = Il2Cpp.delegate(UnityUtils.SystemActionBoolString, (pressed: boolean, input: Il2Cpp.String) => {
+            Logger.debug(`pressed: ${pressed}, input: ${input.content}`);
+        });
+
+        PopupManager.show(data, 1.3);
         /// #endif
     }
 
