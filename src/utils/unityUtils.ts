@@ -54,10 +54,9 @@ export class UnityUtils {
     }
 
     /** Wrapper over UnityEngine::Object::FindObjectFromInstanceID */
-    static FindObjectFromInstanceID(id: number): Il2Cpp.Object | null {
+    static FindObjectFromInstanceID(id: number): Il2Cpp.Object | undefined {
         const object = this.Object.method<Il2Cpp.Object>("FindObjectFromInstanceID", 1).invoke(id);
-        Logger.debug(object.size);
-        if (object.isNull()) return null;
+        if (object.isNull()) return undefined;
         return object;
     }
 
@@ -74,16 +73,12 @@ export class UnityUtils {
 
     /** Wrapper over UnityEngine::Vector3::.ctor */
     static createVector3(x: number, y: number, z: number): Il2Cpp.ValueType {
-        const vector = this.Vector3.alloc().unbox();
-        vector.method(".ctor", 3).invoke(x, y, z);
-        return vector;
+        return this.createInstance(this.Vector3, x, y, z).unbox();
     }
 
     /** Wrapper over UnityEngine::Vector2::.ctor */
     static createVector2(x: number, y: number): Il2Cpp.ValueType {
-        const vector = this.Vector2.alloc().unbox();
-        vector.method(".ctor", 2).invoke(x, y);
-        return vector;
+        return this.createInstance(this.Vector2, x, y).unbox();
     }
 
     /** Wrapper over System.Collections.Generic.List<Il2Cpp.String> */
@@ -109,6 +104,20 @@ export class UnityUtils {
         return component.method<Il2Cpp.Object>("get_gameObject").invoke();
     }
 
+    /** Wrapper over UnityEngine::Compontent::get_transform */
+    static getTransform(component: Il2Cpp.Object): Il2Cpp.Object {
+        return component.method<Il2Cpp.Object>("get_transform").invoke();
+    }
+
+    /**
+     * Wrapper over UnityEngine::Transform::set_localScale
+     *
+     * @param scale UnityEngine::Vector3
+     */
+    static setLocalScale(transform: Il2Cpp.Object, scale: Il2Cpp.ValueType): void {
+        transform.method("set_localScale").invoke(scale);
+    }
+
     /** Wrapper over UnityEngine::GameObject::SetActive */
     static SetActive(gameObject: Il2Cpp.Object, active: boolean): void {
         gameObject.method<void>("SetActive").invoke(active);
@@ -132,5 +141,28 @@ export class UnityUtils {
         const instance = klass.alloc();
         instance.method(".ctor").invoke(...parameters);
         return instance;
+    }
+
+    /**
+     * Wrapper over ::GetComponent
+     *
+     * @param object UnityEngine::Component or UnityEngine::GameObject
+     * @param componentClass component to find
+     */
+    static getComponentFromObject(object: Il2Cpp.Object, componentClass: Il2Cpp.Class): Il2Cpp.Object | undefined {
+        const componentClassType = componentClass.type.object;
+
+        const component = object.method<Il2Cpp.Object>("GetComponent", 1).invoke(componentClassType);
+        if (component.isNull()) return undefined;
+        return component;
+    }
+
+    /**
+     * Wrapper over set_enabled in component
+     *
+     * Make sure components has it. I'm too lazy
+     */
+    static setEnabledComponent(component: Il2Cpp.Object, state: boolean): void {
+        return component.method<void>("set_enabled").invoke(state);
     }
 }
