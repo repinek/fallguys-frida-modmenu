@@ -38,13 +38,17 @@ export class LocalisedStrings {
         this.GetString = this.LocalisedStrings.method<Il2Cpp.String>("GetString", 1);
 
         this.initHooks();
-
         Logger.info(`[${this.tag}::init] Initialized`);
     }
 
     private static initHooks(): void {
         // @ts-ignore
         this.GetString.implementation = function (id: Il2Cpp.String): Il2Cpp.String {
+            // when opening shop access violation accessing 0x10 -> get length -> get content
+            if (id.isNull()) {
+                return this.method<Il2Cpp.String>("GetString", 1).invoke(id);
+            }
+
             const result = this.method<Il2Cpp.String>("GetString", 1).invoke(id);
 
             const originalText = result.content;
