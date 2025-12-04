@@ -21,7 +21,9 @@ import { UpdateUtils } from "./utils/updateUtils.js";
 class FallGuysFridaModMenu {
     static init() {
         try {
+            Logger.debug("Script Loaded");
             Il2Cpp.perform(() => {
+                Logger.debug("IL2CPP Loaded");
                 Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
                 I18n.init();
 
