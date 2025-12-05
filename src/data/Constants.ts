@@ -10,7 +10,7 @@ export const Constants = {
     DISCORD_URL: "https://discord.gg/cNFJ73P6p3",
 
     // === Unity Logging ===
-    UNITY_LOGGING: true,
+    UNITY_LOGGING: false,
 
     // == Spoof ===
     USE_SPOOF: true,

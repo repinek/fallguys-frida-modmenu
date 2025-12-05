@@ -3,6 +3,7 @@ import { BaseModule } from "./BaseModule";
 // Game
 import { BanBypassModule } from "../modules/game/BanBypass";
 import { BuildInfoModule } from "../modules/game/BuildInfo";
+import { MatchInfoModule } from "../modules/game/MatchInfo";
 import { UwUifyModule } from "../modules/game/UwUify";
 
 // Network
@@ -33,6 +34,7 @@ export class ModuleManager {
         // sorted the same as imports
         new BanBypassModule(),
         new BuildInfoModule(),
+        new MatchInfoModule(),
         new UwUifyModule(),
         new CatapultModule(),
         new NetworkModule(),

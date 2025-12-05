@@ -280,7 +280,7 @@ export class MenuTabs {
 
         Menu.add(
             layout.button(I18n.t("menu.functions.server_details"), () => {
-                m.matchInfo?.showGameDetails();
+                m.matchInfo?.showServerDetails();
             })
         );
 

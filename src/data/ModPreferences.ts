@@ -1,25 +1,22 @@
 declare const process: { env: { BUILD_ENV: string } };
 
 export const ModPreferences = {
-    VERSION: "2.122", // Don't forget update after changes!
+    VERSION: "2.123", // Don't forget update after changes!
     ENV: (process.env.BUILD_ENV || "dev") as "dev" | "staging" | "release",
     FOR_GAME_VERSION: "21.1.1"
 } as const;
 
 /*
 !! TODO: 
+login by token
 fix spam popups
 minimalistic fps counter
 eula popup (cool)
 project structure in readme
 create cool screenshots for readme
-improve logging at modules
-on screen logging
 made localization for other languages
 refer changeResolutionScale()
 custom image on loading screen
-login by token
-config file (?)
 log file
 all cosmetics lobby (?)
 check old commits for pre-installed value on seekbars
@@ -28,6 +25,7 @@ maybe:
 fork menu and update it to frida 17
 
 DONE:
+[x] improve logging at modules
 [x] add changing platform & some other things
 [x] PascalCase naming
 [x] remove .js from imports since we using webpack
@@ -56,6 +54,8 @@ DONE:
 [x] refactor menu and some other things using createPopup
 [x] refactor structure of project / script (all script in one file :cry:) 
 
-will not be done: 
+not planned: 
 implement extensions.ts (.setActive, .getGameObject) 
+on screen logging
+config file
 */

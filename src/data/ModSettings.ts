@@ -19,11 +19,8 @@ export const ModSettings = {
 
     customFov: false,
     fov: 70,
-    fgDebug: false,
     disableAnalytics: false,
-    hideDoors: false,
     showQueuedPlayers: false,
     resolutionScale: 1,
-
     uwuifyMode: false
 };
