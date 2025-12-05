@@ -2,7 +2,7 @@ import { AssemblyHelper } from "../../core/assemblyHelper.js";
 import { BaseModule } from "../../core/baseModule.js";
 import { I18n } from "../../i18n/i18n.js";
 import { Logger } from "../../logger/logger.js";
-import { MenuBuilder } from "../../ui/menu.js";
+import { MenuUtils } from "../../ui/menu/MenuUtils.js";
 
 export class BuildInfoModule extends BaseModule {
     public readonly name = "BuildInfo";
@@ -32,7 +32,7 @@ export class BuildInfoModule extends BaseModule {
             module.buildNumber = this.field<Il2Cpp.String>("buildNumber").value.content!;
             module.buildDate = this.field<Il2Cpp.String>("buildDate").value.content!;
 
-            MenuBuilder.addCenterText(module.getShortString());
+            MenuUtils.addCenterText(module.getShortString());
 
             return this.method<void>("OnEnable").invoke();
         };

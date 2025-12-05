@@ -12,7 +12,7 @@ import { Logger } from "./logger/logger.js";
 import { UnityLogger } from "./logger/unityLogger.js";
 
 import { PopupManager } from "./ui/popup/popupManager.js";
-import { MenuBuilder } from "./ui/menu.js";
+import { MenuBuilder } from "./ui/menu/MenuBuilder.js";
 
 import { LocalisedStrings } from "./utils/game/localisedStrings.js";
 import { UnityUtils } from "./utils/unityUtils.js";

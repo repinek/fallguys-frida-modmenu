@@ -1,17 +1,18 @@
 declare const process: { env: { BUILD_ENV: string } };
 
 export const ModPreferences = {
-    VERSION: "2.119", // Don't forget update after changes!
+    VERSION: "2.120", // Don't forget update after changes!
     ENV: (process.env.BUILD_ENV || "dev") as "dev" | "staging" | "release",
     FOR_GAME_VERSION: "21.1.1"
 } as const;
 
 /*
 !! TODO: 
+remove .js from imports since we using webpack
+PascalCase naming
 minimalistic fps counter
 eula popup (cool)
-implement extensions.ts (.setActive, .getGameObject) 
-project structure
+project structure in readme
 add changing platform & some other things
 create cool screenshots for readme
 improve logging at modules
@@ -23,13 +24,14 @@ login by token
 config file (?)
 log file
 all cosmetics lobby (?)
-separate configs
 check old commits for pre-installed value on seekbars
 
 maybe:
 fork menu and update it to frida 17
 
 DONE:
+[x] move menu in differents files
+[x] separate configs
 [x] change language
 [x] move popup manager to ui 
 [x] update to 21.1.1
@@ -53,4 +55,7 @@ DONE:
 [x] refactor vars names
 [x] refactor menu and some other things using createPopup
 [x] refactor structure of project / script (all script in one file :cry:) 
+
+will not be done: 
+implement extensions.ts (.setActive, .getGameObject) 
 */

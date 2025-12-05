@@ -46,7 +46,6 @@ export class CatapultModule extends BaseModule {
 
     // Methods
     private BuildCatapultConfig!: Il2Cpp.Method;
-
     private WebSocketNetworkHostCtor!: Il2Cpp.Method;
 
     private clientDetails: IClientDetails | null = null;
