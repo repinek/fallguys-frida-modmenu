@@ -11,7 +11,6 @@ import { UnityUtils } from "../../utils/UnityUtils";
  *    - Overrides clientVersion and clientVersionSignature to match the latest client
  *    - Allows connecting with outdated APKs, data fetched from Config.VERSION_URL (thx floyzi) (You can find it yourself if you want)
  *
- *
  * 2. Platform Spoofing:
  *    - We can also change the platform here, but make sure it exists (otherwise you won't be able to login, mediatonic fixed this)
  *      Some existing platforms:
@@ -38,6 +37,9 @@ interface IClientDetails {
 export class CatapultModule extends BaseModule {
     public readonly name = "Catapult";
 
+    // any pc platform for some reason on mobile version required EAC_MESSAGE, which we can't handle -> gets disconnected
+    static readonly PLATFORMS: string[] = ["android_ega", "ios_ega", "ps5", "xb1", "switch", "ports3_2"];
+
     // Classes
     private CatapultServicesManager!: Il2Cpp.Class;
 
@@ -49,6 +51,7 @@ export class CatapultModule extends BaseModule {
     private WebSocketNetworkHostCtor!: Il2Cpp.Method;
 
     private clientDetails: IClientDetails | null = null;
+    private targetPlatform: string = "android_ega";
 
     public init(): void {
         this.CatapultServicesManager = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager");
@@ -60,6 +63,7 @@ export class CatapultModule extends BaseModule {
         this.WebSocketNetworkHostCtor = this.WebSocketNetworkHost.method<void>(".ctor", 3);
 
         this.fetchClientDetails();
+        this.readPlatform();
     }
 
     public override initHooks(): void {
@@ -67,18 +71,17 @@ export class CatapultModule extends BaseModule {
 
         this.BuildCatapultConfig.implementation = function (): Il2Cpp.Object {
             Logger.hook("BuildCatapultConfig called");
-
             const catapultConfig = this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // <--- OnLeave
 
             if (Constants.USE_SPOOF && module.clientDetails) {
                 catapultConfig.field<Il2Cpp.String>("ClientVersion").value = Il2Cpp.string(module.clientDetails.clientVersion);
                 catapultConfig.field<Il2Cpp.String>("ClientVersionSignature").value = Il2Cpp.string(module.clientDetails.clientVersionSignature);
-                Logger.debug(`[${module.name}] Applied version spoof to ${module.clientDetails.clientVersion}`);
+                Logger.debug(`[${module.name}::BuildCatapultConfig] Applied version spoof to ${module.clientDetails.clientVersion}`);
             }
 
-            if (Constants.PLATFORM != "android_ega") {
-                catapultConfig.field<Il2Cpp.String>("Platform").value = Il2Cpp.string(Constants.PLATFORM);
-                Logger.debug(`[${module.name}] Modified platform to ${Constants.PLATFORM}`);
+            if (module.targetPlatform != "android_ega") {
+                catapultConfig.field<Il2Cpp.String>("Platform").value = Il2Cpp.string(module.targetPlatform);
+                Logger.debug(`[${module.name}::BuildCatapultConfig] Modified platform to ${module.targetPlatform}`);
             }
 
             if (Constants.USE_CUSTOM_SERVER) {
@@ -96,7 +99,9 @@ export class CatapultModule extends BaseModule {
 
                 catapultConfig.field("LoginServerHost").value = LoginServerHost;
                 catapultConfig.field("GatewayServerHost").value = GatewayServerHost;
-                Logger.debug(`[${module.name}] Applied custom login and gateway server to ${Constants.CUSTOM_LOGIN_URL}, ${Constants.CUSTOM_GATEWAY_URL}`);
+                Logger.debug(
+                    `[${module.name}::BuildCatapultConfig] Applied custom login and gateway server to ${Constants.CUSTOM_LOGIN_URL}, ${Constants.CUSTOM_GATEWAY_URL}`
+                );
             }
 
             return catapultConfig;
@@ -131,5 +136,26 @@ export class CatapultModule extends BaseModule {
                 this.clientDetails = JSON.parse(response) as IClientDetails;
             });
         }
+    }
+
+    private readPlatform(): void {
+        Java.perform(() => {
+            if (Menu.sharedPreferences.contains("platform")) {
+                this.targetPlatform = Menu.sharedPreferences.getString("platform");
+            }
+        });
+    }
+
+    static changePlatform(newPlatform: string): void {
+        Java.perform(() => {
+            Logger.debug(`put platform string into config: ${newPlatform}`);
+            Menu.sharedPreferences.putString("platform", newPlatform);
+        });
+    }
+
+    static getLocalisedPlatforms(): string[] {
+        return this.PLATFORMS.map(platform => {
+            return I18n.t(`platforms.${platform}`);
+        });
     }
 }

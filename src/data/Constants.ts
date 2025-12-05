@@ -10,12 +10,11 @@ export const Constants = {
     DISCORD_URL: "https://discord.gg/cNFJ73P6p3",
 
     // === Unity Logging ===
-    UNITY_LOGGING: false,
+    UNITY_LOGGING: true,
 
     // == Spoof ===
     USE_SPOOF: true,
     SPOOF_VERSION_URL: "https://floyzi.github.io/fallguys/version.json",
-    PLATFORM: "android_ega", // android_ega is default
 
     // === Custom Server ===
     USE_CUSTOM_SERVER: false,

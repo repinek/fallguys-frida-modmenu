@@ -293,6 +293,13 @@ export class MenuTabs {
                 })
             )
         );
+
+        Menu.add(
+            layout.button(
+                I18n.t("menu.functions.select_platform"),
+                MenuUtils.run(() => MenuPopups.showPlatformPopup())
+            )
+        );
     }
 
     private static buildOtherTab(layout: Menu.ObsidianLayout): void {

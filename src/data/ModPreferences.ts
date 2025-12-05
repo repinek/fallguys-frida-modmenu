@@ -1,17 +1,17 @@
 declare const process: { env: { BUILD_ENV: string } };
 
 export const ModPreferences = {
-    VERSION: "2.120", // Don't forget update after changes!
+    VERSION: "2.122", // Don't forget update after changes!
     ENV: (process.env.BUILD_ENV || "dev") as "dev" | "staging" | "release",
     FOR_GAME_VERSION: "21.1.1"
 } as const;
 
 /*
 !! TODO: 
+fix spam popups
 minimalistic fps counter
 eula popup (cool)
 project structure in readme
-add changing platform & some other things
 create cool screenshots for readme
 improve logging at modules
 on screen logging
@@ -28,6 +28,7 @@ maybe:
 fork menu and update it to frida 17
 
 DONE:
+[x] add changing platform & some other things
 [x] PascalCase naming
 [x] remove .js from imports since we using webpack
 [x] move menu in differents files
@@ -48,7 +49,6 @@ DONE:
 [x] move teleportmanager from utils
 [x] something with to global classes 
 [x] rename velocity to gravity and dive strenght to dive force or wtf im was doing
-[x] unityTools
 [x] wrapper over setActive
 [x] refactor localization (info and other)
 [x] wrapper for Il2cpp.perform main

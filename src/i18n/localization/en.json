@@ -55,7 +55,8 @@
             "custom_resolution": "Custom Resolution (will apply in next round): {0}%",
             "game_details": "Show Game Details",
             "server_details": "Show and Copy Server Details",
-            "uwuify": "UwUify Mode"
+            "uwuify": "UwUify Mode",
+            "select_platform": "Select Platform"
         },
         "other": {
             "language": "Select Language",
@@ -96,6 +97,11 @@
             "title": "Select Mod Menu Language",
             "message": "It will only be applied after restarting the game",
             "ok": "Select Language"
+        },
+        "platform": {
+            "title": "Select Platform",
+            "message": "The spoofed platform will only be applied after restarting the game",
+            "ok": "Apply Platform"
         }
     },
     "update_utils": {
@@ -115,5 +121,13 @@
     "rounds_toasts": {
         "no_tiptoe": "No tip toe platforms found",
         "no_doors": "No doors found"
+    },
+    "platforms": {
+        "android_ega": "Android",
+        "ios_ega": "IOS",
+        "ps5": "Playstation",
+        "xb1": "Xbox",
+        "switch": "Nintendo Switch",
+        "ports3_2": "Secret Test Platform"
     }
 }

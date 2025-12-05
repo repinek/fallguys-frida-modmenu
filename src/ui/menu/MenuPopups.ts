@@ -12,6 +12,7 @@ import { PopupManager } from "../popup/PopupManager";
 
 import { UnityUtils } from "../../utils/UnityUtils";
 import { UpdateUtils } from "../../utils/UpdateUtils";
+import { CatapultModule } from "../../modules/network/Catapult";
 
 export class MenuPopups {
     static showDebugPopup(): void {
@@ -77,6 +78,29 @@ export class MenuPopups {
         /// #endif
     }
 
+    static showPlatformPopup(): void {
+        const data = ModalMessageWithOptionSelectionData.create();
+        data.LocaliseOption = LocaliseOption.NotLocalised;
+        data.Title = I18n.t("popups.platform.title");
+        data.Message = I18n.t("popups.platform.message");
+        data.OkTextOverrideId = I18n.t("popups.platform.ok");
+
+        data.ModalType = ModalType.MT_OK_CANCEL;
+        data.OkButtonType = OkButtonType.Green;
+
+        const platforms = CatapultModule.getLocalisedPlatforms();
+        data.OptionStringIds = UnityUtils.createStringList(platforms);
+
+        data.OnOptionSelectionModalClosed = Il2Cpp.delegate(UnityUtils.SystemActionBoolInt, (pressed: boolean, selectedIndex: number) => {
+            if (pressed) {
+                const selectedPlatform = CatapultModule.PLATFORMS[selectedIndex];
+                CatapultModule.changePlatform(selectedPlatform);
+            }
+        });
+
+        PopupManager.show(data, 1.5);
+    }
+
     static showLanguagePopup(): void {
         const data = ModalMessageWithOptionSelectionData.create();
         data.LocaliseOption = LocaliseOption.NotLocalised;
@@ -90,11 +114,11 @@ export class MenuPopups {
         const languageNames = I18n.getLocalisedLanguages();
         data.OptionStringIds = UnityUtils.createStringList(languageNames);
 
-        data.OnOptionSelectionModalClosed = Il2Cpp.delegate(UnityUtils.SystemActionBoolInt, (pressed: boolean, indexLanguage: number) => {
+        data.OnOptionSelectionModalClosed = Il2Cpp.delegate(UnityUtils.SystemActionBoolInt, (pressed: boolean, selectedIndex: number) => {
             if (pressed) {
-                const selectedLocale = I18n.supportedLocales[indexLanguage];
+                const selectedLocale = I18n.supportedLocales[selectedIndex];
                 I18n.changeLocale(selectedLocale);
-                Logger.toast(I18n.t("menu.toasts.on_locale_changed", languageNames[indexLanguage]), 0);
+                Logger.toast(I18n.t("menu.toasts.on_locale_changed", languageNames[selectedIndex]), 0);
             }
         });
 
