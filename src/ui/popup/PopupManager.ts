@@ -1,9 +1,9 @@
-import { AssemblyHelper } from "../../core/assemblyHelper.js";
-import { Logger } from "../../logger/logger.js";
-import { UnityUtils } from "../../utils/unityUtils.js";
-import { ModalMessageData } from "./data/ModalMessageData.js";
-import { ModalMessageWithInputFieldData } from "./data/ModalMessageWithInputFieldData.js";
-import { ModalMessageWithOptionSelectionData } from "./data/ModalMessageWithOptionSelectionData.js";
+import { AssemblyHelper } from "../../core/AssemblyHelper";
+import { Logger } from "../../logger/Logger";
+import { UnityUtils } from "../../utils/UnityUtils";
+import { ModalMessageData } from "./data/ModalMessageData";
+import { ModalMessageWithInputFieldData } from "./data/ModalMessageWithInputFieldData";
+import { ModalMessageWithOptionSelectionData } from "./data/ModalMessageWithOptionSelectionData";
 
 /*
  * Wrapper over FGClient::UI::PopupManager

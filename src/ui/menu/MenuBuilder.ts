@@ -1,13 +1,13 @@
-import { Constants } from "../../data/constants.js";
-import { ObsidianConfig } from "../../data/layoutConfig.js";
-import { ModPreferences } from "../../data/modPreferences.js";
+import { Constants } from "../../data/Constants";
+import { ObsidianConfig } from "../../data/LayoutConfig";
+import { ModPreferences } from "../../data/ModPreferences";
 
-import { I18n } from "../../i18n/i18n.js";
+import { I18n } from "../../i18n/I18n";
 
-import { Logger } from "../../logger/logger.js";
+import { Logger } from "../../logger/Logger";
 
-import { MenuTabs } from "./MenuTabs.js";
-import { MenuUtils } from "./MenuUtils.js";
+import { MenuTabs } from "./MenuTabs";
+import { MenuUtils } from "./MenuUtils";
 
 export class MenuBuilder {
     private static readonly tag = "MenuBuilder";

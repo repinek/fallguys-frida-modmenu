@@ -1,4 +1,4 @@
-import { AssemblyHelper } from "../../../core/assemblyHelper.js";
+import { AssemblyHelper } from "../../../core/AssemblyHelper";
 
 export enum LocaliseOption {
     Localised = 0,

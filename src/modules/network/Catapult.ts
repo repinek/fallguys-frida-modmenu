@@ -1,10 +1,10 @@
-import { AssemblyHelper } from "../../core/assemblyHelper.js";
-import { BaseModule } from "../../core/baseModule.js";
-import { Constants } from "../../data/constants.js";
-import { I18n } from "../../i18n/i18n.js";
-import { Logger } from "../../logger/logger.js";
-import { JavaUtils } from "../../utils/javaUtils.js";
-import { UnityUtils } from "../../utils/unityUtils.js";
+import { AssemblyHelper } from "../../core/AssemblyHelper";
+import { BaseModule } from "../../core/BaseModule";
+import { Constants } from "../../data/Constants";
+import { I18n } from "../../i18n/I18n";
+import { Logger } from "../../logger/Logger";
+import { JavaUtils } from "../../utils/JavaUtils";
+import { UnityUtils } from "../../utils/UnityUtils";
 
 /*
  * 1. Login and Version Spoofing:

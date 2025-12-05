@@ -1,22 +1,22 @@
 import "frida-il2cpp-bridge";
 import "frida-java-menu";
 
-import { AssemblyHelper } from "./core/assemblyHelper.js";
-import { ModuleManager } from "./core/moduleManager.js";
+import { AssemblyHelper } from "./core/AssemblyHelper";
+import { ModuleManager } from "./core/ModuleManager";
 
-import { ModPreferences } from "./data/modPreferences.js";
+import { ModPreferences } from "./data/ModPreferences";
 
-import { I18n } from "./i18n/i18n.js";
+import { I18n } from "./i18n/I18n";
 
-import { Logger } from "./logger/logger.js";
-import { UnityLogger } from "./logger/unityLogger.js";
+import { Logger } from "./logger/Logger";
+import { UnityLogger } from "./logger/UnityLogger";
 
-import { PopupManager } from "./ui/popup/popupManager.js";
-import { MenuBuilder } from "./ui/menu/MenuBuilder.js";
+import { PopupManager } from "./ui/popup/PopupManager";
+import { MenuBuilder } from "./ui/menu/MenuBuilder";
 
-import { LocalisedStrings } from "./utils/game/localisedStrings.js";
-import { UnityUtils } from "./utils/unityUtils.js";
-import { UpdateUtils } from "./utils/updateUtils.js";
+import { LocalisedStrings } from "./utils/game/LocalisedStrings";
+import { UnityUtils } from "./utils/UnityUtils";
+import { UpdateUtils } from "./utils/UpdateUtils";
 
 class FallGuysFridaModMenu {
     static init() {

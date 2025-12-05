@@ -1,8 +1,8 @@
-import { AssemblyHelper } from "../../core/assemblyHelper.js";
-import { BaseModule } from "../../core/baseModule.js";
-import { I18n } from "../../i18n/i18n.js";
-import { Logger } from "../../logger/logger.js";
-import { MenuUtils } from "../../ui/menu/MenuUtils.js";
+import { AssemblyHelper } from "../../core/AssemblyHelper";
+import { BaseModule } from "../../core/BaseModule";
+import { I18n } from "../../i18n/I18n";
+import { Logger } from "../../logger/Logger";
+import { MenuUtils } from "../../ui/menu/MenuUtils";
 
 export class BuildInfoModule extends BaseModule {
     public readonly name = "BuildInfo";

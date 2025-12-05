@@ -1,22 +1,22 @@
-import { ModuleManager } from "../../core/moduleManager.js";
+import { ModuleManager } from "../../core/ModuleManager";
 
-import { BuildInfoModule } from "../../modules/game/buildInfo.js";
-import { MatchInfoModule } from "../../modules/game/matchInfo.js";
-import { UwUifyModule } from "../../modules/game/uwuify.js";
+import { BuildInfoModule } from "../../modules/game/BuildInfo";
+import { MatchInfoModule } from "../../modules/game/MatchInfo";
+import { UwUifyModule } from "../../modules/game/UwUify";
 
-import { CharacterPhysicsModule } from "../../modules/player/characterPhysics.js";
-import { TeleportManagerModule } from "../../modules/player/teleportManager.js";
+import { CharacterPhysicsModule } from "../../modules/player/CharacterPhysics";
+import { TeleportManagerModule } from "../../modules/player/TeleportManager";
 
-import { DoorManagerModule } from "../../modules/rounds/doorManager.js";
-import { TipToeManagerModule } from "../../modules/rounds/tipToeManager.js";
+import { DoorManagerModule } from "../../modules/rounds/DoorManager";
+import { TipToeManagerModule } from "../../modules/rounds/TipToeManager";
 
-import { FGDebugModule } from "../../modules/visuals/fgDebug.js";
-import { GraphicsManagerModule } from "../../modules/visuals/graphicsManager.js";
-import { UICanvasModule } from "../../modules/visuals/uiCanvas.js";
+import { FGDebugModule } from "../../modules/visuals/FGDebug";
+import { GraphicsManagerModule } from "../../modules/visuals/GraphicsManager";
+import { UICanvasModule } from "../../modules/visuals/UICanvas";
 
-import { MenuBuilder } from "./MenuBuilder.js";
+import { MenuBuilder } from "./MenuBuilder";
 
-import { UnityUtils } from "../../utils/unityUtils.js";
+import { UnityUtils } from "../../utils/UnityUtils";
 
 export class MenuUtils {
     public static modules: {

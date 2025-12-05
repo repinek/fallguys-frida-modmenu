@@ -1,7 +1,7 @@
-import { AssemblyHelper } from "../../core/assemblyHelper.js";
-import { BaseModule } from "../../core/baseModule.js";
-import { ModSettings } from "../../data/modSettings.js";
-import { Logger } from "../../logger/logger.js";
+import { AssemblyHelper } from "../../core/AssemblyHelper";
+import { BaseModule } from "../../core/BaseModule";
+import { ModSettings } from "../../data/ModSettings";
+import { Logger } from "../../logger/Logger";
 
 export class GraphicsManagerModule extends BaseModule {
     public readonly name = "GraphicsManager";

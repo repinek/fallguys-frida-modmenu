@@ -1,9 +1,9 @@
-import { AssemblyHelper } from "../../core/assemblyHelper.js";
-import { BaseModule } from "../../core/baseModule.js";
-import { Logger } from "../../logger/logger.js";
-import { UnityUtils } from "../../utils/unityUtils.js";
-import { I18n } from "../../i18n/i18n.js";
-import { JavaUtils } from "../../utils/javaUtils.js";
+import { AssemblyHelper } from "../../core/AssemblyHelper";
+import { BaseModule } from "../../core/BaseModule";
+import { Logger } from "../../logger/Logger";
+import { UnityUtils } from "../../utils/UnityUtils";
+import { I18n } from "../../i18n/I18n";
+import { JavaUtils } from "../../utils/JavaUtils";
 
 export class MatchInfoModule extends BaseModule {
     public readonly name = "MatchInfo";

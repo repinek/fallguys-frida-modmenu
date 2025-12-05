@@ -1,12 +1,12 @@
-import { Constants } from "../../data/constants.js";
-import { ModSettings } from "../../data/modSettings.js";
+import { Constants } from "../../data/Constants";
+import { ModSettings } from "../../data/ModSettings";
 
-import { I18n } from "../../i18n/i18n.js";
+import { I18n } from "../../i18n/I18n";
 
-import { JavaUtils } from "../../utils/javaUtils.js";
+import { JavaUtils } from "../../utils/JavaUtils";
 
-import { MenuPopups } from "./MenuPopups.js";
-import { MenuUtils } from "./MenuUtils.js";
+import { MenuPopups } from "./MenuPopups";
+import { MenuUtils } from "./MenuUtils";
 
 export class MenuTabs {
     static buildAll(layout: Menu.ObsidianLayout) {

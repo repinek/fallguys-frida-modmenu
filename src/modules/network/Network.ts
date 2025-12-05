@@ -1,8 +1,8 @@
-import { AssemblyHelper } from "../../core/assemblyHelper.js";
-import { BaseModule } from "../../core/baseModule.js";
-import { ModSettings } from "../../data/modSettings.js";
-import { I18n } from "../../i18n/i18n.js";
-import { Logger } from "../../logger/logger.js";
+import { AssemblyHelper } from "../../core/AssemblyHelper";
+import { BaseModule } from "../../core/BaseModule";
+import { ModSettings } from "../../data/ModSettings";
+import { I18n } from "../../i18n/I18n";
+import { Logger } from "../../logger/Logger";
 
 export class NetworkModule extends BaseModule {
     public readonly name = "Network";

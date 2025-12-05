@@ -1,6 +1,6 @@
-import { AssemblyHelper } from "../core/assemblyHelper.js";
-import { Constants } from "../data/constants.js";
-import { Logger } from "./logger.js";
+import { AssemblyHelper } from "../core/AssemblyHelper";
+import { Constants } from "../data/Constants";
+import { Logger } from "./Logger";
 
 /*
 this.DebugLogHandler = AssemblyHelper.CoreModule.class("UnityEngine.DebugLogHandler");

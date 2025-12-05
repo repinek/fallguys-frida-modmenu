@@ -1,29 +1,29 @@
-import { BaseModule } from "./baseModule.js";
+import { BaseModule } from "./BaseModule";
 
 // Game
-import { BanBypassModule } from "../modules/game/banBypass.js";
-import { BuildInfoModule } from "../modules/game/buildInfo.js";
-import { UwUifyModule } from "../modules/game/uwuify.js";
+import { BanBypassModule } from "../modules/game/BanBypass";
+import { BuildInfoModule } from "../modules/game/BuildInfo";
+import { UwUifyModule } from "../modules/game/UwUify";
 
 // Network
-import { CatapultModule } from "../modules/network/catapult.js";
-import { NetworkModule } from "../modules/network/network.js";
+import { CatapultModule } from "../modules/network/Catapult";
+import { NetworkModule } from "../modules/network/Network";
 
 // Player
-import { AntiAFKModule } from "../modules/player/antiAFK.js";
-import { CharacterPhysicsModule } from "../modules/player/characterPhysics.js";
-import { TeleportManagerModule } from "../modules/player/teleportManager.js";
+import { AntiAFKModule } from "../modules/player/AntiAFK";
+import { CharacterPhysicsModule } from "../modules/player/CharacterPhysics";
+import { TeleportManagerModule } from "../modules/player/TeleportManager";
 
 // Rounds
-import { DoorManagerModule } from "../modules/rounds/doorManager.js";
-import { TipToeManagerModule } from "../modules/rounds/tipToeManager.js";
+import { DoorManagerModule } from "../modules/rounds/DoorManager";
+import { TipToeManagerModule } from "../modules/rounds/TipToeManager";
 
 // Visuals
-import { FGDebugModule } from "../modules/visuals/fgDebug.js";
-import { GraphicsManagerModule } from "../modules/visuals/graphicsManager.js";
-import { UICanvasModule } from "../modules/visuals/uiCanvas.js";
+import { FGDebugModule } from "../modules/visuals/FGDebug";
+import { GraphicsManagerModule } from "../modules/visuals/GraphicsManager";
+import { UICanvasModule } from "../modules/visuals/UICanvas";
 
-import { Logger } from "../logger/logger.js";
+import { Logger } from "../logger/Logger";
 
 export class ModuleManager {
     public readonly name = "ModuleManager";

@@ -53,10 +53,7 @@ module.exports = function (env) {
             ]
         },
         resolve: {
-            extensions: [".ts", ".js"],
-            extensionAlias: {
-                ".js": [".ts", ".js"]
-            }
+            extensions: [".ts"],
         },
         output: {
             filename: "agent.js",

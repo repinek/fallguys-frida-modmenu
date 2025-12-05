@@ -1,8 +1,8 @@
-import { AssemblyHelper } from "../../core/assemblyHelper.js";
-import { BaseModule } from "../../core/baseModule.js";
-import { Logger } from "../../logger/logger.js";
-import { CharacterPhysicsModule } from "./characterPhysics.js";
-import { UnityUtils } from "../../utils/unityUtils.js";
+import { AssemblyHelper } from "../../core/AssemblyHelper";
+import { BaseModule } from "../../core/BaseModule";
+import { Logger } from "../../logger/Logger";
+import { CharacterPhysicsModule } from "./CharacterPhysics";
+import { UnityUtils } from "../../utils/UnityUtils";
 
 // TODO: describe issue here
 

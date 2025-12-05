@@ -1,12 +1,12 @@
-import { Constants } from "../data/constants.js";
-import { ModPreferences } from "../data/modPreferences.js";
-import { I18n } from "../i18n/i18n.js";
-import { Logger } from "../logger/logger.js";
-import { LocaliseOption } from "../ui/popup/data/ModalMessageBaseData.js";
-import { ModalType, OkButtonType, ModalMessageData } from "../ui/popup/data/ModalMessageData.js";
-import { PopupManager } from "../ui/popup/popupManager.js";
-import { JavaUtils } from "./javaUtils.js";
-import { UnityUtils } from "./unityUtils.js";
+import { Constants } from "../data/Constants";
+import { ModPreferences } from "../data/ModPreferences";
+import { I18n } from "../i18n/I18n";
+import { Logger } from "../logger/Logger";
+import { LocaliseOption } from "../ui/popup/data/ModalMessageBaseData";
+import { ModalType, OkButtonType, ModalMessageData } from "../ui/popup/data/ModalMessageData";
+import { PopupManager } from "../ui/popup/PopupManager";
+import { JavaUtils } from "./JavaUtils";
+import { UnityUtils } from "./UnityUtils";
 
 interface IModMenuVersion {
     scriptVersion: string;

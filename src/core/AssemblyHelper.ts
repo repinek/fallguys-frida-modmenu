@@ -1,4 +1,4 @@
-import { Logger } from "../logger/logger.js";
+import { Logger } from "../logger/Logger";
 
 export class AssemblyHelper {
     static MediatonicCatapultClientSdkRuntime: Il2Cpp.Image; // Catapult namespace & network related

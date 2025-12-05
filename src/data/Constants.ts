@@ -1,8 +1,8 @@
 export const Constants = {
     // === Mod Menu URLs ===
     MOD_MENU_ICON_URL: "https://floyzi.github.io/images/obed-guys-present.png",
-    MOD_MENU_VERSION_URL: "https://repinek.github.io/fallguys-modmenu/latest_version.json",
-    MOD_MENU_CHANGELOG_URL: `https://repinek.github.io/fallguys-modmenu/changelogs.json`,
+    MOD_MENU_VERSION_URL: "https://repinek.github.io/fallguys-modmenu/latest_versionon",
+    MOD_MENU_CHANGELOG_URL: `https://repinek.github.io/fallguys-modmenu/changelogson`,
 
     // === Social URLs ===
     GITHUB_URL: "https://github.com/repinek/fallguys-frida-modmenu",
@@ -14,7 +14,7 @@ export const Constants = {
 
     // == Spoof ===
     USE_SPOOF: true,
-    SPOOF_VERSION_URL: "https://floyzi.github.io/fallguys/version.json",
+    SPOOF_VERSION_URL: "https://floyzi.github.io/fallguys/versionon",
     PLATFORM: "android_ega", // android_ega is default
 
     // === Custom Server ===

@@ -1,5 +1,5 @@
-import { AssemblyHelper } from "../core/assemblyHelper.js";
-import { Logger } from "../logger/logger.js";
+import { AssemblyHelper } from "../core/AssemblyHelper";
+import { Logger } from "../logger/Logger";
 
 export class UnityUtils {
     private static readonly tag = "UnityUtils";

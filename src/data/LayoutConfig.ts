@@ -1,4 +1,4 @@
-import { I18n } from "../i18n/i18n.js";
+import { I18n } from "../i18n/I18n";
 
 export const ObsidianConfig: Menu.ObsidianConfig = {
     color: {

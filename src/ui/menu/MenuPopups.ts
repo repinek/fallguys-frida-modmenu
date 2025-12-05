@@ -1,17 +1,17 @@
-import { ModPreferences } from "../../data/modPreferences.js";
+import { ModPreferences } from "../../data/ModPreferences";
 
-import { I18n } from "../../i18n/i18n.js";
+import { I18n } from "../../i18n/I18n";
 
-import { Logger } from "../../logger/logger.js";
+import { Logger } from "../../logger/Logger";
 
-import { LocaliseOption } from "../popup/data/ModalMessageBaseData.js";
-import { ModalType, OkButtonType, ModalMessageData } from "../popup/data/ModalMessageData.js";
-import { ModalMessageWithInputFieldData } from "../popup/data/ModalMessageWithInputFieldData.js";
-import { ModalMessageWithOptionSelectionData } from "../popup/data/ModalMessageWithOptionSelectionData.js";
-import { PopupManager } from "../popup/popupManager.js";
+import { LocaliseOption } from "../popup/data/ModalMessageBaseData";
+import { ModalType, OkButtonType, ModalMessageData } from "../popup/data/ModalMessageData";
+import { ModalMessageWithInputFieldData } from "../popup/data/ModalMessageWithInputFieldData";
+import { ModalMessageWithOptionSelectionData } from "../popup/data/ModalMessageWithOptionSelectionData";
+import { PopupManager } from "../popup/PopupManager";
 
-import { UnityUtils } from "../../utils/unityUtils.js";
-import { UpdateUtils } from "../../utils/updateUtils.js";
+import { UnityUtils } from "../../utils/UnityUtils";
+import { UpdateUtils } from "../../utils/UpdateUtils";
 
 export class MenuPopups {
     static showDebugPopup(): void {

@@ -1,6 +1,6 @@
-import { AssemblyHelper } from "../../../core/assemblyHelper.js";
-import { ModalMessageData } from "./ModalMessageData.js";
-import { UnityUtils } from "../../../utils/unityUtils.js";
+import { AssemblyHelper } from "../../../core/AssemblyHelper";
+import { ModalMessageData } from "./ModalMessageData";
+import { UnityUtils } from "../../../utils/UnityUtils";
 
 /*
  * There's also

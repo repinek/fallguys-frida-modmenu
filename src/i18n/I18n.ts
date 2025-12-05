@@ -1,5 +1,5 @@
-import { JavaUtils } from "../utils/javaUtils.js";
-import { Logger } from "../logger/logger.js";
+import { JavaUtils } from "../utils/JavaUtils";
+import { Logger } from "../logger/Logger";
 
 import en from "./localization/en.json";
 import ru from "./localization/ru.json";

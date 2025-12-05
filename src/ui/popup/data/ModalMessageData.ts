@@ -1,6 +1,6 @@
-import { AssemblyHelper } from "../../../core/assemblyHelper.js";
-import { ModalMessageBaseData } from "./ModalMessageBaseData.js";
-import { UnityUtils } from "../../../utils/unityUtils.js";
+import { AssemblyHelper } from "../../../core/AssemblyHelper";
+import { ModalMessageBaseData } from "./ModalMessageBaseData";
+import { UnityUtils } from "../../../utils/UnityUtils";
 
 export enum ModalType {
     MT_OK = "MT_OK",

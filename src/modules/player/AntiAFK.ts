@@ -1,7 +1,7 @@
-import { AssemblyHelper } from "../../core/assemblyHelper.js";
-import { BaseModule } from "../../core/baseModule.js";
+import { AssemblyHelper } from "../../core/AssemblyHelper";
+import { BaseModule } from "../../core/BaseModule";
 
-import { Logger } from "../../logger/logger.js";
+import { Logger } from "../../logger/Logger";
 
 export class AntiAFKModule extends BaseModule {
     public readonly name = "AntiAFK";

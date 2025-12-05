@@ -1,7 +1,7 @@
-import { AssemblyHelper } from "../../core/assemblyHelper.js";
-import { BaseModule } from "../../core/baseModule.js";
-import { ModSettings } from "../../data/modSettings.js";
-import { UnityUtils } from "../../utils/unityUtils.js";
+import { AssemblyHelper } from "../../core/AssemblyHelper";
+import { BaseModule } from "../../core/BaseModule";
+import { ModSettings } from "../../data/ModSettings";
+import { UnityUtils } from "../../utils/UnityUtils";
 
 /*
  * Hooks TMP_Text::set_text and return UwUified result

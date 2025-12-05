@@ -8,8 +8,6 @@ export const ModPreferences = {
 
 /*
 !! TODO: 
-remove .js from imports since we using webpack
-PascalCase naming
 minimalistic fps counter
 eula popup (cool)
 project structure in readme
@@ -30,6 +28,8 @@ maybe:
 fork menu and update it to frida 17
 
 DONE:
+[x] PascalCase naming
+[x] remove .js from imports since we using webpack
 [x] move menu in differents files
 [x] separate configs
 [x] change language

@@ -1,9 +1,9 @@
-import { AssemblyHelper } from "../../core/assemblyHelper.js";
-import { BaseModule } from "../../core/baseModule.js";
+import { AssemblyHelper } from "../../core/AssemblyHelper";
+import { BaseModule } from "../../core/BaseModule";
 
-import { GameDefaults } from "../../data/gameDefaults.js";
-import { ModSettings } from "../../data/modSettings.js";
-import { Logger } from "../../logger/logger.js";
+import { GameDefaults } from "../../data/GameDefaults";
+import { ModSettings } from "../../data/ModSettings";
+import { Logger } from "../../logger/Logger";
 
 export class CharacterPhysicsModule extends BaseModule {
     public readonly name = "CharacterPhysics";

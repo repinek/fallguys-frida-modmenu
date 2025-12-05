@@ -1,4 +1,4 @@
-import { Logger } from "../logger/logger.js";
+import { Logger } from "../logger/Logger";
 
 export class JavaUtils {
     private static readonly tag = "JavaUtils";
