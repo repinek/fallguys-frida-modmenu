@@ -1,6 +1,6 @@
 # Contributing to Fall Guys Frida Mod Menu
 
-Thank you for your interest in this project! We welcome any contributions: bug fixes, new features or documentation improvements.
+Thank you for your interest in this project! We welcome any contributions: bug fixes, new features or localization improvements.
 
 Please read this guide before you start coding.
 
@@ -18,6 +18,7 @@ Please read this guide before you start coding.
 - [Project Structure](#project-structure)
 - [Code Style](#code-style)
 - [Pull Request Process](#pull-request-process)
+- [Helpful Information](#helpful-information--resources)
 
 
 ## Prerequisites
@@ -30,7 +31,7 @@ For apk building:
 - Android Studio or Android Build tools
 - Java Development Kit
 
-\
+
 ## Setup & Installation
 There are two steps: building the script and building the APK.
 
@@ -134,7 +135,7 @@ Builds the script and immediately inject script into the game with the gadget.
 ```npm run lint``` - Runs [eslint](https://eslint.org/) to check for errors.  
 ```npm run prettier``` - Runs [prettier](https://prettier.io/) to format code.  
 
-\* from package.
+\* from package.json
 
 
 ## Project Structure
@@ -185,7 +186,7 @@ We enforce code style using **ESLint** and **Prettier**.
 
 ### Typing
 We rely on TypeScript to catch errors before runtime.
-*   **No `any`:** Avoid using `any` type. It defeats the purpose of TypeScript. Excludes is ...parameters and errors.
+*   **No `any`:** Avoid using `any` type. It defeats the purpose of TypeScript. Exceptions are allowed for rest parameters (...args) and catch (error) blocks.
 *   **Use Il2Cpp Types:** Always use specific types from `frida-il2cpp-bridge` (e.g., `Il2Cpp.Class`, `Il2Cpp.String`, `Il2Cpp.Object`).
 *   **Interfaces:** Define interfaces for JSON responses or complex objects (see `IClientDetails` in `Catapult.ts`).
 *   **Return Types:** Explicitly define return types for methods.
@@ -215,11 +216,23 @@ Logger.warn(`[${this.tag}::someFetchFunc] Can't fetch info about something`);
 Logger.errorThrow(error, "Failed to do something");
 ```
 
+### Conditional Compilation
+We use preprocessor directives to exclude debug logic from production builds.
+*   Wrap development-only code (e.g., debug functions, testing hooks) in `/// #if DEV` blocks.
+*   This code will be **stripped out** in `build:release`/
+
+```ts
+function someDebugFunction(): void {
+    /// #if DEV
+    this.unlockAll(); // Some testing code here
+    /// #endif
+}
+```
+
 ### Documentation (JSDoc)
 We have documentation for:
-*   Public methods.
-*   Complex logic / hooks.
-*   Wrappers around IL2CPP classes.
+*   Complex logic.
+*   Wrappers around Unity IL2CPP classes.
 
 ```ts
 // Good
@@ -245,3 +258,49 @@ import { BaseModule } from "../../core/BaseModule";
 import { CatapultModule } from "../modules/network/Catapult";
 import { Logger } from "../../logger/Logger";
 ```
+
+
+## Pull Request Process
+We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification.  
+Format: `<type>[optional scope]: <description>`
+
+1. **Fork** the repository 
+2. **Create** a feature branch (git checkout -b feature/amazing-feature)
+3. **Make** your changes
+4. **Commit** your changes
+5. **Push** to the branch 
+6. **Open** a Pull Request
+
+
+## Helpful Information / Resources
+### Mono Code Leaks
+Fall Guys has several leaks of development builds with **Mono** DLLs.  
+These are extremely useful for analyzing game logic and class structures in clean C# before they are compiled to IL2CPP.
+
+We maintain a Telegram channel with these builds. **A Telegram account is required to download them.**
+*   **v4.5.0** (5 May 2021) — [Download Link](https://t.me/FallGuysBuilds/34)
+*   **v9.0.1** (1 March 2023) — [Download Link](https://t.me/FallGuysBuilds/203)
+*   **v10.7.0 Developer Mono Build** (28 November 2023) — [Download Link](https://t.me/FallGuysBuilds/201)
+
+All managed DLLs stored in `FallGuys_client_BackUpThisFolder_ButDontShipItWithYourGame/Managed` folder.
+
+### Reverse Engineering Tools
+*   [Il2CppDumper-GUI](https://github.com/AndnixSH/Il2CppDumper-GUI) - Generating `dump.cs`. Use this to quickly view class structures, fields, and method signatures.
+*   [Il2CppInspectorRedux](https://github.com/LukeFZ/Il2CppInspectorRedux) - Generating the python script to rename functions and apply structs in disassemblers.
+*   IDA Pro, Ghidra or Binary Ninja - Required for analyzing Android-specific logic, and game versions newer than the last Mono leak (10.7+).
+*   [dnSpyEx](https://github.com/dnSpyEx/dnSpy) or [ILSpy](https://github.com/icsharpcode/ILSpy) - For viewing C# DLLs (From Mono builds)
+
+### Docs
+*   [Frida Documentation](https://frida.re/docs/) - General Frida API reference. 
+*   [Unity Scripting Documentation](https://docs.unity3d.com/ScriptReference/index.html) - Reference for Unity classes (GameObject, Transform, etc...).
+*   [frida-il2cpp-bridge Wiki](https://github.com/vfsfitvnm/frida-il2cpp-bridge/wiki) - Specific API for the IL2CPP used in this project.
+
+
+## Questions? 
+- Check `README.md` for project overview.
+- Open issue on Github.
+- Ask on our [discord server](https://discord.gg/cNFJ73P6p3).
+
+---
+
+Thank you for contributing to Fall Guys Frida Mod Menu!
