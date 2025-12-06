@@ -31,12 +31,12 @@ export class MatchInfoModule extends BaseModule {
                 return;
             }
 
-            // TODO: describe. we need CGM 
+            // TODO: describe. we need CGM
             const gameStateView = GameStateInstance.method<Il2Cpp.Object>("get_GameStateView").invoke();
             const mem = Memory.alloc(Process.pointerSize);
-            const out = new Il2Cpp.Reference<Il2Cpp.Object>(mem, this.ClientGameManager.type)
+            const out = new Il2Cpp.Reference<Il2Cpp.Object>(mem, this.ClientGameManager.type);
             const isSuccess = gameStateView.method<boolean>("GetLiveClientGameManager").invoke(out);
-            
+
             if (!isSuccess) {
                 return;
             }

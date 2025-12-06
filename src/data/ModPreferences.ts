@@ -1,7 +1,7 @@
 declare const process: { env: { BUILD_ENV: string } };
 
 export const ModPreferences = {
-    VERSION: "2.123", // Don't forget update after changes!
+    VERSION: "3.00", // Don't forget update after changes!
     ENV: (process.env.BUILD_ENV || "dev") as "dev" | "staging" | "release",
     FOR_GAME_VERSION: "21.1.1"
 } as const;
@@ -12,7 +12,6 @@ login by token
 fix spam popups
 minimalistic fps counter
 eula popup (cool)
-project structure in readme
 create cool screenshots for readme
 made localization for other languages
 refer changeResolutionScale()
@@ -25,6 +24,7 @@ maybe:
 fork menu and update it to frida 17
 
 DONE:
+[x] project structure in readme
 [x] improve logging at modules
 [x] add changing platform & some other things
 [x] PascalCase naming

@@ -37,7 +37,7 @@ For updates announcements join our community in Discord:
 - **View Names Shortcut Button**
 - **Change FOV**
 - **Toggle Display UI**
-- **Display FGDebug:**  
+- **Display FGDebug:**
   - Shows FPS (min/max/avg/current), Time, Ping, Dropped Packets
 - **Disable FG Analytics** 
 - **Show Number of Queued Players** in matchmaking

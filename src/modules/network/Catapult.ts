@@ -59,7 +59,7 @@ export class CatapultModule extends BaseModule {
         this.HttpNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.HttpNetworkHost");
         this.WebSocketNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
 
-        // TODO: use BuildLoginRequest instead 
+        // TODO: use BuildLoginRequest instead
         this.BuildCatapultConfig = this.CatapultServicesManager.method<Il2Cpp.Object>("BuildCatapultConfig");
         this.WebSocketNetworkHostCtor = this.WebSocketNetworkHost.method<void>(".ctor", 3);
 
