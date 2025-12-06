@@ -6,7 +6,7 @@
 # Fall Guys Mod Menu
 Android Fall Guys mod menu using [Frida](https://frida.re/) and [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge)
 
-For help, updates announcements, and additional platforms support, join our community in Discord:
+For updates announcements join our community in Discord:
 [Make FG Great Again Discord Server](https://discord.gg/cNFJ73P6p3) 
 
 ## 📸 Showcase
@@ -60,11 +60,12 @@ For help, updates announcements, and additional platforms support, join our comm
 Just download and install the .apk from [Releases](https://github.com/repinek/fallguys-frida-modmenu/releases/latest)  
 Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 
-> If you don't want to wait for game resources to download, copy the .obb file from:  
-> Android/obb/com.Mediatonic.FallGuys_client/ to  
-> Android/obb/com.Mediatonic.FallGuys_client.modmenu/,  
-> then rename it by adding .modmenu before .obb  
-> Final file name example: main.XXXX.com.mediatonic.FallGuys_client.modmenu.obb  
+> **Tip regarding OBB files:**  
+> If you don't want to wait for game resources to download again:
+> 1. Copy the `.obb` file from `Android/obb/com.Mediatonic.FallGuys_client/`.
+> 2. Create a new folder: `Android/obb/com.Mediatonic.FallGuys_client.modmenu/`.
+> 3. Paste the file there and rename it by adding `.modmenu` before `.obb`.  
+> *Example:* `main.XXXX.com.mediatonic.FallGuys_client.modmenu.obb`
 
 ## 🛠️ Troubleshooting
 > This project is for **educational and research purposes only**. I won't be providing support.
@@ -79,88 +80,37 @@ Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 **A:** No. This project uses Frida 16.7.19, whick is not support 16 Android 
 
 **Q:** Why frida 16.7.19 is used instead 17.1.4 with Android 16 support?  
-**A:** Since frida-java-menu builded on 16.7.19, It can't be loaded on 17+. Current thread is not attached to the Java VM; please move this code inside a Java.perform() callback
-- Frida 17 works in listen mode, but not in the script, because java is not loaded (?)
+**A:** Since frida-java-menu builded on 16.7.19, It can't be loaded on 17+. Current thread is not attached to the Java VM; please move this code inside a Java.perform() callback  
+*Note: Frida 17 works in listen mode, but not in the script, because java is not loaded (?)*
 
 **Q:** Are emulators supported?  
 **A:** No. Emulators are not supported because they cannot handle the Java required for the menu.  
 
+### ⚠️ Stability Issues
+This mod relies on `frida-java-bridge`, which is **very unstable**. This results in random crashes and inconsistent behavior.
+
+*   **The Issue:** The game may crash immediately upon calling Java methods, even if Frida reports `Java.available = true`.
+
 **HyperOS, ColorOS, OneUI, HarmonyOS**, and other **OEM ROMs** may not work properly or at all.   
 **It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).**    
 
-*Also frida or frida-il2cpp-bridge can be unstable.*
+## 🧑‍💻 Development & Building
+Want to build the APK yourself, debug the code, or contribute new features?
 
-## 🏗️ Build
+**Please read our [CONTRIBUTING.md](CONTRIBUTING.md) guide.**
 
-1. Clone the repository:
-```
-git clone https://github.com/repinek/fallguys-frida-modmenu
-cd fallguys-frida-modmenu
-```
-
-**— Install dependencies** 
-1. Make sure you have Python Installed. 
-2. Install frida from requirements.txt
-```
-pip install -r requirements.txt
-```
-
-**— Build script**
-1. Install dependencies:
-``` 
-npm install 
-```
-2. Create dist folder:
-```
-mkdir dist
-```
-3. Build the script
-```
-npm run build
-```
-Script will be saved at the path: ./dist/agent.js  
-
-<!-- TODO: custom python script for it -->
-**— Build APK**
-1. Download Fall Guys Latest APK
-2. Add permission to AndroidManifest.xml
-```
-<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-```
-3. Download frida-gadget for frida version from requirements.txt: [arm](https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm.so.xz) (you need frida-gadget-FRIDA_VERSION-android-arm.so.xz) and [arm64](https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm64.so.xz) (you need frida-gadget-FRIDA_VERSION-android-arm64.so.xz) 
-4. Install [frida-gadget injector](https://github.com/commonuserlol/fgi?tab=readme-ov-file#installing) (You can use any other way to inject frida-gadget to your APK)
-5. Extract .so file and copy downloaded frida gadget to C:\Users\YOURUSER\\.fgi\arm64.so (rename it to arm64.so as well)
-6. Inject frida-gadget
-###### short command:
-```
-fgi -i <path_to_your_fall_guys.apk> -t script -l ./dist/agent.js --offline-mode
-```
-###### full command:
-```
-fgi -i <path_to_your_fall_guys.apk> -t script -l ./dist/agent.js -n libModMenu.so -s libModMenu.s.so --offline-mode
-```
-Apk will be saved as ./your_fall_guys.patched.apk 
-
-## ⚙️ Debugging 
-There's two way:   
-**— Using frida-gadget (non root)**
-1. Follow the instructions in [🏗️ Build](#%EF%B8%8F-build) up to the step with injecting frida-gadget  
-2. Inject frida-gadget in your APK in listen mode instead script:
-```
-fgi -i <yourfallguys.apk> -a arm64 --offline-mode
-```
-3. Connect your android device using [ADB](https://developer.android.com/tools/adb)
-4. Install and launch the apk then inject the script
-```
-npm run spawn
-```
-You will see frida console
-
-**— Using frida-server (root)**
-1. Refer [official Frida documentation](https://frida.re/docs/android/)
+It covers:
+*   Project Structure
+*   Building from source
+*   Debugging with Frida Gadget
+*   Code Style & Tools
 
 ## 🤝 Contribution
-Pull requests are welcome. Got ideas or questions? Join our [Discord!](https://discord.gg/cNFJ73P6p3)
+Pull requests are welcome! Got ideas or questions? Join our [Discord](https://discord.gg/cNFJ73P6p3).
+
+## 📜 License
+This project is licensed under the **GNU General Public License v3.0**.  
+See the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Special Thanks
 Obed Guys Team - Some features powered by **Obed Guys Team**  
