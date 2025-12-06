@@ -178,9 +178,9 @@ We enforce code style using **ESLint** and **Prettier**.
 
 ### Naming Conventions
 - **Classes & Files:** `PascalCase` (e.g., `PopupManager.ts`, `UICanvasModule`).
-- **Methods & Properties:** `camelCase` (e.g., `toggleSpeed`, `initHooks`).
-- **Private Fields:** Use the `_` prefix (e.g., `_isInitialized`, `_cache`).
-- **Constants:** `UPPER_SNAKE_CASE` (e.g., `MAX_SPEED_MULTIPLIER`).
+- **Methods & Properties:** `camelCase` (e.g., `toggleNames`, `initHooks`).
+- **Private & Cached Fields:** Use the `_` prefix (e.g., `_popupManagerInstance`).
+- **Constants:** `UPPER_SNAKE_CASE` (e.g., `TELEPORT_COOLDOWN`).
 - **Interfaces:** Prefix with `I` (e.g., `IClientDetails`).
 - **Game/Unity Code:** Keep original naming for Unity classes and methods to match the game's assembly (e.g., `FallGuysCharacterController`, `TheMultiplayerGuys.FGCommon`).
 
