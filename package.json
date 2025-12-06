@@ -26,7 +26,7 @@
     "build:staging": "webpack --env staging",
     "watch": "webpack --watch --env dev",
     "spawn": "frida -U gadget -l dist/agent.js",
-    "spawn:release": "npm run build && frida -U gadget -l dist/agent.js",
+    "spawn:release": "npm run build:release && frida -U gadget -l dist/agent.js",
     "spawn:staging": "npm run build:staging && frida -U gadget -l dist/agent.js",
     "spawn:dev": "npm run build:dev && frida -U gadget -l dist/agent.js",
     "lint": "eslint \"src/**\"",
