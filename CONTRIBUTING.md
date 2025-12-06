@@ -75,7 +75,7 @@ but you can use any other way to inject script.
     * [arm64.so.xz](https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm64.so.xz)
 2. Extract the downloaded libraries and rename it to `arm.so` and `arm64.so`.
 3. Place `.so` files into `fgi` configuration folder.  
-    For Windows it's: C:\Users\%USERPROFILE%\\.fgi\\
+    For Windows it's: %USERPROFILE%\\.fgi\\
 
 #### Development Build: 
 Injects Frida in `listen` mode. The game will pause at startup until you manually inject the script.
@@ -219,7 +219,7 @@ Logger.errorThrow(error, "Failed to do something");
 ### Conditional Compilation
 We use preprocessor directives to exclude debug logic from production builds.
 *   Wrap development-only code (e.g., debug functions, testing hooks) in `/// #if DEV` blocks.
-*   This code will be **stripped out** in `build:release`/
+*   This code will be **stripped out** in `build:release`.
 
 ```ts
 function someDebugFunction(): void {
@@ -282,7 +282,7 @@ We maintain a Telegram channel with these builds. **A Telegram account is requir
 *   **v9.0.1** (1 March 2023) — [Download Link](https://t.me/FallGuysBuilds/203)
 *   **v10.7.0 Developer Mono Build** (28 November 2023) — [Download Link](https://t.me/FallGuysBuilds/201)
 
-All managed DLLs stored in `FallGuys_client_BackUpThisFolder_ButDontShipItWithYourGame/Managed` folder.
+All managed DLLs are stored in `FallGuys_client_BackUpThisFolder_ButDontShipItWithYourGame/Managed` folder.
 
 ### Reverse Engineering Tools
 *   [Il2CppDumper-GUI](https://github.com/AndnixSH/Il2CppDumper-GUI) - Generating `dump.cs`. Use this to quickly view class structures, fields, and method signatures.
