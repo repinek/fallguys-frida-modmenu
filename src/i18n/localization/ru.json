@@ -72,7 +72,7 @@
             "close_button": "Закрыть",
             "hide_callback": "Иконка скрыта",
             "kill_callback": "Меню закрыто",
-            "on_locale_changed": "Язык меню изменен на: {0}"
+            "on_locale_changed": "Язык меню изменен на {0}"
         }
     },
     "popups": {
@@ -82,7 +82,7 @@
         },
         "credits": {
             "title": "Авторы",
-            "message": "<b>Разработчик:</b>\nrepinek\n\n<b>Особая благодарность:</b>\n• <b>Floyzi</b> — Помощь с функциями и локализацией.\n• <b>commonuserlol</b> — Помощь с кодом и меню\n• <b>Obed Guys Team</b> — Некоторые функции\n\n<b>Было использовано:</b>\n• <b>frida.re</b> — Потрясающий инструмент динамического анализа.\n• <b>frida-il2cpp-bridge</b> — Невероятный Frida модуль для IL2CPP."
+            "message": "Разработчик:\nrepinek\n\nОсобая благодарность:\n• Floyzi< — Помощь с функциями и локализацией.\n• commonuserlol — Помощь с кодом и меню\n• Obed Guys Team — Некоторые функции\n\nБыло использовано:\n• frida.re — Потрясающий инструмент динамического анализа.\n• frida-il2cpp-bridge — Невероятный Frida модуль для IL2CPP."
         },
         "changelog": {
             "title": "Список изменений v{0} — {1}",
