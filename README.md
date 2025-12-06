@@ -9,53 +9,60 @@ Android Fall Guys mod menu using [Frida](https://frida.re/) and [frida-il2cpp-br
 For updates announcements join our community in Discord:
 [Make FG Great Again Discord Server](https://discord.gg/cNFJ73P6p3) 
 
+
 ## 📸 Showcase
 ![Demo](https://github.com/user-attachments/assets/57b9a4cd-3a62-47b7-8a3e-17dc801ea0b3)
 <img src="https://github.com/user-attachments/assets/f2164534-1700-4ba6-b681-576dca29583d" width="500" height="224"/>
 
-<!-- TODO: add remain features -->
+
 ## ✨ Features
 ### Movement
-- 360 Dives
-- Air Jump
-- Freeze Player
-- Don't send Fall Guy state (packets)
-- Change Speed
-- Change Vertical Velocity / No Velocity / Negative Velocity
-- Change Jump and Dive Strength
+- **360 Dives**
+- **Air Jump**
+- **Freeze Player**
+- **Don't send Fall Guy state:** Stop sending packets to server
+- **Change Speed**
+- **Change Vertical Gravity:** Normal / Zero / Negative
+- **Change Jump and Dive Strength**
 
 ### Rounds helper
-- Hide Real Doors (Door Dash and Lost Temple)
-- Hide Fake Platforms (Tip Toe)
+- **Door Dash / Lost Temple:** Hide Real Doors
+- **Tip Toe:** Hide Fake Platforms
 
 ### Teleports
-- Teleport To Finish or Crown
-- Teleport To Bubble or Active Button
+- **Teleport To Finish or Crown**
+- **Teleport to Score Points** *(e.g., Bubbles)* **or Active Buttons**
 
 ### Other
-- View Names Shortcut
-- Toggle Display UI
-- Change FOV
-- Display FGDebug
+- **View Names Shortcut Button**
+- **Change FOV**
+- **Toggle Display UI**
+- **Display FGDebug:**  
   - Shows FPS (min/max/avg/current), Time, Ping, Dropped Packets
-- Change Resolution
-- Disable FG Analytics 
-- Show Number of Queued Players
-- Show Game Details
+- **Disable FG Analytics** 
+- **Show Number of Queued Players** in matchmaking
+- **Change Game Resolution**
+- **Show Game Details**
   - Shows RoundID, seed and Eliminated Players
-- Show Server Details
+- **Show Server Details**
   - Shows Server IP, Host and Ping
-- Show Build Info
+- **UwUify Game**
+- **Spoof Platform**
+- **Show Build Info**
 
-### Features that always work (Always enabled)
-- Bypass Character Physics Checks
-- Remove FPS Limit
-- Anti-AFK
-- Bypass Permanent Ban (does not affect temporary bans)
-- Automatically spoof to the latest game version
-- Spoof Platform (requires manual script edit)
-- Spoof Login, Gateway and analytics server (requires manual script edit)
+### Always Active
+- **Bypass Character Physics Checks**
+- **Remove FPS Limit**
+- **Anti-AFK**
+- **Bypass Permanent Ban** *(does not affect temporary bans)*
+- **Automatically spoof to the latest game version**
+
+### For developers
+- **Spoof Login, Gateway and analytics server** *(requires script edit)*
+- **Show Unity Logs**
+- **Wrapper for In-Game Popup Manager**
   
+
 ## 📦 Installation
 Just download and install the .apk from [Releases](https://github.com/repinek/fallguys-frida-modmenu/releases/latest)  
 Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
@@ -66,6 +73,7 @@ Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 > 2. Create a new folder: `Android/obb/com.Mediatonic.FallGuys_client.modmenu/`.
 > 3. Paste the file there and rename it by adding `.modmenu` before `.obb`.  
 > *Example:* `main.XXXX.com.mediatonic.FallGuys_client.modmenu.obb`
+
 
 ## 🛠️ Troubleshooting
 > This project is for **educational and research purposes only**. I won't be providing support.
@@ -94,6 +102,7 @@ This mod relies on `frida-java-bridge`, which is **very unstable**. This results
 **HyperOS, ColorOS, OneUI, HarmonyOS**, and other **OEM ROMs** may not work properly or at all.   
 **It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).**    
 
+
 ## 🧑‍💻 Development & Building
 Want to build the APK yourself, debug the code, or contribute new features?
 
@@ -105,12 +114,15 @@ It covers:
 *   Debugging with Frida Gadget
 *   Code Style & Tools
 
+
 ## 🤝 Contribution
 Pull requests are welcome! Got ideas or questions? Join our [Discord](https://discord.gg/cNFJ73P6p3).
+
 
 ## 📜 License
 This project is licensed under the **GNU General Public License v3.0**.  
 See the [LICENSE](LICENSE) file for details.
+
 
 ## 🙏 Special Thanks
 Obed Guys Team - Some features powered by **Obed Guys Team**.  
