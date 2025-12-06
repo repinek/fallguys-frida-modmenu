@@ -11,8 +11,14 @@ For updates announcements join our community in Discord:
 
 
 ## 📸 Showcase
-![Demo](https://github.com/user-attachments/assets/57b9a4cd-3a62-47b7-8a3e-17dc801ea0b3)
-<img src="https://github.com/user-attachments/assets/f2164534-1700-4ba6-b681-576dca29583d" width="500" height="224"/>
+<video src="media/video.mp4" width="500" controls="controls" muted="muted"></video>
+
+<details>
+  <summary><b>📸 Screenshots</b> (click to expand)</summary>
+  <img src="media/screenshot1.jpg" alt="Ban bypass showcase" width="500"/>
+  <img src="media/screenshot2.jpg" alt="In-Game showcase" width="500"/>
+  <img src="media/screenshot3.jpg" alt="Platform Spoofing showcase" width="500"/>
+</details>
 
 
 ## ✨ Features
