@@ -16,7 +16,8 @@ module.exports = function (env) {
     const isDev = targetEnv === "dev" || targetEnv === "staging";
     const isRelease = targetEnv === "release";
 
-    console.log(`Building script with ${targetEnv} env`);
+    console.log(`Building script with ${targetEnv} version`);
+    if (isRelease) console.warn(`Excluding all logs in Release version!`);
 
     const opts = {
         DEV: isDev,
