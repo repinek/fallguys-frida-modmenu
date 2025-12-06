@@ -13,8 +13,8 @@ For updates announcements join our community in Discord:
 ![Demo](https://github.com/user-attachments/assets/57b9a4cd-3a62-47b7-8a3e-17dc801ea0b3)
 <img src="https://github.com/user-attachments/assets/f2164534-1700-4ba6-b681-576dca29583d" width="500" height="224"/>
 
+<!-- TODO: add remain features -->
 ## ✨ Features
-
 ### Movement
 - 360 Dives
 - Air Jump
@@ -113,9 +113,12 @@ This project is licensed under the **GNU General Public License v3.0**.
 See the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Special Thanks
-Obed Guys Team - Some features powered by **Obed Guys Team**  
-[FloyzI](https://github.com/FloyzI) - For how the game works, help with some features, localization  
-[commonuserlol](https://github.com/commonuserlol) - For help with code and [menu](https://github.com/commonuserlol/frida-java-menu)  
-[Dynasty-Dev](https://github.com/Dynasty-Dev) - For testing & contribution  
-[igamegod](https://github.com/igamegod) - For help with some features  
-[Gene Brawl](https://github.com/RomashkaTea/genebrawl-public) - For the Webpack build configuration 
+Obed Guys Team - Some features powered by **Obed Guys Team**.  
+[FloyzI](https://github.com/FloyzI) - For how the game works, help with some features, localization.  
+[commonuserlol](https://github.com/commonuserlol) - For help with code and [menu](https://github.com/commonuserlol/frida-java-menu).  
+[Dynasty-Dev](https://github.com/Dynasty-Dev) - For testing & contribution.  
+[igamegod](https://github.com/igamegod) - For help with some features.  
+[Gene Brawl](https://github.com/RomashkaTea/genebrawl-public) - For the Webpack build configuration.  
+
+[Frida](https://frida.re/) - An amazing dynamic instrumentation toolkit.  
+[frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge/) - The incredible frida module for IL2CPP.
