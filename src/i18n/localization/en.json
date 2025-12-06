@@ -37,7 +37,7 @@
             "jump_force_val": "Jump Strength: {0} / 100",
 
             "custom_dive_force": "Use Custom Dive Strength",
-            "seekbar_dive_strength": "Dive Strength: {0} / 100",
+            "dive_strength_val": "Dive Strength: {0} / 100",
 
             "hide_doors": "Hide Real Doors",
             "hide_tiptoe": "Show Tip Toe Path",

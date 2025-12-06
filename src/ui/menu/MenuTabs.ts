@@ -163,7 +163,7 @@ export class MenuTabs {
         );
 
         Menu.add(
-            layout.seekbar(I18n.t("menu.functions.seekbar_dive_strength"), 100, 0, (value: number) => {
+            layout.seekbar(I18n.t("menu.functions.dive_strength_val"), 100, 0, (value: number) => {
                 ModSettings.diveForce = value;
             })
         );
