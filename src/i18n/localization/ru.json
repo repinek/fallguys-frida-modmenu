@@ -56,7 +56,9 @@
             "game_details": "Информация о раунде",
             "server_details": "Показать и скопировать инфо о сервере",
             "uwuify": "Режим UwUify",
-            "select_platform": "Выбор платформы"
+            "select_platform": "Выбор платформы",
+            "token_login": "Вход по токену",
+            "token_login_warn": "Требуется действующий refresh token от Epic Games. Не включайте, если не знаете, где его взять."
         },
         "other": {
             "language": "Выбрать язык мода",
@@ -102,6 +104,12 @@
             "title": "Выбор платформы",
             "message": "Подмена платформы применится только после перезапуска игры",
             "ok": "Применить"
+        },
+        "token_login": {
+            "title": "Вход по токену",
+            "message": "Пожалуйста, введите ваш refresh token от Epic Games ниже для входа",
+            "message_additional": "Закройте окно, чтобы продолжить обычным способом",
+            "placeholder": "Вставьте refresh токен сюда..."
         }
     },
     "update_utils": {

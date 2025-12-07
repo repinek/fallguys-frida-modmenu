@@ -56,7 +56,9 @@
             "game_details": "Show Game Details",
             "server_details": "Show and Copy Server Details",
             "uwuify": "UwUify Mode",
-            "select_platform": "Select Platform"
+            "select_platform": "Select Platform",
+            "token_login": "Token Login",
+            "token_login_warn": "Requires a valid Epic Games refresh token. Do not enable if you don't have one!"
         },
         "other": {
             "language": "Select Language",
@@ -102,6 +104,12 @@
             "title": "Select Platform",
             "message": "The spoofed platform will only be applied after restarting the game",
             "ok": "Apply Platform"
+        },
+        "token_login": {
+            "title": "Token Login",
+            "message": "Please enter your Epic Games refresh token below to authenticate",
+            "message_additional": "Close this window to continue normal way",
+            "placeholder": "Paste refresh token here..."
         }
     },
     "update_utils": {
