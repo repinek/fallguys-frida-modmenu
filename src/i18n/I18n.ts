@@ -53,20 +53,22 @@ export class I18n {
         }, obj);
     }
 
+    /** Replaces {0}, {1} placeholders with provided arguments */
+    public static format(text: string, ...args: (string | number)[]): string {
+        if (args.length === 0) return text;
+
+        return text.replace(/{(\d+)}/g, (match, number) => {
+            const index = parseInt(number);
+            return args[index] !== undefined ? String(args[index]) : match;
+        });
+    }
+
     static t(key: string, ...args: (string | number)[]): string {
         const value = this.resolveKey(TRANSLATIONS[this.currentLocale], key);
 
         if (!value) return `MISSING: ${key}`;
 
-        if (args.length > 0) {
-            // search for {n}
-            return value.replace(/{(\d+)}/g, (match, number) => {
-                const index = parseInt(number);
-                return args[index] !== undefined ? String(args[index]) : match;
-            });
-        }
-
-        return value;
+        return this.format(value, ...args);
     }
 
     static getLocalisedLanguages(): string[] {
