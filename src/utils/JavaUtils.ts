@@ -69,12 +69,13 @@ export class JavaUtils {
     }
 
     // Thanks a lot: https://github.com/frida/frida/issues/1158#issuecomment-1227967229
+    // yeees, we can use sockets but idk I'm too lazy and it's works
     // TODO do it await or promise instead ts
     /**
      * Creates HTTP GET request using Java
      *
      * @param targetUrl URL to request
-     * @param onReceive CallBack function to handle response
+     * @param onReceive Callback function to handle response
      */
     static httpGet(targetUrl: string, onReceive: (response: string | null) => void = () => {}): void {
         Java.perform(() => {
@@ -121,6 +122,95 @@ export class JavaUtils {
                 onReceive(response);
             } catch (error: any) {
                 Logger.errorThrow(error, "HTTP GET");
+                onReceive(null);
+            }
+        });
+    }
+
+    /**
+     * Creates HTTP POST request using Java
+     *
+     * @param targetUrl URL to request
+     * @param body Raw string content to send
+     * @param headers Object with headers (e.g. { "Authorization": "Bearer 123", "Content-Type": "application/json" })
+     * @param onReceive Callback function to handle response
+     */
+    static httpPost(targetUrl: string, body: string, headers: Record<string, string> = {}, onReceive: (response: string | null) => void = () => {}): void {
+        Java.perform(() => {
+            try {
+                Logger.debug(`[${this.tag}::httpPost] HTTP POST to: ${targetUrl}`);
+
+                const HttpURLConnection = Java.use("java.net.HttpURLConnection");
+                const URL = Java.use("java.net.URL");
+                const BufferedReader = Java.use("java.io.BufferedReader");
+                const BufferedWriter = Java.use("java.io.BufferedWriter");
+                const InputStreamReader = Java.use("java.io.InputStreamReader");
+                const OutputStreamWriter = Java.use("java.io.OutputStreamWriter");
+                const StringBuilder = Java.use("java.lang.StringBuilder");
+                const StringJava = Java.use("java.lang.String");
+
+                const url = URL.$new(targetUrl);
+                const connection = Java.cast(url.openConnection(), HttpURLConnection);
+
+                connection.setRequestMethod("POST");
+
+                let contentTypeSet = false;
+
+                for (const key in headers) {
+                    const value = headers[key];
+                    connection.setRequestProperty(key, value);
+
+                    if (key.toLowerCase() === "content-type") {
+                        contentTypeSet = true;
+                    }
+                }
+
+                if (!contentTypeSet) {
+                    connection.setRequestProperty("Content-Type", "application/json");
+                }
+
+                connection.setConnectTimeout(5000);
+                connection.setReadTimeout(5000);
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+
+                const outputStream = connection.getOutputStream();
+                const writer = BufferedWriter.$new(OutputStreamWriter.$new(outputStream, StringJava.$new("UTF-8")));
+
+                const javaBody = StringJava.$new(body);
+                writer.write(javaBody, 0, javaBody.length());
+                writer.flush();
+                writer.close();
+                outputStream.close();
+
+                connection.connect();
+                const responseCode = connection.getResponseCode();
+                let response: string | null = null;
+
+                if (responseCode === 200 || responseCode === 201) {
+                    const inputStream = connection.getInputStream();
+                    const buffer = BufferedReader.$new(InputStreamReader.$new(inputStream));
+                    const sb = StringBuilder.$new();
+
+                    let line: string | null;
+                    while ((line = buffer.readLine()) != null) {
+                        sb.append(line);
+                    }
+
+                    response = sb.toString();
+
+                    inputStream.close();
+                    buffer.close();
+                } else {
+                    Logger.warn(`[${this.tag}::httpPost] Failed with code: ${responseCode}`);
+                    response = null;
+                }
+
+                connection.disconnect();
+                Logger.debug(`[${this.tag}::httpPost] HTTP POST response: ${response}`);
+                onReceive(response);
+            } catch (error: any) {
+                Logger.errorThrow(error, "HTTP POST");
                 onReceive(null);
             }
         });
