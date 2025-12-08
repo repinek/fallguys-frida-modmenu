@@ -125,7 +125,7 @@
     "network_toasts": {
         "signature_fetch_fail": "Не удалось получить сигнатуру сервера. Спуф отключен.",
         "queued_players": "Игроков в очереди: {0}",
-        "logined_in": "Аккаунт: {0}",
+        "logined_in": "Вход выполнен как: {0}",
         "invalid_token": "Неверный токен"
     },
     "rounds_toasts": {

@@ -11,7 +11,7 @@ For updates announcements join our community in Discord:
 
 
 ## 📸 Showcase
-<video src="media/video.mp4" width="500" controls="controls" muted="muted"></video>
+<img src="media/video1.gif" width="500" alt="Teleport showcase" />
 
 <details>
   <summary><b>📸 Screenshots</b> (click to expand)</summary>
@@ -55,6 +55,7 @@ For updates announcements join our community in Discord:
 - **UwUify Game**
 - **Spoof Platform**
 - **Show Build Info**
+- **Login Using Refresh Token**
 
 ### Always Active
 - **Bypass Character Physics Checks**
