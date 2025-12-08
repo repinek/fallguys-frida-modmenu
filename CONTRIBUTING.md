@@ -288,7 +288,9 @@ All managed DLLs are stored in `FallGuys_client_BackUpThisFolder_ButDontShipItWi
 *   [Il2CppDumper-GUI](https://github.com/AndnixSH/Il2CppDumper-GUI) - Generating `dump.cs`. Use this to quickly view class structures, fields, and method signatures.
 *   [Il2CppInspectorRedux](https://github.com/LukeFZ/Il2CppInspectorRedux) - Generating the python script to rename functions and apply structs in disassemblers.
 *   IDA Pro, Ghidra or Binary Ninja - Required for analyzing Android-specific logic, and game versions newer than the last Mono leak (10.7+).
-*   [dnSpyEx](https://github.com/dnSpyEx/dnSpy) or [ILSpy](https://github.com/icsharpcode/ILSpy) - For viewing C# DLLs (From Mono builds)
+*   [dnSpyEx](https://github.com/dnSpyEx/dnSpy) or [ILSpy](https://github.com/icsharpcode/ILSpy) - For viewing C# DLLs (From Mono builds).
+*   [UnityExplorer](https://github.com/sinai-dev/UnityExplorer) - BepInEx & MelonLoader mod for in-game exploring, debugging and modifying unity games.
+*   Any network debugger - For analyzing HTTPs traffic.
 
 ### Docs
 *   [Frida Documentation](https://frida.re/docs/) - General Frida API reference. 
