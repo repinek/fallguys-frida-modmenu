@@ -124,7 +124,9 @@
     },
     "network_toasts": {
         "signature_fetch_fail": "Failed to fetch server signature. Spoofing disabled.",
-        "queued_players": "Queued Players: {0}"
+        "queued_players": "Queued Players: {0}",
+        "logined_in": "Logged in as {0}",
+        "invalid_token": "Invalid token format"
     },
     "rounds_toasts": {
         "no_tiptoe": "No tip toe platforms found",

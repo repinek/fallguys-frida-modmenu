@@ -56,8 +56,9 @@ export class PopupManager {
 
     private static initHooks(): void {
         const module = this;
-
+        
         //@ts-ignore
+        // It's a bad implementation, but idk. Not always working
         this.DOScale.implementation = function (transform: Il2Cpp.Object, endValueVector3: Il2Cpp.ValueType, duration: number) {
             Logger.hook("DOScale called with args:", transform, endValueVector3, duration);
             if (module.waitingForScaling) {
@@ -120,6 +121,6 @@ export class PopupManager {
 
         this.waitingForScaling = false;
 
-        // There's was some commented stuff about scaling, but it's removed in commit <paste>
+        // There's was some commented stuff about scaling, but it's removed in commit d08ea23
     }
 }

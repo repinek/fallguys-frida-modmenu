@@ -26,5 +26,10 @@ export const Constants = {
     IS_GATEWAY_SECURE: true,
     CUSTOM_ANALYTICS_URL: "analytics-gateway.fallguys.oncatapult.com",
     CUSTOM_ANALYTICS_PORT: 443,
-    IS_ANALYTICS_SECURE: true
+    IS_ANALYTICS_SECURE: true,
+
+    // === Token Login ===
+    TOKEN_URL: "https://api.epicgames.dev/epic/oauth/v2/token",
+    TOKEN_BODY: "grant_type=refresh_token&deployment_id=8bedfebaf56f406ebab78986ada3f9b3&scope=8w2sDwL5/GuUjeVbHZIxe1FAFwi+tuQI2msSCVIO+EA&refresh_token={0}",
+    TOKEN_AUTHORIZATION: "Basic eHl6YTc4OTFtQURFRDB0UE5KRk9pRjhPbUkwRHdZMEo6OHcyc0R3TDUvR3VVamVWYkhaSXhlMUZBRndpK3R1UUkybXNTQ1ZJTytFQQ=="
 } as const;

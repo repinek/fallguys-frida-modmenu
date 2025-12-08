@@ -22,5 +22,6 @@ export const ModSettings = {
     disableAnalytics: false,
     showQueuedPlayers: false,
     resolutionScale: 1,
-    uwuifyMode: false
+    uwuifyMode: false,
+    tokenLogin: false
 };

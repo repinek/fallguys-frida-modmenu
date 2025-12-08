@@ -9,7 +9,7 @@ import { UnityUtils } from "../../utils/UnityUtils";
 /*
  * 1. Login and Version Spoofing:
  *    - Overrides clientVersion and clientVersionSignature to match the latest client
- *    - Allows connecting with outdated APKs, data fetched from Config.VERSION_URL (thx floyzi) (You can find it yourself if you want)
+ *    - Allows connecting with outdated APKs, data fetched from Constants.VERSION_URL (thx floyzi) (You can find it yourself if you want)
  *
  * 2. Platform Spoofing:
  *    - We can also change the platform here, but make sure it exists (otherwise you won't be able to login, mediatonic fixed this)
@@ -59,7 +59,6 @@ export class CatapultModule extends BaseModule {
         this.HttpNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.HttpNetworkHost");
         this.WebSocketNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
 
-        // TODO: use BuildLoginRequest instead
         this.BuildCatapultConfig = this.CatapultServicesManager.method<Il2Cpp.Object>("BuildCatapultConfig");
         this.WebSocketNetworkHostCtor = this.WebSocketNetworkHost.method<void>(".ctor", 3);
 
@@ -126,7 +125,7 @@ export class CatapultModule extends BaseModule {
         };
     }
 
-    private fetchClientDetails() {
+    private fetchClientDetails(): void {
         if (Constants.USE_SPOOF) {
             JavaUtils.httpGet(Constants.SPOOF_VERSION_URL, response => {
                 if (!response) {

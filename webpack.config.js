@@ -2,6 +2,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const TerserPlugin = require("terser-webpack-plugin");
+const fs = require("node:fs");
 
 /*
  * Webpack configuration adapted from Gene Brawl
@@ -35,12 +36,16 @@ module.exports = function (env) {
         })
     );
 
+    plugins.push(new webpack.ProvidePlugin({
+        process: "process/browser",
+        Buffer: ["buffer", "Buffer"],
+    }));
+
     // No reason to add obfuscator here idk
 
     return {
         mode: isDev ? "development" : "production",
         entry: "./src/index.ts",
-        target: "node",
         module: {
             rules: [
                 {
