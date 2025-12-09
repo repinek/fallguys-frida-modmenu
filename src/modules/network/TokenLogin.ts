@@ -13,7 +13,7 @@ import { UnityUtils } from "../../utils/UnityUtils";
 
 // SHITCODE ALERT!
 
-/**
+/*
  * 1. Hook PerformLoginFlow:
  *    We are pausing the game's attempt to log in.
  *    Instead of logging in, we show an Input Popup to the user.

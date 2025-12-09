@@ -13,9 +13,8 @@ export class JavaUtils {
     }
 
     /**
-     * Returns system language (like, "en", "ru")
-     *
      * @note Use with Java.perform
+     * @returns system language (like, "en", "ru")
      */
     static getSystemLocale(): string {
         const Locale = Java.use("java.util.Locale");

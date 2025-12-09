@@ -17,6 +17,7 @@ import { CatapultModule } from "../../modules/network/Catapult";
 export class MenuPopups {
     static showDebugPopup(): void {
         /// #if DEV
+        // you can grab logic from here
         const data = ModalMessageData.create();
         data.LocaliseOption = LocaliseOption.NotLocalised;
         data.Title = "Switchgear";
@@ -39,6 +40,7 @@ export class MenuPopups {
 
     static showDebugOptionsPopup(): void {
         /// #if DEV
+        // you can grab logic from here
         const data = ModalMessageWithOptionSelectionData.create();
         data.LocaliseOption = LocaliseOption.NotLocalised;
         data.Title = "Selection Popup Test";
@@ -61,6 +63,7 @@ export class MenuPopups {
 
     static showDebugInputPopup(): void {
         /// #if DEV
+        // you can grab logic from here
         const data = ModalMessageWithInputFieldData.create();
         data.LocaliseOption = LocaliseOption.NotLocalised;
         data.Title = "Input Popup Test";

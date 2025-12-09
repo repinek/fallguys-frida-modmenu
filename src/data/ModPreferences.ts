@@ -8,14 +8,10 @@ export const ModPreferences = {
 
 /*
 !! TODO: 
-login by token
 fix spam popups
 minimalistic fps counter
 eula popup (cool)
-create cool screenshots for readme
-made localization for other languages
 refer changeResolutionScale()
-custom image on loading screen
 log file
 all cosmetics lobby (?)
 check old commits for pre-installed value on seekbars
@@ -24,6 +20,9 @@ maybe:
 fork menu and update it to frida 17
 
 DONE:
+[x] made localization for other languages
+[x] create cool screenshots for readme
+[x] login by token
 [x] project structure in readme
 [x] improve logging at modules
 [x] add changing platform & some other things
@@ -58,4 +57,5 @@ not planned:
 implement extensions.ts (.setActive, .getGameObject) 
 on screen logging
 config file
+custom image on loading screen
 */

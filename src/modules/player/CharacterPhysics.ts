@@ -5,6 +5,19 @@ import { GameDefaults } from "../../data/GameDefaults";
 import { ModSettings } from "../../data/ModSettings";
 import { Logger } from "../../logger/Logger";
 
+/*
+ * Original CharacterDataMonitor::CheckCharacterControllerData logic is 
+ *    - called by update func
+ *    - generates checksum from character.data
+ *    - compares with hardcoded hash
+ *    - if checksum != hardcoded hash -> return false 
+ *    if false: 
+ *    SwitchToDisconnectingState(reason.IngameMenuLeaveMatch)
+ * 
+ * character arg is our FallGuysCharacterController,
+ * so we can easily grab it and change values as we want (but we force returning true) 
+ */
+
 export class CharacterPhysicsModule extends BaseModule {
     public readonly name = "CharacterPhysics";
 
@@ -117,7 +130,6 @@ export class CharacterPhysicsModule extends BaseModule {
             characterRigidBody.method<void>("set_isKinematic").invoke(state);
         } catch (error: any) {
             Logger.warn(`[${this.name}::freezePlayer] No character Instance found: ${error.name}`);
-            //Menu.toast()
         }
     }
 
