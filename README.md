@@ -109,6 +109,9 @@ This mod relies on `frida-java-bridge`, which is **very unstable**. This results
 **HyperOS, ColorOS, OneUI, HarmonyOS**, and other **OEM ROMs** may not work properly or at all.   
 **It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).**    
 
+### 💡 Alternative Solution
+If you are unable to run this mod menu, we recommend checking out [**FGTools Mobile**](https://github.com/floyzi/FGToolsMobile) by [Floyzi](https://github.com/floyzi).
+
 
 ## 🧑‍💻 Development & Building
 Want to build the APK yourself, debug the code, or contribute new features?
@@ -133,7 +136,7 @@ See the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Special Thanks
 Obed Guys Team - Some features powered by **Obed Guys Team**.  
-[FloyzI](https://github.com/FloyzI) - For how the game works, help with some features, localization.  
+[Floyzi](https://github.com/floyzi) - For how the game works, help with some features, localization.  
 [commonuserlol](https://github.com/commonuserlol) - For help with code and [menu](https://github.com/commonuserlol/frida-java-menu).  
 [Dynasty-Dev](https://github.com/Dynasty-Dev) - For testing & contribution.  
 [igamegod](https://github.com/igamegod) - For help with some features.  
@@ -143,7 +146,7 @@ Obed Guys Team - Some features powered by **Obed Guys Team**.
 [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge/) - The incredible frida module for IL2CPP.
 
 
-## Disclaimer
+# Disclaimer
 
 This project is **NOT** affiliated with Mediatonic or Epic Games.
 
