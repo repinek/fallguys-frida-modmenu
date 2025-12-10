@@ -141,3 +141,10 @@ Obed Guys Team - Some features powered by **Obed Guys Team**.
 
 [Frida](https://frida.re/) - An amazing dynamic instrumentation toolkit.  
 [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge/) - The incredible frida module for IL2CPP.
+
+
+## Disclaimer
+
+This project is **NOT** affiliated with Mediatonic or Epic Games.
+
+**Fall Guys** is a trademark of **Mediatonic Limited**.
