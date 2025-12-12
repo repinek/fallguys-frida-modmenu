@@ -322,6 +322,7 @@ export class MenuTabs {
 
         Menu.add(layout.button(I18n.t("menu.other.github_url"), () => JavaUtils.openURL(Constants.GITHUB_URL)));
         Menu.add(layout.button(I18n.t("menu.other.discord_url"), () => JavaUtils.openURL(Constants.DISCORD_URL)));
+        Menu.add(layout.button(I18n.t("menu.other.fgtools_mobile_url"), () => JavaUtils.openURL(Constants.FGTOOLS_MOBILE_URL)));
 
         Menu.add(
             layout.button(

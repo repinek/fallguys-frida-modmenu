@@ -56,7 +56,7 @@ export class PopupManager {
 
     private static initHooks(): void {
         const module = this;
-        
+
         //@ts-ignore
         // It's a bad implementation, but idk. Not always working!
         this.DOScale.implementation = function (transform: Il2Cpp.Object, endValueVector3: Il2Cpp.ValueType, duration: number) {

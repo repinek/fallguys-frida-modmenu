@@ -8,6 +8,7 @@ export const Constants = {
     GITHUB_URL: "https://github.com/repinek/fallguys-frida-modmenu",
     GITHUB_RELEASES_URL: "https://github.com/repinek/fallguys-frida-modmenu/releases/latest",
     DISCORD_URL: "https://discord.gg/cNFJ73P6p3",
+    FGTOOLS_MOBILE_URL: "https://github.com/floyzi/FGToolsMobile",
 
     // === Unity Logging ===
     UNITY_LOGGING: false,

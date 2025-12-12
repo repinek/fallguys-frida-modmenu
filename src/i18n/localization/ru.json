@@ -64,6 +64,7 @@
             "language": "Выбрать язык мода",
             "github_url": "Репозиторий GitHub (Поставьте звезду!)",
             "discord_url": "Discord сервер",
+            "fgtools_mobile_url": "Зацените FGTools Mobile!",
             "credits": "Авторы мода",
             "changelog": "Список изменений",
             "based_on": "Версия игры: {0}"

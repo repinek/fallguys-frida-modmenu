@@ -64,6 +64,7 @@
             "language": "Select Language",
             "github_url": "GitHub Repository (Leave a star!)",
             "discord_url": "Discord Server",
+            "fgtools_mobile_url": "Check Out FGTools Mobile!",
             "credits": "Open Credits",
             "changelog": "Open Changelog",
             "based_on": "Based on: {0}"
