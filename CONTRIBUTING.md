@@ -277,10 +277,12 @@ Format: `<type>[optional scope]: <description>`
 Fall Guys has several leaks of development builds with **Mono** DLLs.  
 These are extremely useful for analyzing game logic and class structures in clean C# before they are compiled to IL2CPP.
 
-We maintain a Telegram channel with these builds. **A Telegram account is required to download them.**
+We maintain a FG Archive with these builds. **A Telegram account is required to download them.**
 *   **v4.5.0** (5 May 2021) — [Download Link](https://t.me/FallGuysBuilds/34)
-*   **v9.0.1** (1 March 2023) — [Download Link](https://t.me/FallGuysBuilds/203)
+*   **v9.0.4** (1 March 2023) — [Download Link](https://t.me/FallGuysBuilds/203)
 *   **v10.7.0 Developer Mono Build** (28 November 2023) — [Download Link](https://t.me/FallGuysBuilds/201)
+*   **Other Builds** — [FG Archive Website](https://floyzi.github.io/fg_archive/)
+    *   *(Note: You can also download older builds via Steam Depots if you own the game on Steam)*
 
 All managed DLLs are stored in `FallGuys_client_BackUpThisFolder_ButDontShipItWithYourGame/Managed` folder.
 
