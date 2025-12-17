@@ -130,6 +130,7 @@ Builds the script and immediately inject script into the game with the gadget.
 
 **Run script:**   
 ```npm run spawn``` - Just spawns script in gadget-mode.  
+```npm run spawn:server``` - Just spawns script using frida-server. (Ensure that the app name is "Fall Guys", otherwise, change it).    
 
 **Code quality:**  
 ```npm run lint``` - Runs [eslint](https://eslint.org/) to check for errors.  
