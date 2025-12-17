@@ -89,6 +89,10 @@ module.exports = function (env) {
                 : []
         },
         plugins: plugins,
-        stats: "minimal"
+        stats: "minimal",
+        performance: {
+            maxAssetSize: 5 * 1024 * 1024,
+            maxEntrypointSize: 5 * 1024 * 1024
+        }
     };
 };
