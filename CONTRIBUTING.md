@@ -68,19 +68,10 @@ To run the mod, you need to patch the game APK. You can do this in two modes:
 I recommend using [frida-gadget-injector (fgi)](https://github.com/commonuserlol/fgi),
 but you can use any other way to inject script.
 
-1. Download frida-gadget from frida-releases:  
-    *Note: Ensure the gadget version matches the `frida` version in `requirements.txt`.*  
-    v16.7.19:
-    * [arm.so.xz](https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm.so.xz)
-    * [arm64.so.xz](https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm64.so.xz)
-2. Extract the downloaded libraries and rename it to `arm.so` and `arm64.so`.
-3. Place `.so` files into `fgi` configuration folder.  
-    For Windows it's: %USERPROFILE%\\.fgi\\
-
 #### Development Build: 
 Injects Frida in `listen` mode. The game will pause at startup until you manually inject the script.
 ```bash
-fgi -i <path_to_apk> --offline-mode
+fgi -i <path_to_apk> --frida-version 16.7.19
 ```
 
 #### Release Build: 
@@ -88,15 +79,8 @@ Injects Frida in `script` mode. Frida will load the script itself.
 The script is located in ./dist/agent.js.
 ```bash
 npm run build:release
-fgi -i <path_to_apk> -t script -l ./dist/agent.js -n libModMenu.so -s libModMenu.s.so --offline-mode
+fgi -i <path_to_apk> -t script -l ./dist/agent.js -n libModMenu.so -s libModMenu.s.so --frida-version 16.7.19
 ```
-
-> **Note:**  
-> If you are running `fgi` for the first time, offline mode may fail due to missing dependencies.  
-> To fix this:
-> 1. Run `fgi` **without** `--offline-mode` once to let it download the necessary base files.
-> 2. Replace the gadget files in the `.fgi` folder with the specific versions (16.7.19) you downloaded above.
-> 3. Run the command again **with** `--offline-mode`.
 
 
 ## Development Workflow
