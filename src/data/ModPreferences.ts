@@ -9,7 +9,7 @@ export const ModPreferences = {
 /*
 !! TODO: 
 fix spam popups
-minimalistic fps counter
+minimalistic fps counter: check ToggleFPSCounter() and FGDebug::GlobalDebug class
 eula popup (cool)
 refer changeResolutionScale()
 log file
