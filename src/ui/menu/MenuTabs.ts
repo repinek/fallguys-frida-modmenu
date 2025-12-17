@@ -24,6 +24,17 @@ export class MenuTabs {
         debugtab.gravity = Menu.Api.CENTER;
         Menu.add(debugtab);
 
+        const debugtext = [
+            `Frida version: v${Frida.version}`,
+            `Frida Runtime: ${Script.runtime}`,
+            `Architecture: ${Process.arch}`,
+            `Platform: ${Process.platform}`,
+            `Android version: ${Java.androidVersion}`
+        ];
+        for (const text of debugtext) {
+            Menu.add(layout.textView(text));
+        }
+
         Menu.add(
             layout.button(
                 "System.exit",
