@@ -7,7 +7,7 @@
 # Virtual environment for frida
 /.venv/
 
-# some frida related things nvm
+# Some frida related things nvm
 /frida-server/
 /tools/
 /BackUpThisFolder_ButDontShipIt
