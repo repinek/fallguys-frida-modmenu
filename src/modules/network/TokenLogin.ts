@@ -41,7 +41,7 @@ export class TokenLoginModule extends BaseModule {
 
     private args?: [Il2Cpp.Object, Il2Cpp.Object];
     private isPerformingLogin = false;
-    private accessToken: string | null = null;
+    private accessToken?: string;
 
     public init(): void {
         this.CatapultGatewayConnection = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Gateway.CatapultGatewayConnection");

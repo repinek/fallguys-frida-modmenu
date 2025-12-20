@@ -22,7 +22,7 @@ interface IChangelogEntry {
 export class UpdateUtils {
     private static readonly tag = "UpdateUtils";
 
-    private static modMenuUpdateVersion: IModMenuVersion | null = null;
+    private static modMenuUpdateVersion: IModMenuVersion;
 
     static checkForUpdate(): void {
         if (ModPreferences.ENV !== "release") {
@@ -80,10 +80,10 @@ export class UpdateUtils {
 
     // TODO: the same as httpGet
     // TODO: add link to apk too in changelog
-    static getChangelog(targetScriptVersion: string, onReceive: (entry: IChangelogEntry | null) => void): void {
+    static getChangelog(targetScriptVersion: string, onReceive: (entry: IChangelogEntry | undefined) => void): void {
         JavaUtils.httpGet(Constants.MOD_MENU_CHANGELOG_URL, response => {
             if (!response) {
-                onReceive(null);
+                onReceive(undefined);
                 return;
             }
 
@@ -92,7 +92,7 @@ export class UpdateUtils {
             const entry = history.find(e => e.scriptVersion === targetScriptVersion);
 
             if (entry) onReceive(entry);
-            else onReceive(null);
+            else onReceive(undefined);
         });
     }
 }

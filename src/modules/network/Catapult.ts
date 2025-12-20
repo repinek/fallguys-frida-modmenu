@@ -50,7 +50,7 @@ export class CatapultModule extends BaseModule {
     private BuildCatapultConfig!: Il2Cpp.Method;
     private WebSocketNetworkHostCtor!: Il2Cpp.Method;
 
-    private clientDetails: IClientDetails | null = null;
+    private clientDetails?: IClientDetails;
     private targetPlatform: string = "android_ega";
 
     public init(): void {

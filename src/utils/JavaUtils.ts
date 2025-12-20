@@ -76,7 +76,7 @@ export class JavaUtils {
      * @param targetUrl URL to request
      * @param onReceive Callback function to handle response
      */
-    static httpGet(targetUrl: string, onReceive: (response: string | null) => void = () => {}): void {
+    static httpGet(targetUrl: string, onReceive: (response: string | undefined) => void = () => {}): void {
         Java.perform(() => {
             try {
                 Logger.debug(`[${this.tag}::httpGet] HTTP GET to: ${targetUrl}`);
@@ -96,7 +96,7 @@ export class JavaUtils {
                 connection.connect();
 
                 const responseCode = connection.getResponseCode();
-                let response: string | null = null;
+                let response: string | undefined;
 
                 if (responseCode === 200) {
                     const inputStream = connection.getInputStream();
@@ -112,8 +112,6 @@ export class JavaUtils {
 
                     inputStream.close();
                     buffer.close();
-                } else {
-                    response = null;
                 }
 
                 connection.disconnect();
@@ -121,7 +119,7 @@ export class JavaUtils {
                 onReceive(response);
             } catch (error: any) {
                 Logger.errorThrow(error, "HTTP GET");
-                onReceive(null);
+                onReceive(undefined);
             }
         });
     }
@@ -134,7 +132,7 @@ export class JavaUtils {
      * @param headers Object with headers (e.g. { "Authorization": "Bearer 123", "Content-Type": "application/json" })
      * @param onReceive Callback function to handle response
      */
-    static httpPost(targetUrl: string, body: string, headers: Record<string, string> = {}, onReceive: (response: string | null) => void = () => {}): void {
+    static httpPost(targetUrl: string, body: string, headers: Record<string, string> = {}, onReceive: (response: string | undefined) => void = () => {}): void {
         Java.perform(() => {
             try {
                 Logger.debug(`[${this.tag}::httpPost] HTTP POST to: ${targetUrl}`);
@@ -184,7 +182,7 @@ export class JavaUtils {
 
                 connection.connect();
                 const responseCode = connection.getResponseCode();
-                let response: string | null = null;
+                let response: string | undefined;
 
                 if (responseCode === 200 || responseCode === 201) {
                     const inputStream = connection.getInputStream();
@@ -202,7 +200,6 @@ export class JavaUtils {
                     buffer.close();
                 } else {
                     Logger.warn(`[${this.tag}::httpPost] Failed with code: ${responseCode}`);
-                    response = null;
                 }
 
                 connection.disconnect();
@@ -210,7 +207,7 @@ export class JavaUtils {
                 onReceive(response);
             } catch (error: any) {
                 Logger.errorThrow(error, "HTTP POST");
-                onReceive(null);
+                onReceive(undefined);
             }
         });
     }
