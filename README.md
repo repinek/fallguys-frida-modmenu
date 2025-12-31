@@ -92,14 +92,14 @@ Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 **A:** Ensure you granted the "Display over other apps" permission. The game should ask for it on the first launch. If not, grant it manually.
 
 **Q:** Is Android 16 supported?  
-**A:** No. This project uses Frida 16.7.19, whick is not support 16 Android 
+**A:** No. This project uses Frida 16.7.19, which is not support 16 Android 
 
 **Q:** Why frida 16.7.19 is used instead 17.1.4 with Android 16 support?  
-**A:** Since frida-java-menu builded on 16.7.19, It can't be loaded on 17+. Current thread is not attached to the Java VM; please move this code inside a Java.perform() callback  
+**A:** Since frida-java-menu builded on 16.7.19, It can't be loaded on 17+. Probably issue: `Current thread is not attached to the Java VM; please move this code inside a Java.perform() callback`  
 *Note: Frida 17 works in listen mode, but not in the script, because java is not loaded (?)*
 
 **Q:** Are emulators supported?  
-**A:** No. Emulators are not supported because they cannot handle the Java required for the menu.  
+**A:** No. Emulators are not supported because they cannot handle the `frida-java-bridge` required for the menu.  
 
 ### ⚠️ Stability Issues
 This mod relies on `frida-java-bridge`, which is **very unstable**. This results in random crashes and inconsistent behavior.
