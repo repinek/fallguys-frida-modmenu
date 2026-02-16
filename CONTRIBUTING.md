@@ -128,27 +128,35 @@ Builds the script and immediately inject script into the game with the gadget.
 fallguys-frida-modmenu/
 ├── src/
 │   ├── index.ts                # Entry Point
+|   |
 │   ├── core/
 │   │   ├── BaseModule.ts       # Abstract base class for all modules (Extend this!)
 │   │   ├── ModuleManager.ts    # Module initialization
 │   │   └── AssemblyHelper.ts   # Manages IL2CPP assemblies
+|   |
 │   ├── data/                   # Defaults, Layouts & Preferences
+|   |
 │   ├── i18n/                   # Internationalization system
 │   │   └── localization/       # JSON translation files
+|   |
 │   ├── logger/                 # Custom logger implementation
+|   |
 │   ├── modules/                # Mod features categorized
 │   │   ├── game/               # Internal game features
 │   │   ├── network/            # Network related
 │   │   ├── player/             # Player movement & physics
 │   │   ├── rounds/             # Level-specific logic (DoorManager, TipToeManager...)
 │   │   └── visuals/            # Visual changes (FGDebug, FPS Bypass, etc.)
+|   |
 │   ├── ui/                     # Menu interface
 │   │   ├── menu/               # Main menu construction (using frida-java-menu)
 │   │   └── popup/              # Wrapper for In-Game PopupManager
 │   │       └── data/           # Wrappers for Popups classes
+|   |
 │   └── utils/                  # Helper functions
 │       ├── JavaUtils.ts        # Java-bridge helper functions
 │       └── UnityUtils.ts       # Unity / IL2CPP helper functions
+|
 ├── eslint.config.mts           # ESLint config
 ├── package.json                # Node.js dependencies & scripts
 ├── requirements.txt            # Python dependencies
