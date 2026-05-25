@@ -14,7 +14,15 @@ export const Constants = {
     UNITY_LOGGING: false,
 
     // == Spoof ===
-    USE_SPOOF: true,
+    USE_SPOOF: false,
+    /* 
+    Mirrors, if 404
+    https://floyzi.github.io/fallguys/version.json
+    https://floyzi-gitlab-io.vercel.app/fallguys/version.json
+    https://floyzi-page.netlify.app/public/fallguys/version.json
+    https://page.floyzi.workers.dev/fallguys/version.json
+    https://cdn.floyzi.ru/minimal-content/fallguys/version.json
+    */
     SPOOF_VERSION_URL: "https://floyzi.github.io/fallguys/version.json",
 
     // === Custom Server ===
