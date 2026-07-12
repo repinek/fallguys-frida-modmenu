@@ -1,5 +1,10 @@
 # Contributing to Fall Guys Frida Mod Menu
 
+> [!WARNING]  
+> CONTRIBUTING UNDER THE WORK
+> It has a lot of outdated parts
+
+
 Thank you for your interest in this project! We welcome any contributions: bug fixes, new features or localization improvements.
 
 Please read this guide before you start coding.
