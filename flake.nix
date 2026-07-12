@@ -19,11 +19,18 @@
         inherit system;
         config = {
           allowUnfree = true; # !!! 
+          android_sdk.accept_license = true;
         };
       };
     });
   in {
-    devShells = forEachSupportedSystem ({ pkgs }: {
+    devShells = forEachSupportedSystem ({ pkgs }:
+    let 
+      buildToolsVersion = "34.0.0";
+      androidComposition = pkgs.androidenv.composeAndroidPackages {
+        buildToolsVersions = [ buildToolsVersion ];
+      };
+    in {
       default = pkgs.mkShell {
         buildInputs = with pkgs; [
           nodejs
@@ -33,13 +40,16 @@
           apksigner
           androidenv.androidPkgs.platform-tools
           apkeditor
+          apktool
         ];
       
         shellHook = ''
           . .venv/bin/activate
+          export PATH="${androidComposition.androidsdk}/libexec/android-sdk/build-tools/${buildToolsVersion}:$PATH"
         '';
       };
     });
   };
 }
+  
   
