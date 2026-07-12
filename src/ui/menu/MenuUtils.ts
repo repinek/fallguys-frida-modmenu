@@ -17,7 +17,7 @@ import { UICanvasModule } from "../../modules/visuals/UICanvas";
 import { MenuBuilder } from "./MenuBuilder";
 
 import { UnityUtils } from "../../utils/UnityUtils";
-import { add, Api, CENTER } from "frida-java-menu";
+import { add, CENTER } from "frida-java-menu";
 
 export class MenuUtils {
     public static modules: {

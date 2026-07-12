@@ -1,5 +1,4 @@
 import "frida-il2cpp-bridge";
-import Java from "frida-java-bridge"
 
 import { AssemblyHelper } from "./core/AssemblyHelper";
 import { ModuleManager } from "./core/ModuleManager";

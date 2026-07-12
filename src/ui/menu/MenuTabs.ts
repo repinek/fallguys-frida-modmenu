@@ -1,4 +1,4 @@
-import { add, Api, CENTER, ObsidianLayout, toast } from "frida-java-menu";
+import { add, CENTER, ObsidianLayout, toast } from "frida-java-menu";
 import { Constants } from "../../data/Constants";
 import { ModSettings } from "../../data/ModSettings";
 
