@@ -1,3 +1,4 @@
+import { sharedPreferences } from "frida-java-menu";
 import { AssemblyHelper } from "../../core/AssemblyHelper";
 import { BaseModule } from "../../core/BaseModule";
 import { Constants } from "../../data/Constants";
@@ -5,6 +6,8 @@ import { I18n } from "../../i18n/I18n";
 import { Logger } from "../../logger/Logger";
 import { JavaUtils } from "../../utils/JavaUtils";
 import { UnityUtils } from "../../utils/UnityUtils";
+
+import Java from "frida-java-bridge";
 
 /*
  * 1. Login and Version Spoofing:
@@ -140,8 +143,8 @@ export class CatapultModule extends BaseModule {
 
     private readPlatform(): void {
         Java.perform(() => {
-            if (Menu.sharedPreferences.contains("platform")) {
-                this.targetPlatform = Menu.sharedPreferences.getString("platform");
+            if (sharedPreferences.contains("platform")) {
+                this.targetPlatform = sharedPreferences.getString("platform");
             }
         });
     }
@@ -149,7 +152,7 @@ export class CatapultModule extends BaseModule {
     static changePlatform(newPlatform: string): void {
         Java.perform(() => {
             Logger.debug(`put platform string into config: ${newPlatform}`);
-            Menu.sharedPreferences.putString("platform", newPlatform);
+            sharedPreferences.putString("platform", newPlatform);
         });
     }
 

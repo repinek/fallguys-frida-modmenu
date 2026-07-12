@@ -1,6 +1,8 @@
 import { I18n } from "../i18n/I18n";
 
-export const ObsidianConfig: Menu.ObsidianConfig = {
+import { ObsidianConfig as BaseConfig } from "frida-java-menu";
+
+export const ObsidianConfig: BaseConfig = {
     color: {
         primaryText: "#FFFFFF",
         secondaryText: "#FFFFFF",

@@ -1,3 +1,4 @@
+import { add, Api, CENTER, ObsidianLayout, toast } from "frida-java-menu";
 import { Constants } from "../../data/Constants";
 import { ModSettings } from "../../data/ModSettings";
 
@@ -9,7 +10,7 @@ import { MenuPopups } from "./MenuPopups";
 import { MenuUtils } from "./MenuUtils";
 
 export class MenuTabs {
-    static buildAll(layout: Menu.ObsidianLayout) {
+    static buildAll(layout: ObsidianLayout) {
         MenuTabs.buildDebugTab(layout);
         MenuTabs.buildMovementTab(layout);
         MenuTabs.buildRoundTab(layout);
@@ -18,28 +19,28 @@ export class MenuTabs {
         MenuTabs.buildOtherTab(layout);
     }
 
-    private static buildDebugTab(layout: Menu.ObsidianLayout): void {
+    private static buildDebugTab(layout: ObsidianLayout): void {
         /// #if DEV
         const debugtab = layout.textView("Debug");
-        debugtab.gravity = Menu.Api.CENTER;
-        Menu.add(debugtab);
+        debugtab.gravity = CENTER;
+        add(debugtab);
 
-        const debugtext = [
-            `Frida version: v${Frida.version}`,
-            `Frida Runtime: ${Script.runtime}`,
-            `Architecture: ${Process.arch}`,
-            `Platform: ${Process.platform}`,
-            `Android version: ${Java.androidVersion}`
-        ];
-        for (const text of debugtext) {
-            Menu.add(layout.textView(text));
-        }
+        // const debugtext = [
+        //     `Frida version: v${Frida.version}`,
+        //     `Frida Runtime: ${Script.runtime}`,
+        //     `Architecture: ${Process.arch}`,
+        //     `Platform: ${Process.platform}`,
+        //     `Android version: ${Java.androidVersion}`
+        // ];
+        // for (const text of debugtext) {
+        //     add(layout.textView(text));
+        // }
 
-        Menu.add(
+        add(
             layout.button(
                 "System.exit",
                 () => {
-                    Menu.toast("Hold for exit", 0);
+                    toast("Hold for exit", 0);
                 },
                 () => {
                     // Long Callback
@@ -48,7 +49,7 @@ export class MenuTabs {
             )
         );
 
-        Menu.add(
+        add(
             layout.button(
                 "Create Test Popup",
                 MenuUtils.run(() => {
@@ -57,7 +58,7 @@ export class MenuTabs {
             )
         );
 
-        Menu.add(
+        add(
             layout.button(
                 "Create test Selection Option Popup",
                 MenuUtils.run(() => {
@@ -66,7 +67,7 @@ export class MenuTabs {
             )
         );
 
-        Menu.add(
+        add(
             layout.button(
                 "Create Test Input Field Popup",
                 MenuUtils.run(() => {
@@ -76,124 +77,124 @@ export class MenuTabs {
         );
 
         // yes i definitely need to other branch it but... sorry
-        // Menu.add(
+        // add(
         //     layout.button(
         //         "Create Logger",
         //         this.run(() => InGameLogger.createLogger())
         //     )
         // );
 
-        Menu.add(layout.textView(I18n.t("hi.hi", "koluska")));
+        add(layout.textView(I18n.t("hi.hi", "koluska")));
         /// #endif
     }
 
-    private static buildMovementTab(layout: Menu.ObsidianLayout): void {
+    private static buildMovementTab(layout: ObsidianLayout): void {
         const m = MenuUtils.modules;
         const movement = layout.textView(I18n.t("menu.tabs.movement"));
-        movement.gravity = Menu.Api.CENTER;
-        Menu.add(movement);
+        movement.gravity = CENTER;
+        add(movement);
 
-        Menu.add(
+        add(
             layout.toggle(I18n.t("menu.functions.360_dives"), (state: boolean) => {
                 ModSettings.enable360Dives = state;
             })
         );
 
-        Menu.add(
+        add(
             layout.toggle(I18n.t("menu.functions.air_jump"), (state: boolean) => {
                 ModSettings.airjump = state;
             })
         );
 
-        Menu.add(
+        add(
             layout.toggle(I18n.t("menu.functions.freeze_player"), (state: boolean) => {
                 m.characterPhysics?.freezePlayer(state);
             })
         );
 
-        Menu.add(
+        add(
             layout.toggle(I18n.t("menu.functions.fallguy_state"), (state: boolean) => {
                 ModSettings.dontSendFallGuyState = state;
             })
         );
 
-        Menu.add(layout.textView(I18n.t("menu.functions.fallguy_state_warn")));
+        add(layout.textView(I18n.t("menu.functions.fallguy_state_warn")));
 
-        Menu.add(
+        add(
             layout.toggle(I18n.t("menu.functions.custom_speed"), (state: boolean) => {
                 ModSettings.customSpeed = state;
             })
         );
 
-        Menu.add(
+        add(
             layout.seekbar(I18n.t("menu.functions.speed_val"), 100, 1, (value: number) => {
                 ModSettings.normalMaxSpeed = value;
             })
         );
 
-        Menu.add(
+        add(
             layout.toggle(I18n.t("menu.functions.custom_gravity"), (state: boolean) => {
                 ModSettings.customGravity = state;
             })
         );
 
-        Menu.add(
+        add(
             layout.toggle(I18n.t("menu.functions.negative_gravity"), (state: boolean) => {
                 ModSettings.negativeGravity = state;
             })
         );
 
-        Menu.add(
+        add(
             layout.toggle(I18n.t("menu.functions.no_gravity"), (state: boolean) => {
                 ModSettings.noGravity = state;
             })
         );
 
-        Menu.add(
+        add(
             layout.seekbar(I18n.t("menu.functions.gravity_val"), 100, 0, (value: number) => {
                 ModSettings.maxGravityVelocity = value;
             })
         );
 
-        Menu.add(
+        add(
             layout.toggle(I18n.t("menu.functions.custom_jump_force"), (state: boolean) => {
                 ModSettings.customJumpForce = state;
             })
         );
 
-        Menu.add(
+        add(
             layout.seekbar(I18n.t("menu.functions.jump_force_val"), 100, 0, (value: number) => {
                 ModSettings.jumpForce = value;
             })
         );
 
-        Menu.add(
+        add(
             layout.toggle(I18n.t("menu.functions.custom_dive_force"), (state: boolean) => {
                 ModSettings.customDiveForce = state;
             })
         );
 
-        Menu.add(
+        add(
             layout.seekbar(I18n.t("menu.functions.dive_strength_val"), 100, 0, (value: number) => {
                 ModSettings.diveForce = value;
             })
         );
     }
 
-    private static buildRoundTab(layout: Menu.ObsidianLayout): void {
+    private static buildRoundTab(layout: ObsidianLayout): void {
         const m = MenuUtils.modules;
         const round = layout.textView(I18n.t("menu.tabs.round"));
-        round.gravity = Menu.Api.CENTER;
-        Menu.add(round);
+        round.gravity = CENTER;
+        add(round);
 
-        Menu.add(
+        add(
             layout.button(
                 I18n.t("menu.functions.hide_doors"),
                 MenuUtils.run(() => m.doorManager?.removeRealDoors())
             )
         );
 
-        Menu.add(
+        add(
             layout.button(
                 I18n.t("menu.functions.hide_tiptoe"),
                 MenuUtils.run(() => m.tipToeManager?.removeFakeTipToe())
@@ -201,14 +202,14 @@ export class MenuTabs {
         );
     }
 
-    private static buildTeleportsTab(layout: Menu.ObsidianLayout): void {
+    private static buildTeleportsTab(layout: ObsidianLayout): void {
         const m = MenuUtils.modules;
         const teleports = layout.textView(I18n.t("menu.tabs.teleports"));
-        teleports.gravity = Menu.Api.CENTER;
-        Menu.add(teleports);
+        teleports.gravity = CENTER;
+        add(teleports);
 
         // prettier-ignore
-        Menu.add(
+        add(
             layout.button(
                 I18n.t("menu.functions.tp_finish_or_crown"),
                 MenuUtils.run(() => m.teleportManager?.teleportToFinish())
@@ -216,7 +217,7 @@ export class MenuTabs {
         );
 
         // prettier-ignore
-        Menu.add(
+        add(
             layout.button(
                 I18n.t("menu.functions.tp_score"),
                 MenuUtils.run(() => m.teleportManager?.teleportToScore())
@@ -224,32 +225,32 @@ export class MenuTabs {
         );
     }
 
-    private static buildUtilityTab(layout: Menu.ObsidianLayout): void {
+    private static buildUtilityTab(layout: ObsidianLayout): void {
         const m = MenuUtils.modules;
         const utility = layout.textView(I18n.t("menu.tabs.utility"));
-        utility.gravity = Menu.Api.CENTER;
-        Menu.add(utility);
+        utility.gravity = CENTER;
+        add(utility);
 
-        Menu.add(
+        add(
             layout.button(I18n.t("menu.functions.view_names"), () => {
                 m.graphicsManager?.toggleNames();
             })
         );
 
-        Menu.add(
+        add(
             layout.toggle(I18n.t("menu.functions.custom_fov"), (state: boolean) => {
                 ModSettings.customFov = state;
             })
         );
 
-        Menu.add(
+        add(
             layout.seekbar(I18n.t("menu.functions.custom_fov_val"), 180, 1, (value: number) => {
                 ModSettings.fov = value;
             })
         );
 
         // prettier-ignore
-        Menu.add(
+        add(
             layout.toggle(
                 I18n.t("menu.functions.disable_ui"),
                 MenuUtils.run((state: boolean) => m.uiCanvas?.toggleUICanvas(!state))
@@ -257,45 +258,45 @@ export class MenuTabs {
         );
 
         // prettier-ignore
-        Menu.add(
+        add(
             layout.toggle(
                 I18n.t("menu.functions.fgdebug"),
                 MenuUtils.run((state: boolean) => m.fgDebug?.toggleFGDebug(state))
             )
         );
 
-        Menu.add(
+        add(
             layout.toggle(I18n.t("menu.functions.disable_analytics"), (state: boolean) => {
                 ModSettings.disableAnalytics = state;
             })
         );
 
-        Menu.add(
+        add(
             layout.toggle(I18n.t("menu.functions.queued_players"), (state: boolean) => {
                 ModSettings.showQueuedPlayers = state;
             })
         );
 
-        Menu.add(
+        add(
             layout.seekbar(I18n.t("menu.functions.custom_resolution"), 100, 1, (value: number) => {
                 ModSettings.resolutionScale = value / 100;
                 m.graphicsManager?.changeResolutionScale();
             })
         );
 
-        Menu.add(
+        add(
             layout.button(I18n.t("menu.functions.game_details"), () => {
                 m.matchInfo?.showGameDetails();
             })
         );
 
-        Menu.add(
+        add(
             layout.button(I18n.t("menu.functions.server_details"), () => {
                 m.matchInfo?.showServerDetails();
             })
         );
 
-        Menu.add(
+        add(
             layout.toggle(
                 I18n.t("menu.functions.uwuify"),
                 MenuUtils.run((state: boolean) => {
@@ -305,44 +306,44 @@ export class MenuTabs {
             )
         );
 
-        Menu.add(
+        add(
             layout.button(
                 I18n.t("menu.functions.select_platform"),
                 MenuUtils.run(() => MenuPopups.showPlatformPopup())
             )
         );
 
-        Menu.add(
+        add(
             layout.toggle(I18n.t("menu.functions.token_login"), (state: boolean) => {
                 ModSettings.tokenLogin = state;
             })
         );
     }
 
-    private static buildOtherTab(layout: Menu.ObsidianLayout): void {
+    private static buildOtherTab(layout: ObsidianLayout): void {
         const other = layout.textView(I18n.t("menu.tabs.other"));
-        other.gravity = Menu.Api.CENTER;
-        Menu.add(other);
+        other.gravity = CENTER;
+        add(other);
 
-        Menu.add(
+        add(
             layout.button(
                 I18n.t("menu.other.language"),
                 MenuUtils.run(() => MenuPopups.showLanguagePopup())
             )
         );
 
-        Menu.add(layout.button(I18n.t("menu.other.github_url"), () => JavaUtils.openURL(Constants.GITHUB_URL)));
-        Menu.add(layout.button(I18n.t("menu.other.discord_url"), () => JavaUtils.openURL(Constants.DISCORD_URL)));
-        Menu.add(layout.button(I18n.t("menu.other.fgtools_mobile_url"), () => JavaUtils.openURL(Constants.FGTOOLS_MOBILE_URL)));
+        add(layout.button(I18n.t("menu.other.github_url"), () => JavaUtils.openURL(Constants.GITHUB_URL)));
+        add(layout.button(I18n.t("menu.other.discord_url"), () => JavaUtils.openURL(Constants.DISCORD_URL)));
+        add(layout.button(I18n.t("menu.other.fgtools_mobile_url"), () => JavaUtils.openURL(Constants.FGTOOLS_MOBILE_URL)));
 
-        Menu.add(
+        add(
             layout.button(
                 I18n.t("menu.other.credits"),
                 MenuUtils.run(() => MenuPopups.showCreditsPopup())
             )
         );
 
-        Menu.add(
+        add(
             layout.button(
                 I18n.t("menu.other.changelog"),
                 MenuUtils.run(() => MenuPopups.showChangelogPopup())
