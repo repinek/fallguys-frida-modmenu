@@ -55,11 +55,17 @@ module.exports = function (env) {
                         { loader: "ts-loader" },
                         { loader: "ifdef-loader", options: opts }
                     ]
+                },
+                {
+                    test: /\.m?js/,
+                    resolve: {
+                        fullySpecified: false,
+                    },
                 }
             ]
         },
         resolve: {
-            extensions: [".ts"],
+            extensions: [".ts", ".js", ".json"],
         },
         output: {
             filename: "agent.js",
