@@ -1,2 +1,3 @@
 frida==17.15.4
 frida-tools==14.10.4
+objection==1.12.5
