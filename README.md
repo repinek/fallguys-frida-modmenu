@@ -91,13 +91,6 @@ Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 **Q:** The menu doesn't appear.  
 **A:** Ensure you granted the "Display over other apps" permission. The game should ask for it on the first launch. If not, grant it manually.
 
-**Q:** Is Android 16 supported?  
-**A:** No. This project uses Frida 16.7.19, which is not support 16 Android 
-
-**Q:** Why frida 16.7.19 is used instead 17.1.4 with Android 16 support?  
-**A:** Since frida-java-menu builded on 16.7.19, It can't be loaded on 17+. Probably issue: `Current thread is not attached to the Java VM; please move this code inside a Java.perform() callback`  
-*Note: Frida 17 works in listen mode, but not in the script, because java is not loaded (?)*
-
 **Q:** Are emulators supported?  
 **A:** No. Emulators are not supported because they cannot handle the `frida-java-bridge` required for the menu.  
 
@@ -138,8 +131,9 @@ See the [LICENSE](LICENSE) file for details.
 Obed Guys Team - Some features powered by **Obed Guys Team**.  
 [Floyzi](https://github.com/floyzi) - For how the game works, help with some features, localization.  
 [commonuserlol](https://github.com/commonuserlol) - For help with code and [menu](https://github.com/commonuserlol/frida-java-menu).  
-[Dynasty-Dev](https://github.com/Dynasty-Dev) - For testing & contribution.  
+[Dynasty-Dev](https://github.com/Dynasty-Dev) - For testing and contribution.  
 [igamegod](https://github.com/igamegod) - For help with some features.  
+[Astra1dev](https://github.com/astra1dev) - For help with [menu](https://github.com/astra1dev/frida-java-menu) and other things.
 [Gene Brawl](https://github.com/RomashkaTea/genebrawl-public) - For the Webpack build configuration.  
 
 [Frida](https://frida.re/) - An amazing dynamic instrumentation toolkit.  
