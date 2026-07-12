@@ -1,20 +1,24 @@
 # Dedependencies
-/node_modules/
+node_modules/
 
 # Build output
-/dist/
+dist/
 
 # Virtual environment for frida
-/.venv/
+.venv/
 
 # Some frida related things nvm
-/frida-server/
-/tools/
-/BackUpThisFolder_ButDontShipIt
+frida-server/
+tools/
 
 # Logcat logs
 *.log
 
 # Local things for storing apks, dumps..
-/data/
-/dump/
+data/
+dump/
+app_process64/
+
+# Nix Flake
+.direnv/
+
