@@ -1,5 +1,5 @@
 import { Logger } from "../logger/Logger";
-import Java from "frida-java-bridge"
+import Java from "frida-java-bridge";
 
 export class JavaUtils {
     private static readonly tag = "JavaUtils";
