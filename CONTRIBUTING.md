@@ -1,276 +1,183 @@
 # Contributing to Fall Guys Frida Mod Menu
 
-> [!WARNING]  
-> CONTRIBUTING UNDER THE WORK
-> It has a lot of outdated parts
+Thank you for your interest in this project! We welcome any contributions, such as bug fixes, new features or localization improvements.
 
+> [!WARNING]
+> This project is for educational and research purposes only. The author is not responsible for bans or any damage. Use at your own risk.
 
-Thank you for your interest in this project! We welcome any contributions: bug fixes, new features or localization improvements.
-
-Please read this guide before you start coding.
-
-> [!WARNING]  
-> This project is for **educational and research purposes only**.  
-> The author is **not responsible** for bans or any damage. 
-
-
-## Table of Contents
+#### Contents
 - [Prerequisites](#prerequisites)
 - [Setup & Installation](#setup--installation)
-    - [Building the APK](#building-the-apk)
-- [Development Workflow](#development-workflow)
-- [Available Scripts](#available-scripts)
+- [Preparing the APK](#preparing-the-apk)
+- [Building](#building)
+- [Developing](#developing)
+- [Available npm Scripts](#available-npm-scripts)
+- [Conventions](#conventions)
 - [Project Structure](#project-structure)
-- [Code Style](#code-style)
 - [Pull Request Process](#pull-request-process)
-- [Helpful Information](#helpful-information--resources)
-
+- [Resources](#resources)
 
 ## Prerequisites
-- Python >=3.10 for frida & fgi
-- Node.js
-- Android Device (You **DON'T** need root)
-- [Android Debug Bridge](https://developer.android.com/tools/adb)  
 
-For apk building:
-- Android Studio or Android Build tools
-- Java Development Kit
+If you are using [Nix](https://nixos.org/), you can use the provided [flake.nix](flake.nix) to automatically set up the development shell. Otherwise, make sure you have installed:
 
+- git
+- [Python 3.10+](https://www.python.org/) (3.14 is recommended)
+- [Node.js](https://nodejs.org/)
+- [JDK](https://www.oracle.com/java/technologies/downloads/)
+- [APKEditor](https://github.com/REAndroid/APKEditor/releases/latest)
+- [Android SDK Build Tools](https://developer.android.com/studio) (`zipalign`, `apksigner`)
+- Android device (root is not required)
+- [Android Debug Bridge (ADB)](https://developer.android.com/tools/adb)
 
 ## Setup & Installation
-There are two steps: building the script and building the APK.
 
-1. Clone the repository:
 ```bash
 git clone https://github.com/repinek/fallguys-frida-modmenu
 cd fallguys-frida-modmenu
-```
 
-2. Install the required version of Frida: 
-```bash
+python -m venv .venv
+source .venv/bin/activate
+
 pip install -r requirements.txt
-```
-
-3. Install Node.js dependencies (for script)
-```bash
 npm install
 ```
 
-### Building the APK
-To run the mod, you need to patch the game APK. You can do this in two modes: 
-1. **Script Mode** (for users)
-2. **Listen Mode** (for developers)
+## Preparing the APK
 
-#### 1. Prepare APK
-1. Obtain the latest Fall Guys APK.
-2. Use an APK Editor to add the overlay permission to `AndroidManifest.xml`. Without this, the menu UI will not render.
-```xml
-<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-```
-3. Optional: you can change the package name and application name.
+Download the latest Fall Guys APK from the Epic Games Store and save it as `data/Fall_Guys_<VERSION>.apk`.
 
-#### 2. Patching with Frida Gadget
-I recommend using [frida-gadget-injector (fgi)](https://github.com/commonuserlol/fgi),
-but you can use any other way to inject script.
+Patch it with APKEditor: add the overlay permission and rename the package to `com.Mediatonic.FallGuys_client.modmenu` so the mod installs alongside the original game.
 
-#### Development Build: 
-Injects Frida in `listen` mode. The game will pause at startup until you manually inject the script.
 ```bash
-fgi -i <path_to_apk> --frida-version 16.7.19
+java -jar APKEditor.jar d -i data/Fall_Guys_<VERSION>.apk -o data/edited
+
+# add to AndroidManifest.xml:
+#   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+# change package to com.Mediatonic.FallGuys_client.modmenu
+java -jar APKEditor.jar b -i data/edited -o data/Fall_Guys_<VERSION>_perm.apk
 ```
 
-#### Release Build: 
-Injects Frida in `script` mode. Frida will load the script itself.
-The script is located in ./dist/agent.js.
+## Building
+
+Script mode: the script is embedded into the APK and runs automatically on launch.
+
 ```bash
 npm run build:release
-fgi -i <path_to_apk> -t script -l ./dist/agent.js -n libModMenu.so -s libModMenu.s.so --frida-version 16.7.19
+
+objection patchapk -s data/Fall_Guys_<VERSION>_perm.apk -c objection.cfg.json -l dist/agent.js
 ```
 
+> **Tip regarding OBB files:**  
+> If you don't want to wait for game resources to download again:
+> 1. Copy the `.obb` file from `Android/obb/com.Mediatonic.FallGuys_client/`.
+> 2. Create a new folder: `Android/obb/com.Mediatonic.FallGuys_client.modmenu/`.
+> 3. Paste the file there and rename it by adding `.modmenu` before `.obb`.  
+> *Example:* `main.XXXX.com.mediatonic.FallGuys_client.modmenu.obb`
 
-## Development Workflow
-If you are modifying the code, use this workflow to avoid rebuilding the APK constantly:
+On the first launch the game will ask for the "Display over other apps" permission.
 
-1. Install the **Development Build** APK on your device.
-2. Grant permission to "Display over other apps" in your Android settings. When you first spawn the menu, it will ask you for this permission.
-3. Connect your device via ADB.
-4. Compile script & spawn 
+## Developing
+
+Use listen mode while modifying the script, so you don't have to rebuild and reinstall the APK on every change. The game pauses at startup and waits for the script to be injected manually.
+
 ```bash
+objection patchapk -s data/Fall_Guys_<VERSION>_perm.apk
+adb install data/Fall_Guys_<VERSION>_perm.objection.apk
+
+# build a dev script and inject it into the paused game
 npm run spawn:dev
 ```
-Look for [Available Scripts](#available-scripts).
 
-## Available Scripts
+## Available npm Scripts
 
-**Build the script:**  
-Compile the agent into `./dist/agent.js`.  
-```npm run build:release``` - a **RELEASE** version (minified, optimized, no logs).  
-```npm run build:staging``` - a **STAGING** version.  
-```npm run build:dev``` - a **DEV** version.
+Scripts are defined in [package.json](package.json).
 
-**Build & run script:**  
-Builds the script and immediately inject script into the game with the gadget.  
-```npm run spawn:release``` - a **RELEASE** version.  
-```npm run spawn:staging``` - a **STAGING** version.  
-```npm run spawn:dev``` - a **DEV** version.  
+### Build
 
-**Watch script**  
-```npm run watch``` - Watches a DEV version.  
+Build the agent into `./dist/agent.js`:
 
-**Run script:**   
-```npm run spawn``` - Just spawns script in gadget-mode.  
-```npm run spawn:server``` - Just spawns script using frida-server. (Ensure that the app name is "Fall Guys", otherwise, change it).    
+- `npm run build:release` - a release version (minified, optimized)
+- `npm run build:dev` - a dev version (with logs and debug UI)
+- `npm run watch` - a dev version, rebuilds on file changes
 
-**Code quality:**  
-```npm run lint``` - Runs [eslint](https://eslint.org/) to check for errors.  
-```npm run prettier``` - Runs [prettier](https://prettier.io/) to format code.  
+### Spawn
 
-\* from package.json
+> **Prerequisites:** a listen-mode patched APK, a device connected via ADB and the Frida CLI installed (`requirements.txt`).
 
+- `npm run spawn:dev` - builds a dev version and injects it
+- `npm run spawn:release` - builds a release version and injects it
+- `npm run spawn` - injects the existing `dist/agent.js`
+- `npm run spawn:server` - injects via frida-server
+
+### Code Quality & Formatting
+
+- `npm run lint` - runs [ESLint](https://eslint.org/)
+- `npm run prettier` - runs [Prettier](https://prettier.io/)
+
+## Conventions
+
+- Files and classes are `PascalCase`, methods and properties are `camelCase`, private/cached fields use a `_` prefix, constants are `UPPER_SNAKE_CASE`, interfaces use an `I` prefix.
+- Use [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge) types where possible instead of `any`.
+- Use `Logger` instead of `console.log` and tag messages as `[ModuleName::MethodName] message`.
+- Development-only code goes inside `/// #if DEV` blocks, it is stripped from release builds.
+- Don't hardcode UI strings or toasts; add them to `src/i18n/localization/en.json` and `ru.json` and use `I18n.t("...")`.
+- In hooks `this` is the game instance; keep a `const module = this` reference and use `//@ts-ignore` for explicit hook argument types if needed.
+- For Il2Cpp calls prefer the wrappers in `src/utils/` over bare `.method(...).invoke()` calls.
 
 ## Project Structure
+
 ```text
 fallguys-frida-modmenu/
 ├── src/
 │   ├── index.ts                # Entry Point
-|   |
-│   ├── core/
-│   │   ├── BaseModule.ts       # Abstract base class for all modules (Extend this!)
-│   │   ├── ModuleManager.ts    # Module initialization
-│   │   └── AssemblyHelper.ts   # Manages IL2CPP assemblies
-|   |
-│   ├── data/                   # Defaults, Layouts & Preferences
-|   |
-│   ├── i18n/                   # Internationalization system
-│   │   └── localization/       # JSON translation files
-|   |
-│   ├── logger/                 # Custom logger implementation
-|   |
-│   ├── modules/                # Mod features categorized
-│   │   ├── game/               # Internal game features
-│   │   ├── network/            # Network related
-│   │   ├── player/             # Player movement & physics
-│   │   ├── rounds/             # Level-specific logic (DoorManager, TipToeManager...)
-│   │   └── visuals/            # Visual changes (FGDebug, FPS Bypass, etc.)
-|   |
-│   ├── ui/                     # Menu interface
-│   │   ├── menu/               # Main menu construction (using frida-java-menu)
-│   │   └── popup/              # Wrapper for In-Game PopupManager
-│   │       └── data/           # Wrappers for Popups classes
-|   |
-│   └── utils/                  # Helper functions
-│       ├── JavaUtils.ts        # Java-bridge helper functions
-│       └── UnityUtils.ts       # Unity / IL2CPP helper functions
-|
-├── eslint.config.mts           # ESLint config
-├── package.json                # Node.js dependencies & scripts
-├── requirements.txt            # Python dependencies
-├── tsconfig.json               # TypeScript configuration
-└── webpack.config.js           # Webpack compiler config
+│   │
+│   ├── core/                   # Module system
+│   │   ├── BaseModule.ts       # Abstract base class for all modules
+│   │   ├── ModuleManager.ts    # Module registration and initialization
+│   │   └── AssemblyHelper.ts   # Cached IL2CPP assemblies
+│   │
+│   ├── data/                   # Preferences, settings, defaults and layout
+│   │
+│   ├── i18n/                   # Internationalization
+│   │   └── localization/       # JSON translation files (en.json, ru.json)
+│   │
+│   ├── logger/                 # Logger and Unity log redirect
+│   │
+│   ├── modules/                # Mod features
+│   │   ├── game/
+│   │   ├── network/
+│   │   ├── player/
+│   │   ├── rounds/
+│   │   └── visuals/
+│   │
+│   ├── ui/
+│   │   ├── menu/               # Menu construction (frida-java-menu)
+│   │   └── popup/              # Wrapper for the in-game popup manager
+│   │
+│   └── utils/                  # Java and Unity helpers
+│
+├── objection.cfg.json          # Frida gadget config (script mode)
+├── eslint.config.mts
+├── flake.nix
+├── package.json
+├── requirements.txt
+├── tsconfig.json
+└── webpack.config.js
 ```
-
-## Code Style
-
-We enforce code style using **ESLint** and **Prettier**.  
-**Please run `npm run lint` before submitting a PR.**
-
-### Naming Conventions
-- **Classes & Files:** `PascalCase` (e.g., `PopupManager.ts`, `UICanvasModule`).
-- **Methods & Properties:** `camelCase` (e.g., `toggleNames`, `initHooks`).
-- **Private & Cached Fields:** Use the `_` prefix (e.g., `_popupManagerInstance`).
-- **Constants:** `UPPER_SNAKE_CASE` (e.g., `TELEPORT_COOLDOWN`).
-- **Interfaces:** Prefix with `I` (e.g., `IClientDetails`).
-- **Game/Unity Code:** Keep original naming for Unity classes and methods to match the game's assembly (e.g., `FallGuysCharacterController`, `TheMultiplayerGuys.FGCommon`).
-
-### Typing
-We rely on TypeScript to catch errors before runtime.
-*   **No `any`:** Avoid using `any` type. It defeats the purpose of TypeScript. Exceptions are allowed for rest parameters (...args) and catch (error) blocks.
-*   **Use Il2Cpp Types:** Always use specific types from `frida-il2cpp-bridge` (e.g., `Il2Cpp.Class`, `Il2Cpp.String`, `Il2Cpp.Object`).
-*   **Interfaces:** Define interfaces for JSON responses or complex objects (see `IClientDetails` in `Catapult.ts`).
-*   **Return Types:** Explicitly define return types for methods.
-*   **@ts-ignore:** Use //@ts-ignore for hooks where you need to specify types of arguments: [Explanation](https://github.com/vfsfitvnm/frida-il2cpp-bridge/wiki/Changelog#v090).
-*   **Do not worry about this alias:** I mean [this](https://typescript-eslint.io/rules/no-this-alias/).
-
-```ts
-// Good
-//@ts-ignore
-this.WebSocketNetworkHostCtor.implementation = function (serverAddress: Il2Cpp.String, port: number, isSecure: boolean): void { ... }
-
-GameManagerInstance.field<Il2Cpp.Object>("_round").value;
-```
-
-### Logging Standard 
-*   **Tagging:** Every class should have a `tag` or `name` property.
-*   **Format:** `[${this.tag}::MethodName] Message`.
-*   **No Console:** Never use `console.log`. Use `Logger`.
-*   **Hook Logs:** Add `Logger.hook` to hooks, **excluding** high-frequency methods.
-
-```ts
-// Good
-private static readonly tag = "UnityUtils";
-
-Logger.info(`[${this.tag}::init] Initialized`);
-Logger.warn(`[${this.tag}::someFetchFunc] Can't fetch info about something`);
-Logger.errorThrow(error, "Failed to do something");
-```
-
-### Conditional Compilation
-We use preprocessor directives to exclude debug logic from production builds.
-*   Wrap development-only code (e.g., debug functions, testing hooks) in `/// #if DEV` blocks.
-*   This code will be **stripped out** in `build:release`.
-
-```ts
-function someDebugFunction(): void {
-    /// #if DEV
-    this.unlockAll(); // Some testing code here
-    /// #endif
-}
-```
-
-### Documentation (JSDoc)
-We have documentation for:
-*   Complex logic.
-*   Wrappers around Unity IL2CPP classes.
-
-```ts
-// Good
-/** Wrapper over UnityEngine::Object::FindObjectsOfType */
-static FindObjectsOfType(klass: Il2Cpp.Class): Il2Cpp.Array<Il2Cpp.Object> { ... }
-```
-
-### IL2CPP Wrappers
-*   Create wrappers for classes, methods instead calling of `.method().invoke()` everywhere.
-*   Reuse existing wrappers in `src/utils/`.
-
-### Internationalization (i18n)
-Do not hardcode strings for UI or Toasts.
-*   Use `I18n.t("tab.key_name")`.
-*   Add translations to `src/i18n/localization/lang.json`.
-
-### Imports Organization
-Group imports in the same way as the structure to keep the file header clean.
-
-```ts
-// Good
-import { BaseModule } from "../../core/BaseModule";
-import { CatapultModule } from "../modules/network/Catapult";
-import { Logger } from "../../logger/Logger";
-```
-
 
 ## Pull Request Process
-We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification.  
-Format: `<type>[optional scope]: <description>`
 
-1. **Fork** the repository 
-2. **Create** a feature branch (git checkout -b feature/amazing-feature)
+We use [Conventional Commits](https://www.conventionalcommits.org/): `<type>(optional scope): <description>`.
+
+1. **Fork** the repository
+2. **Create** a feature branch (e.g. `<your_nickname>/add-feature`)
 3. **Make** your changes
 4. **Commit** your changes
-5. **Push** to the branch 
-6. **Open** a Pull Request
+5. **Push** to your branch
+6. **Open** a pull request
 
-
-## Helpful Information / Resources
+## Helpful information / Resources
 ### Mono Code Leaks
 Fall Guys has several leaks of development builds with **Mono** DLLs.  
 These are extremely useful for analyzing game logic and class structures in clean C# before they are compiled to IL2CPP.
@@ -279,11 +186,10 @@ We maintain a FG Archive with these builds. **A Telegram account is required to 
 *   **v4.5.0** (5 May 2021) — [Download Link](https://t.me/FallGuysBuilds/34)
 *   **v9.0.4** (1 March 2023) — [Download Link](https://t.me/FallGuysBuilds/203)
 *   **v10.7.0 Developer Mono Build** (28 November 2023) — [Download Link](https://t.me/FallGuysBuilds/201)
-*   **Other Builds** — [FG Archive Website](https://floyzi.github.io/fg_archive/)
+*   **Other Builds** — [FG Archive Website](https://obed-guys-corp.github.io/fg-archive)
     *   *(Note: You can also download older builds via Steam Depots if you own the game on Steam)*
 
 All managed DLLs are stored in `FallGuys_client_BackUpThisFolder_ButDontShipItWithYourGame/Managed` folder.
-
 ### Reverse Engineering Tools
 *   [Il2CppDumper-GUI](https://github.com/AndnixSH/Il2CppDumper-GUI) - Generating `dump.cs`. Use this to quickly view class structures, fields, and method signatures.
 *   [Il2CppInspectorRedux](https://github.com/LukeFZ/Il2CppInspectorRedux) - Generating the python script to rename functions and apply structs in disassemblers.
@@ -296,13 +202,5 @@ All managed DLLs are stored in `FallGuys_client_BackUpThisFolder_ButDontShipItWi
 *   [Frida Documentation](https://frida.re/docs/) - General Frida API reference. 
 *   [Unity Scripting Documentation](https://docs.unity3d.com/ScriptReference/index.html) - Reference for Unity classes (GameObject, Transform, etc...).
 *   [frida-il2cpp-bridge Wiki](https://github.com/vfsfitvnm/frida-il2cpp-bridge/wiki) - Specific API for the IL2CPP used in this project.
-
-
-## Questions? 
-- Check `README.md` for project overview.
-- Open issue on Github.
-- Ask on our [discord server](https://discord.gg/cNFJ73P6p3).
-
----
-
-Thank you for contributing to Fall Guys Frida Mod Menu!
+*   [APKEditor](https://github.com/REAndroid/APKEditor) - Powerful Android APK editor 
+*   [objection Patching Guide](https://github.com/sensepost/objection/wiki/Patching-Android-Applications) 
