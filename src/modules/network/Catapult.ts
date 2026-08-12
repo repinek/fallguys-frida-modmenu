@@ -12,7 +12,7 @@ import Java from "frida-java-bridge";
 /*
  * 1. Login and Version Spoofing:
  *    - Overrides clientVersion and clientVersionSignature to match the latest client
- *    - Allows connecting with outdated APKs, data fetched from Constants.VERSION_URL (thx floyzi) (You can find it yourself if you want)
+ *    - Allows connecting with outdated APKs, data fetched from Constants.SPOOF_VERSION_MIRRORS (thx floyzi) (You can find it yourself if you want)
  *
  * 2. Platform Spoofing:
  *    - We can also change the platform here, but make sure it exists (otherwise you won't be able to login, mediatonic fixed this)
@@ -129,16 +129,36 @@ export class CatapultModule extends BaseModule {
     }
 
     private fetchClientDetails(): void {
-        if (Constants.USE_SPOOF) {
-            JavaUtils.httpGet(Constants.SPOOF_VERSION_URL, response => {
-                if (!response) {
-                    Logger.warn(`[${this.name}::fetchSpoofData] Actual server signature can't be fetched, spoof won't be working`);
-                    Logger.toast(I18n.t("network_toasts.signature_fetch_fail"), 1);
-                    return;
-                }
-                this.clientDetails = JSON.parse(response) as IClientDetails;
-            });
+        if (!Constants.USE_SPOOF) {
+            return;
         }
+
+        this.tryFetchSpoofData(0);
+    }
+
+    private tryFetchSpoofData(index: number): void {
+        if (index >= Constants.SPOOF_VERSION_MIRRORS.length) {
+            Logger.warn(`[${this.name}::fetchClientDetails] All mirrors failed, spoof won't be working`);
+            Logger.toast(I18n.t("network_toasts.signature_fetch_fail"), 1);
+            return;
+        }
+
+        const mirror = Constants.SPOOF_VERSION_MIRRORS[index];
+        Logger.debug(`[${this.name}::fetchClientDetails] Fetching spoof data from ${mirror}`);
+
+        JavaUtils.httpGet(mirror, response => {
+            if (!response) {
+                this.tryFetchSpoofData(index + 1);
+                return;
+            }
+
+            try {
+                this.clientDetails = JSON.parse(response) as IClientDetails;
+            } catch {
+                Logger.warn(`[${this.name}::fetchClientDetails] Bad response from ${mirror}, trying next mirror`);
+                this.tryFetchSpoofData(index + 1);
+            }
+        });
     }
 
     private readPlatform(): void {

@@ -1,6 +1,6 @@
 export const Constants = {
     // === Mod Menu URLs ===
-    MOD_MENU_ICON_URL: "https://floyzi.github.io/images/obed-guys-present.png",
+    MOD_MENU_ICON_URL: "https://floyzi-gitlab-io.vercel.app/images/obed-guys-present.png", 
     MOD_MENU_VERSION_URL: "https://repinek.github.io/fallguys-modmenu/latest_version.json",
     MOD_MENU_CHANGELOG_URL: `https://repinek.github.io/fallguys-modmenu/changelogs.json`,
 
@@ -15,15 +15,12 @@ export const Constants = {
 
     // == Spoof ===
     USE_SPOOF: false,
-    /* 
-    Mirrors, if 404
-    https://floyzi.github.io/fallguys/version.json
-    https://floyzi-gitlab-io.vercel.app/fallguys/version.json
-    https://floyzi-page.netlify.app/public/fallguys/version.json
-    https://page.floyzi.workers.dev/fallguys/version.json
-    https://cdn.floyzi.ru/minimal-content/fallguys/version.json
-    */
-    SPOOF_VERSION_URL: "https://floyzi.github.io/fallguys/version.json",
+    // Mirrors, if 404 (tried in order)
+    SPOOF_VERSION_URL: "https://floyzi-gitlab-io.vercel.app/fallguys/version.json",
+    SPOOF_VERSION_MIRRORS: [
+        "https://page.floyzi.workers.dev/fallguys/version.json",
+        "https://floyzi-page.netlify.app/public/fallguys/version.json"
+    ],
 
     // === Custom Server ===
     USE_CUSTOM_SERVER: false,
