@@ -36,7 +36,7 @@ export class UpdateUtils {
 
     static checkForUpdate(): void {
         if (ModPreferences.ENV !== "release") {
-            Logger.debug(`[${this.tag}::checkForUpdate] Skipping mod menu version check in dev/staging`);
+            Logger.debug(`[${this.tag}::checkForUpdate] Skipping mod menu version check in dev`);
             return;
         }
 
