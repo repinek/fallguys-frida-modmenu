@@ -3,6 +3,7 @@ import { BaseModule } from "../../core/BaseModule";
 import { Logger } from "../../logger/Logger";
 import { CharacterPhysicsModule } from "./CharacterPhysics";
 import { UnityUtils } from "../../utils/UnityUtils";
+import { toast } from "frida-java-menu";
 
 // TODO: describe issue here
 
@@ -40,7 +41,7 @@ export class TeleportManagerModule extends BaseModule {
 
         if (diff < this.TELEPORT_COOLDOWN) {
             const remaining = ((this.TELEPORT_COOLDOWN - diff) / 1000).toFixed(1);
-            Menu.toast(`Wait ${remaining}s`, 0);
+            toast(`Wait ${remaining}s`, 0);
             return false;
         }
 

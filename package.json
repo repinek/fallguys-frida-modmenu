@@ -20,47 +20,49 @@
   "license": "GPL-3.0",
   "main": "src/index.ts",
   "scripts": {
-    "prepare": "npm run build:release",
     "build:release": "webpack --env release",
     "build:dev": "webpack --env dev",
-    "build:staging": "webpack --env staging",
     "watch": "webpack --watch --env dev",
     "spawn": "frida -U gadget -l dist/agent.js",
     "spawn:server": "frida -U \"Fall Guys\" -l dist/agent.js",
     "spawn:release": "npm run build:release && frida -U gadget -l dist/agent.js",
-    "spawn:staging": "npm run build:staging && frida -U gadget -l dist/agent.js",
     "spawn:dev": "npm run build:dev && frida -U gadget -l dist/agent.js",
     "lint": "eslint \"src/**\"",
     "prettier": "prettier --write \"src/**\""
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@types/frida-gum": "^18.7.1",
-    "@types/node": "^22.9.0",
-    "@typescript-eslint/eslint-plugin": "^8.47.0",
-    "@typescript-eslint/parser": "^8.47.0",
-    "eslint": "^9.39.1",
+    "@eslint/js": "^10.0.1",
+    "@types/frida-gum": "^19.8.0",
+    "@types/node": "^26.1.1",
+    "eslint": "^10.7.0",
     "eslint-config-prettier": "^10.1.8",
-    "globals": "^16.5.0",
+    "globals": "^17.7.0",
     "ifdef-loader": "^2.3.2",
-    "jiti": "^2.6.1",
-    "prettier": "^3.6.2",
-    "terser-webpack-plugin": "^5.3.14",
-    "ts-loader": "^9.5.4",
-    "typescript": "^5.6.3",
-    "typescript-eslint": "^8.47.0",
-    "webpack": "^5.103.0",
-    "webpack-cli": "^6.0.1"
+    "jiti": "^2.7.0",
+    "prettier": "^3.9.5",
+    "terser-webpack-plugin": "^5.6.1",
+    "ts-loader": "^9.6.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.63.0",
+    "webpack": "^5.108.4",
+    "webpack-cli": "^7.2.1"
   },
   "dependencies": {
     "buffer": "^6.0.3",
-    "frida-il2cpp-bridge": "^0.9.1",
-    "frida-java-menu": "github:commonuserlol/frida-java-menu"
+    "frida-compile": "^19.0.5",
+    "frida-il2cpp-bridge": "^0.13.1",
+    "frida-java-bridge": "^7.0.13",
+    "frida-java-menu": "github:astra1dev/frida-java-menu"
   },
   "prettier": {
     "tabWidth": 4,
     "arrowParens": "avoid",
     "trailingComma": "none",
     "printWidth": 160
+  },
+  "allowScripts": {
+    "github:astra1dev/frida-java-menu#aa6e44e3f7e88bba18042b0d08b30ebec42ebae2": true,
+    "frida@17.17.0": true,
+    "github:astra1dev/frida-java-menu#f260169ee1640b5a805d954b27ff475506991ac7": true
   }
 }

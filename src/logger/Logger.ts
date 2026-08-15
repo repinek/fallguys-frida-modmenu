@@ -1,3 +1,5 @@
+import { toast } from "frida-java-menu";
+
 export class Logger {
     private static readonly Colors = {
         RESET: "\x1b[0m",
@@ -76,6 +78,6 @@ export class Logger {
      * @param [length=0] 0 - 2s, 1 - 3.5s, default is 2s
      */
     static toast(text: string, length: 0 | 1 = 0) {
-        Menu.toast(text, length);
+        toast(text, length);
     }
 }

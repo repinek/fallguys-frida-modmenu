@@ -1,22 +1,16 @@
 {
-  "compilerOptions": {
-    "target": "esnext",
-    "lib": [ "es2022" ],
-    "experimentalDecorators": true,
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "checkJs": false,
-    "noEmit": false,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "sourceMap": true,
-    "skipLibCheck": true
-  },
-  "include": [
-    "src/**/*"
-  ]
+    "compilerOptions": {
+        "target": "esnext",
+        "lib": ["ESNext"],
+        "module": "NodeNext",
+        "moduleResolution": "nodenext",
+        "types": ["node", "frida-gum"],
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "noImplicitOverride": true,
+        "useUnknownInCatchVariables": true
+    },
+    "include": ["src/**/*", "webpack.config.mts", "eslint.config.mts"]
 }

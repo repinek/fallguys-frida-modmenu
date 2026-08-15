@@ -17,6 +17,7 @@ import { UICanvasModule } from "../../modules/visuals/UICanvas";
 import { MenuBuilder } from "./MenuBuilder";
 
 import { UnityUtils } from "../../utils/UnityUtils";
+import { add, CENTER } from "frida-java-menu";
 
 export class MenuUtils {
     public static modules: {
@@ -65,8 +66,8 @@ export class MenuUtils {
     static addCenterText(text: string): void {
         if (MenuBuilder.layout) {
             const textToAdd = MenuBuilder.layout.textView(text);
-            textToAdd.gravity = Menu.Api.CENTER;
-            Menu.add(textToAdd);
+            textToAdd.gravity = CENTER;
+            add(textToAdd);
         }
     }
 }

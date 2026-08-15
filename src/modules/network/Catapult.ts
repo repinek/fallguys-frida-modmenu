@@ -1,3 +1,4 @@
+import { sharedPreferences } from "frida-java-menu";
 import { AssemblyHelper } from "../../core/AssemblyHelper";
 import { BaseModule } from "../../core/BaseModule";
 import { Constants } from "../../data/Constants";
@@ -6,10 +7,12 @@ import { Logger } from "../../logger/Logger";
 import { JavaUtils } from "../../utils/JavaUtils";
 import { UnityUtils } from "../../utils/UnityUtils";
 
+import Java from "frida-java-bridge";
+
 /*
  * 1. Login and Version Spoofing:
  *    - Overrides clientVersion and clientVersionSignature to match the latest client
- *    - Allows connecting with outdated APKs, data fetched from Constants.VERSION_URL (thx floyzi) (You can find it yourself if you want)
+ *    - Allows connecting with outdated APKs, data fetched from Constants.SPOOF_VERSION_MIRRORS (thx floyzi) (You can find it yourself if you want)
  *
  * 2. Platform Spoofing:
  *    - We can also change the platform here, but make sure it exists (otherwise you won't be able to login, mediatonic fixed this)
@@ -79,7 +82,7 @@ export class CatapultModule extends BaseModule {
                 Logger.debug(`[${module.name}::BuildCatapultConfig] Applied version spoof to ${module.clientDetails.clientVersion}`);
             }
 
-            if (module.targetPlatform != "android_ega") {
+            if (module.targetPlatform !== "android_ega") {
                 catapultConfig.field<Il2Cpp.String>("Platform").value = Il2Cpp.string(module.targetPlatform);
                 Logger.debug(`[${module.name}::BuildCatapultConfig] Modified platform to ${module.targetPlatform}`);
             }
@@ -112,7 +115,7 @@ export class CatapultModule extends BaseModule {
             Logger.hook("WebSocketNetworkHost::.ctor called with args:", serverAddress, port, isSecure);
 
             if (Constants.USE_CUSTOM_SERVER) {
-                if (serverAddress.content == "analytics-gateway.fallguys.oncatapult.com") {
+                if (serverAddress.content === "analytics-gateway.fallguys.oncatapult.com") {
                     serverAddress = Il2Cpp.string(Constants.CUSTOM_ANALYTICS_URL);
                     port = Constants.CUSTOM_ANALYTICS_PORT;
                     isSecure = Constants.IS_ANALYTICS_SECURE;
@@ -126,22 +129,64 @@ export class CatapultModule extends BaseModule {
     }
 
     private fetchClientDetails(): void {
-        if (Constants.USE_SPOOF) {
-            JavaUtils.httpGet(Constants.SPOOF_VERSION_URL, response => {
-                if (!response) {
-                    Logger.warn(`[${this.name}::fetchSpoofData] Actual server signature can't be fetched, spoof won't be working`);
-                    Logger.toast(I18n.t("network_toasts.signature_fetch_fail"), 1);
+        if (!Constants.USE_SPOOF) {
+            return;
+        }
+
+        this.tryFetchSpoofData(0);
+    }
+
+    private tryFetchSpoofData(index: number): void {
+        const sources = [Constants.SPOOF_VERSION_URL, ...Constants.SPOOF_VERSION_MIRRORS];
+
+        if (index >= sources.length) {
+            Logger.warn(`[${this.name}::fetchClientDetails] All mirrors failed, spoof won't be working`);
+            Logger.toast(I18n.t("network_toasts.signature_fetch_fail"), 1);
+            return;
+        }
+
+        const mirror = sources[index];
+        Logger.debug(`[${this.name}::fetchClientDetails] Fetching spoof data from ${mirror}`);
+
+        JavaUtils.httpGet(mirror, response => {
+            if (!response) {
+                this.tryFetchSpoofData(index + 1);
+                return;
+            }
+
+            try {
+                const clientDetails = JSON.parse(response) as unknown;
+
+                if (!this.isClientDetails(clientDetails)) {
+                    Logger.warn(`[${this.name}::fetchClientDetails] Invalid response from ${mirror}, trying next mirror`);
+                    this.tryFetchSpoofData(index + 1);
                     return;
                 }
-                this.clientDetails = JSON.parse(response) as IClientDetails;
-            });
-        }
+
+                this.clientDetails = clientDetails;
+            } catch {
+                Logger.warn(`[${this.name}::fetchClientDetails] Bad response from ${mirror}, trying next mirror`);
+                this.tryFetchSpoofData(index + 1);
+            }
+        });
+    }
+
+    private isClientDetails(value: unknown): value is IClientDetails {
+        if (!value || typeof value !== "object") return false;
+
+        const details = value as Record<string, unknown>;
+        return (
+            typeof details.clientVersion === "string" &&
+            details.clientVersion.trim().length > 0 &&
+            typeof details.clientVersionSignature === "string" &&
+            details.clientVersionSignature.trim().length > 0
+        );
     }
 
     private readPlatform(): void {
         Java.perform(() => {
-            if (Menu.sharedPreferences.contains("platform")) {
-                this.targetPlatform = Menu.sharedPreferences.getString("platform");
+            if (sharedPreferences.contains("platform")) {
+                this.targetPlatform = sharedPreferences.getString("platform");
             }
         });
     }
@@ -149,7 +194,7 @@ export class CatapultModule extends BaseModule {
     static changePlatform(newPlatform: string): void {
         Java.perform(() => {
             Logger.debug(`put platform string into config: ${newPlatform}`);
-            Menu.sharedPreferences.putString("platform", newPlatform);
+            sharedPreferences.putString("platform", newPlatform);
         });
     }
 

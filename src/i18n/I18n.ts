@@ -1,8 +1,11 @@
+import Java from "frida-java-bridge";
+
 import { JavaUtils } from "../utils/JavaUtils";
 import { Logger } from "../logger/Logger";
 
 import en from "./localization/en.json";
 import ru from "./localization/ru.json";
+import { sharedPreferences } from "frida-java-menu";
 
 const TRANSLATIONS: Record<string, any> = {
     en: en,
@@ -19,8 +22,8 @@ export class I18n {
         let targetLocale = "en";
 
         Java.perform(() => {
-            if (Menu.sharedPreferences.contains("locale")) {
-                const savedLocale = Menu.sharedPreferences.getString("locale");
+            if (sharedPreferences.contains("locale")) {
+                const savedLocale = sharedPreferences.getString("locale");
                 if (this.isLocaleSupported(savedLocale)) {
                     targetLocale = savedLocale;
                     Logger.debug(`[${this.tag}::init] Loaded locale from config: ${targetLocale}`);
@@ -34,7 +37,7 @@ export class I18n {
                 else 
                     Logger.warn(`[${this.tag}::init] Locale ${systemLang} from system is not supported`);
 
-                Menu.sharedPreferences.putString("locale", targetLocale);
+                sharedPreferences.putString("locale", targetLocale);
                 Logger.info(`[${this.tag}::init] Saved ${targetLocale} locale to config`);
             }
 
@@ -84,7 +87,7 @@ export class I18n {
         }
 
         Java.perform(() => {
-            Menu.sharedPreferences.putString("locale", newLocale);
+            sharedPreferences.putString("locale", newLocale);
         });
 
         Logger.info(`[${this.tag}::changeLocale] Locale changed to: ${newLocale}`);

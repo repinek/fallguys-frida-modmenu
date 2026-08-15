@@ -37,7 +37,7 @@ export class UwUifyModule extends BaseModule {
         this.set_text = this.TMP_Text.method<void>("set_text");
     }
 
-    public initHooks(): void {
+    public override initHooks(): void {
         const module = this;
 
         //@ts-ignore

@@ -1,5 +1,4 @@
 import "frida-il2cpp-bridge";
-import "frida-java-menu";
 
 import { AssemblyHelper } from "./core/AssemblyHelper";
 import { ModuleManager } from "./core/ModuleManager";
@@ -37,6 +36,7 @@ class FallGuysFridaModMenu {
             PopupManager.init();
             MenuBuilder.init();
 
+            UpdateUtils.checkGameVersion();
             UpdateUtils.checkForUpdate();
         }).catch(error => Logger.error(`Failed to initialize script: ${error}`));
     }

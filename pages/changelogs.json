@@ -1,0 +1,22 @@
+[
+    {
+        "scriptVersion": "4.00",
+        "date": "15.08.2026",
+        "changelog": "Technical refactor update\n\n[*] Frida 17 migration\n[*] Build and configuration cleanup\n[*] Stability fixes"
+    },
+    {
+        "scriptVersion": "3.02",
+        "date": "17.12.2025",
+        "changelog": "[+] New Features:\n- Login by refresh token\n- FGTools Mobile mentions\n\n[*] Technical:\n- Update to new Fall Guys Version - 21.1.2"
+    },
+    {
+        "scriptVersion": "3.00",
+        "date": "7.12.2025",
+        "changelog": "Global Refactor Update\n\n[+] New Features:\n- Update Checker & In-game Changelogs\n- Platform Spoofing (PS5, IOS, etc.)\n- Localization System (Multi-language)\n- UwUify Mode :3\n- Disable Analytics option\n- Better Native Popups\n\n[*] Technical:\n- Complete code rewrite for better stability"
+    },
+    {
+        "scriptVersion": "1.02",
+        "date": "29.11.2025",
+        "changelog": "test changelog\n\nHi if you see it lol!"
+    }
+]
