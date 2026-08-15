@@ -1,8 +1,8 @@
 export const Constants = {
     // === Mod Menu URLs ===
     MOD_MENU_ICON_URL: "https://floyzi-gitlab-io.vercel.app/images/obed-guys-present.png",
-    MOD_MENU_VERSION_URL: "https://repinek.github.io/fallguys-modmenu/latest_version.json",
-    MOD_MENU_CHANGELOG_URL: `https://repinek.github.io/fallguys-modmenu/changelogs.json`,
+    MOD_MENU_VERSION_URL: "https://repinek.github.io/fallguys-frida-modmenu/latest_version.json",
+    MOD_MENU_CHANGELOG_URL: "https://repinek.github.io/fallguys-frida-modmenu/changelogs.json",
 
     // === Social URLs ===
     GITHUB_URL: "https://github.com/repinek/fallguys-frida-modmenu",
