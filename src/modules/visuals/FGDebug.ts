@@ -40,13 +40,13 @@ export class FGDebugModule extends BaseModule {
             Logger.hook("GvrFPS::Awake called");
             this.method<void>("Awake").invoke(); // <--- OnLeave
             module.isAwaked = true;
-            if (module.shouldToggled) module.toggleFGDebug(true);
+            module.toggleFGDebug(module.shouldToggled);
         };
     }
 
     public toggleFGDebug(value: boolean): void {
         try {
-            this.shouldToggled = true;
+            this.shouldToggled = value;
             if (this.isAwaked) {
                 this.setFGDebugScale();
                 const gameObject = this.GvrFPSInstance.method<Il2Cpp.Object>("get_gameObject").invoke();

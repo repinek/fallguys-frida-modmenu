@@ -114,7 +114,7 @@
         }
     },
     "update_utils": {
-        "cant_retreive": "Failed to retrieve changelog data",
+        "cant_retrieve": "Failed to retrieve changelog data",
         "not_found": "Changelog for this version not found",
         "unknown_date": "Unknown Date"
     },

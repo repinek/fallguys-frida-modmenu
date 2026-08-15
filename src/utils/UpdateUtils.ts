@@ -24,6 +24,16 @@ export class UpdateUtils {
 
     private static modMenuUpdateVersion: IModMenuVersion;
 
+    static checkGameVersion(): void {
+        const gameVersion = Il2Cpp.application.version!;
+
+        if (gameVersion !== ModPreferences.FOR_GAME_VERSION) {
+            Logger.warn(
+                `[${this.tag}::checkGameVersion] Game version ${gameVersion} is not supported. Expected ${ModPreferences.FOR_GAME_VERSION}. Things may break`
+            );
+        }
+    }
+
     static checkForUpdate(): void {
         if (ModPreferences.ENV !== "release") {
             Logger.debug(`[${this.tag}::checkForUpdate] Skipping mod menu version check in dev/staging`);
@@ -36,9 +46,21 @@ export class UpdateUtils {
                 return;
             }
 
-            this.modMenuUpdateVersion = JSON.parse(response) as IModMenuVersion;
+            try {
+                const updateVersion = JSON.parse(response) as unknown;
 
-            if (this.modMenuUpdateVersion.scriptVersion == ModPreferences.VERSION) {
+                if (!this.isModMenuVersion(updateVersion)) {
+                    Logger.warn(`[${this.tag}::checkForUpdate] Invalid mod menu version response`);
+                    return;
+                }
+
+                this.modMenuUpdateVersion = updateVersion;
+            } catch {
+                Logger.warn(`[${this.tag}::checkForUpdate] Invalid mod menu version response`);
+                return;
+            }
+
+            if (this.modMenuUpdateVersion.scriptVersion === ModPreferences.VERSION) {
                 Logger.info(`[${this.tag}::checkForUpdate] Mod menu is up to date`);
             } else {
                 Logger.warn(`[${this.tag}::checkForUpdate] Mod menu version is outdated`);
@@ -87,12 +109,41 @@ export class UpdateUtils {
                 return;
             }
 
-            const history = JSON.parse(response) as IChangelogEntry[];
+            try {
+                const history = JSON.parse(response) as unknown;
 
-            const entry = history.find(e => e.scriptVersion === targetScriptVersion);
+                if (!this.isChangelogHistory(history)) {
+                    Logger.warn(`[${this.tag}::getChangelog] Invalid changelog response`);
+                    onReceive(undefined);
+                    return;
+                }
 
-            if (entry) onReceive(entry);
-            else onReceive(undefined);
+                const entry = history.find(e => e.scriptVersion === targetScriptVersion);
+
+                if (entry) onReceive(entry);
+                else onReceive(undefined);
+            } catch {
+                Logger.warn(`[${this.tag}::getChangelog] Invalid changelog response`);
+                onReceive(undefined);
+            }
         });
+    }
+
+    private static isModMenuVersion(value: unknown): value is IModMenuVersion {
+        if (!value || typeof value !== "object") return false;
+
+        const version = value as Record<string, unknown>;
+        return typeof version.scriptVersion === "string" && version.scriptVersion.trim().length > 0 && typeof version.forGameVersion === "string";
+    }
+
+    private static isChangelogHistory(value: unknown): value is IChangelogEntry[] {
+        return Array.isArray(value) && value.every(entry => this.isChangelogEntry(entry));
+    }
+
+    private static isChangelogEntry(value: unknown): value is IChangelogEntry {
+        if (!value || typeof value !== "object") return false;
+
+        const entry = value as Record<string, unknown>;
+        return typeof entry.scriptVersion === "string" && typeof entry.date === "string" && typeof entry.changelog === "string";
     }
 }

@@ -1,7 +1,7 @@
 import Java from "frida-java-bridge";
 
 import { Constants } from "../../data/Constants";
-import { ObsidianConfig } from "../../data/LayoutConfig";
+import { getObsidianConfig } from "../../data/LayoutConfig";
 import { ModPreferences } from "../../data/ModPreferences";
 
 import { I18n } from "../../i18n/I18n";
@@ -23,11 +23,13 @@ export class MenuBuilder {
                 waitForInit(MenuBuilder.build);
             });
             Logger.info(`[${this.tag}::init] Initialized`);
+        } else {
+            Logger.warn(`[${this.tag}::init] Java is unavailable, menu won't be initialized`);
         }
     }
 
     private static build(): void {
-        MenuBuilder.layout = new ObsidianLayout(ObsidianConfig);
+        MenuBuilder.layout = new ObsidianLayout(getObsidianConfig());
 
         const title = I18n.t("menu.info.title");
         const desc = I18n.t("menu.info.desc", ModPreferences.VERSION, ModPreferences.ENV);

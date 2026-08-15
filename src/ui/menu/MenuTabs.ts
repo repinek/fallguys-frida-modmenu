@@ -312,12 +312,6 @@ export class MenuTabs {
                 MenuUtils.run(() => MenuPopups.showPlatformPopup())
             )
         );
-
-        add(
-            layout.toggle(I18n.t("menu.functions.token_login"), (state: boolean) => {
-                ModSettings.tokenLogin = state;
-            })
-        );
     }
 
     private static buildOtherTab(layout: ObsidianLayout): void {

@@ -9,7 +9,6 @@ import { UwUifyModule } from "../modules/game/UwUify";
 // Network
 import { CatapultModule } from "../modules/network/Catapult";
 import { NetworkModule } from "../modules/network/Network";
-import { TokenLoginModule } from "../modules/network/TokenLogin";
 
 // Player
 import { AntiAFKModule } from "../modules/player/AntiAFK";
@@ -39,7 +38,6 @@ export class ModuleManager {
         new UwUifyModule(),
         new CatapultModule(),
         new NetworkModule(),
-        new TokenLoginModule(),
         new AntiAFKModule(),
         new CharacterPhysicsModule(),
         new TeleportManagerModule(),

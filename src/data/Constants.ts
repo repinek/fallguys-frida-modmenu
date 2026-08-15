@@ -1,6 +1,6 @@
 export const Constants = {
     // === Mod Menu URLs ===
-    MOD_MENU_ICON_URL: "https://floyzi-gitlab-io.vercel.app/images/obed-guys-present.png", 
+    MOD_MENU_ICON_URL: "https://floyzi-gitlab-io.vercel.app/images/obed-guys-present.png",
     MOD_MENU_VERSION_URL: "https://repinek.github.io/fallguys-modmenu/latest_version.json",
     MOD_MENU_CHANGELOG_URL: `https://repinek.github.io/fallguys-modmenu/changelogs.json`,
 
@@ -8,19 +8,17 @@ export const Constants = {
     GITHUB_URL: "https://github.com/repinek/fallguys-frida-modmenu",
     GITHUB_RELEASES_URL: "https://github.com/repinek/fallguys-frida-modmenu/releases/latest",
     DISCORD_URL: "https://discord.gg/cNFJ73P6p3",
-    FGTOOLS_MOBILE_URL: "https://github.com/floyzi/FGToolsMobile",
+    FGTOOLS_MOBILE_URL: "https://gitlab.com/floyzi/FGToolsMobile",
 
     // === Unity Logging ===
     UNITY_LOGGING: false,
 
     // == Spoof ===
     USE_SPOOF: false,
-    // Mirrors, if 404 (tried in order)
+    // Primary source for the current client version and signature
     SPOOF_VERSION_URL: "https://floyzi-gitlab-io.vercel.app/fallguys/version.json",
-    SPOOF_VERSION_MIRRORS: [
-        "https://page.floyzi.workers.dev/fallguys/version.json",
-        "https://floyzi-page.netlify.app/public/fallguys/version.json"
-    ],
+    // Fallback sources, tried in order after SPOOF_VERSION_URL
+    SPOOF_VERSION_MIRRORS: ["https://page.floyzi.workers.dev/fallguys/version.json", "https://floyzi-page.netlify.app/public/fallguys/version.json"],
 
     // === Custom Server ===
     USE_CUSTOM_SERVER: false,

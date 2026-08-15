@@ -163,7 +163,7 @@ fallguys-frida-modmenu/
 ├── package.json
 ├── requirements.txt
 ├── tsconfig.json
-└── webpack.config.js
+└── webpack.config.mts
 ```
 
 ## Pull Request Process

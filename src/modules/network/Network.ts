@@ -40,7 +40,7 @@ export class NetworkModule extends BaseModule {
                 Logger.debug(`[${module.name}] Received matchmaking message: ${jsonMessage.content!}`);
 
                 // payload example: {"payload":{"queuedPlayers":6,"state":"Queued"},"name":"StatusUpdate"}
-                if (json.payload.state == "Queued") {
+                if (json.payload.state === "Queued") {
                     Logger.toast(I18n.t("network_toasts.queued_players", json.payload.queuedPlayers.toString()));
                 }
             }

@@ -2,16 +2,6 @@ import { AssemblyHelper } from "../core/AssemblyHelper";
 import { Constants } from "../data/Constants";
 import { Logger } from "./Logger";
 
-/*
-this.DebugLogHandler = AssemblyHelper.CoreModule.class("UnityEngine.DebugLogHandler");
-this.String = Il2Cpp.corlib.class("System.String");
-
-// void UnityEngine::DebugLogHandler::LogFormat(LogType__Enum logType, Object_1 *context, String *format, Object__Array *args)
-this.LogFormat = this.DebugLogHandler.method<void>("LogFormat");
-this.Format = this.String.method<Il2Cpp.String>("Format", 2);
-# [20:43:40] [DEBUG] "15:43:40.792: System.Object[]"
-*/
-
 export class UnityLogger {
     // Classes
     private static Debug: Il2Cpp.Class;

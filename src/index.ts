@@ -36,6 +36,7 @@ class FallGuysFridaModMenu {
             PopupManager.init();
             MenuBuilder.init();
 
+            UpdateUtils.checkGameVersion();
             UpdateUtils.checkForUpdate();
         }).catch(error => Logger.error(`Failed to initialize script: ${error}`));
     }

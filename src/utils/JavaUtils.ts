@@ -105,7 +105,7 @@ export class JavaUtils {
                     const sb = StringBuilder.$new();
 
                     let line: string | null;
-                    while ((line = buffer.readLine()) != null) {
+                    while ((line = buffer.readLine()) !== null) {
                         sb.append(line);
                     }
 
@@ -191,7 +191,7 @@ export class JavaUtils {
                     const sb = StringBuilder.$new();
 
                     let line: string | null;
-                    while ((line = buffer.readLine()) != null) {
+                    while ((line = buffer.readLine()) !== null) {
                         sb.append(line);
                     }
 

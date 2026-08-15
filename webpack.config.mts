@@ -1,16 +1,19 @@
-/* eslint-disable */
-const path = require("path");
-const webpack = require("webpack");
-const TerserPlugin = require("terser-webpack-plugin");
-const fs = require("node:fs");
+import path from "node:path";
 
-/*
- * Webpack configuration adapted from Gene Brawl
- * Source: https://github.com/RomashkaTea/genebrawl-public
- */
+import TerserPlugin from "terser-webpack-plugin";
+import type { Configuration } from "webpack";
+import webpack from "webpack";
 
-module.exports = function (env) {
-    let targetEnv = "release";
+interface WebpackEnv {
+    dev?: boolean;
+    staging?: boolean;
+    release?: boolean;
+}
+
+type BuildEnv = "dev" | "staging" | "release";
+
+export default function (env: WebpackEnv = {}): Configuration {
+    let targetEnv: BuildEnv = "release";
     if (env.dev) targetEnv = "dev";
     if (env.staging) targetEnv = "staging";
 
@@ -18,9 +21,9 @@ module.exports = function (env) {
     const isRelease = targetEnv === "release";
 
     console.log(`Building script with ${targetEnv} version`);
-    if (isRelease) console.warn(`Excluding all logs in Release version!`);
+    if (isRelease) console.warn("Excluding all logs in Release version!");
 
-    const opts = {
+    const ifdefOptions = {
         DEV: isDev,
         RELEASE: isRelease,
         version: 3,
@@ -28,20 +31,15 @@ module.exports = function (env) {
         "ifdef-triple-slash": true
     };
 
-    let plugins = [];
-
-    plugins.push(
+    const plugins = [
         new webpack.DefinePlugin({
             "process.env.BUILD_ENV": JSON.stringify(targetEnv)
+        }),
+        new webpack.ProvidePlugin({
+            process: "process/browser",
+            Buffer: ["buffer", "Buffer"]
         })
-    );
-
-    plugins.push(new webpack.ProvidePlugin({
-        process: "process/browser",
-        Buffer: ["buffer", "Buffer"],
-    }));
-
-    // No reason to add obfuscator here idk
+    ];
 
     return {
         mode: isDev ? "development" : "production",
@@ -50,31 +48,26 @@ module.exports = function (env) {
             rules: [
                 {
                     test: /\.ts$/,
-                    include: path.resolve(__dirname, "src"),
-                    use: [
-                        { loader: "ts-loader" },
-                        { loader: "ifdef-loader", options: opts }
-                    ]
+                    include: path.resolve(import.meta.dirname, "src"),
+                    use: [{ loader: "ts-loader" }, { loader: "ifdef-loader", options: ifdefOptions }]
                 },
                 {
-                    test: /\.m?js/,
+                    test: /\.m?js$/,
                     resolve: {
-                        fullySpecified: false,
-                    },
+                        fullySpecified: false
+                    }
                 }
             ]
         },
         resolve: {
-            extensions: [".ts", ".js", ".json"],
+            extensions: [".ts", ".js", ".json"]
         },
         output: {
             filename: "agent.js",
-            path: path.resolve(__dirname, "dist"),
+            path: path.resolve(import.meta.dirname, "dist"),
             clean: true
         },
-
         devtool: "inline-source-map",
-
         optimization: {
             minimize: !isDev,
             minimizer: !isDev
@@ -94,11 +87,11 @@ module.exports = function (env) {
                   ]
                 : []
         },
-        plugins: plugins,
+        plugins,
         stats: "minimal",
         performance: {
             maxAssetSize: 5 * 1024 * 1024,
             maxEntrypointSize: 5 * 1024 * 1024
         }
     };
-};
+}
