@@ -15,7 +15,7 @@ tools/
 *.log
 
 # Local things for storing apks, dumps..
-data/
+/data/
 dump/
 app_process64/
 
