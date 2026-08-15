@@ -62,6 +62,7 @@
   },
   "allowScripts": {
     "github:astra1dev/frida-java-menu#aa6e44e3f7e88bba18042b0d08b30ebec42ebae2": true,
-    "frida@17.15.4": true
+    "frida@17.17.0": true,
+    "github:astra1dev/frida-java-menu#f260169ee1640b5a805d954b27ff475506991ac7": true
   }
 }
