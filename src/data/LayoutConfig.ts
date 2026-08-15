@@ -1,13 +1,13 @@
 import { I18n } from "../i18n/I18n";
 
-import { ObsidianConfig as BaseConfig } from "frida-java-menu";
+import { ObsidianConfig as BaseConfig, systemAccentColor } from "frida-java-menu";
 
 export function getObsidianConfig(): BaseConfig {
     return {
         color: {
             primaryText: "#FFFFFF",
             secondaryText: "#FFFFFF",
-            buttonBg: "#326647", // button
+            buttonBg: systemAccentColor(), // button
             layoutBg: "#1C1C1C", // main
             collapseBg: "#3B3B3B",
             categoryBg: "#296368",
