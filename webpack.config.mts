@@ -6,18 +6,16 @@ import webpack from "webpack";
 
 interface WebpackEnv {
     dev?: boolean;
-    staging?: boolean;
     release?: boolean;
 }
 
-type BuildEnv = "dev" | "staging" | "release";
+type BuildEnv = "dev" | "release";
 
 export default function (env: WebpackEnv = {}): Configuration {
     let targetEnv: BuildEnv = "release";
     if (env.dev) targetEnv = "dev";
-    if (env.staging) targetEnv = "staging";
 
-    const isDev = targetEnv === "dev" || targetEnv === "staging";
+    const isDev = targetEnv === "dev";
     const isRelease = targetEnv === "release";
 
     console.log(`Building script with ${targetEnv} version`);
