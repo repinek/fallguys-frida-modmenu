@@ -3,7 +3,7 @@ declare const process: { env: { BUILD_ENV: string } };
 export const ModPreferences = {
     VERSION: "4.00",
     ENV: (process.env.BUILD_ENV || "dev") as "dev" | "release",
-    FOR_GAME_VERSION: "21.1.2"
+    FOR_GAME_VERSION: "21.3.1"
 } as const;
 
 /*
@@ -15,9 +15,6 @@ refer changeResolutionScale()
 log file
 all cosmetics lobby (?)
 check old commits for pre-installed value on seekbars
-
-maybe:
-fork menu and update it to frida 17
 
 DONE:
 [x] made localization for other languages
