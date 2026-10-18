@@ -60,7 +60,7 @@ export class PopupManager {
         //@ts-ignore
         // It's a bad implementation, but idk. Not always working!
         this.DOScale.implementation = function (transform: Il2Cpp.Object, endValueVector3: Il2Cpp.ValueType, duration: number) {
-            Logger.hook("DOScale called with args:", transform, endValueVector3, duration);
+            // Logger.hook("DOScale called with args:", transform, endValueVector3, duration);
             if (module.waitingForScaling) {
                 const scale = module.scale;
                 endValueVector3 = UnityUtils.createVector3(scale, scale, scale);
