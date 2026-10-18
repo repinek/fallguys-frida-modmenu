@@ -4,12 +4,8 @@ import { Logger } from "../../logger/Logger";
 import { CharacterPhysicsModule } from "./CharacterPhysics";
 import { UnityUtils } from "../../utils/UnityUtils";
 
-// TODO: describe issue here
-
 export class TeleportManagerModule extends BaseModule {
     public readonly name = "TeleportManager";
-
-    private readonly TELEPORT_COOLDOWN = 500;
 
     // Classes
     private ObjectiveReachEndZone!: Il2Cpp.Class;
@@ -18,8 +14,6 @@ export class TeleportManagerModule extends BaseModule {
     private ScoringBubble!: Il2Cpp.Class;
     private ScoredButton!: Il2Cpp.Class;
 
-    private lastTeleportTime = 0;
-
     public init(): void {
         this.ObjectiveReachEndZone = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone"); // finish
         this.GrabToQualify = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crown
@@ -27,26 +21,6 @@ export class TeleportManagerModule extends BaseModule {
         this.ScoringBubble = AssemblyHelper.TheMultiplayerGuys.class("Levels.Progression.COMMON_ScoringBubble"); // bubble creative levels
         this.ScoredButton = AssemblyHelper.TheMultiplayerGuys.class("ScoredButton"); // trigger button unity
     }
-
-    /**
-     * Behavior:
-     * - if false: Shows toast with time you need to wait
-     *
-     * @returns `true` if allowed, `false` if on cooldown
-     */
-    //     private checkCooldown(): boolean {
-    //         const currentTime = Date.now();
-    //         const diff = currentTime - this.lastTeleportTime;
-    //
-    //         if (diff < this.TELEPORT_COOLDOWN) {
-    //             const remaining = ((this.TELEPORT_COOLDOWN - diff) / 1000).toFixed(1);
-    //             toast(`Wait ${remaining}s`, 0);
-    //             return false;
-    //         }
-    //
-    //         this.lastTeleportTime = currentTime;
-    //         return true;
-    //     }
 
     /**
      * Teleports the player to the target object's position.
@@ -74,9 +48,9 @@ export class TeleportManagerModule extends BaseModule {
     }
 
     public teleportToFinish(): void {
-        // if (!this.checkCooldown()) return;
-
         // TODO: fix, doesn't work
+        // UPD: since character is cached, we probably can re-check it here
+        // I don't see a reason to do that currently, since it's not crashing or anything
         if (!this.character) {
             Logger.debug(`[${this.name}::teleportToFinish] No character`);
             return;
@@ -98,8 +72,6 @@ export class TeleportManagerModule extends BaseModule {
     }
 
     public teleportToScore(): void {
-        // if (!this.checkCooldown()) return;
-
         if (!this.character) {
             Logger.debug(`[${this.name}::teleportToScore] No character`);
             return;
@@ -116,7 +88,6 @@ export class TeleportManagerModule extends BaseModule {
                 this.teleportTo(this.character, target, 1);
             } else {
                 Logger.debug(`[${this.name}::teleportToScore] No object`);
-                //menu.toast
             }
         } catch (error: any) {
             Logger.errorThrow(error);
@@ -139,7 +110,7 @@ export class TeleportManagerModule extends BaseModule {
             // if award is negative points: skip
             if (bubble.field<number>("_pointsAwarded").value <= 0) continue;
 
-            const bubbleHandle = bubble.field<Il2Cpp.Object>("_bubbleHandle").value;
+            const bubbleHandle = bubble.field<Il2Cpp.Object>("_bubbleHandle").value; // LevelEditorBubbleHandler class
             if (bubbleHandle.field<boolean>("_spawned").value) {
                 return bubble;
             }
