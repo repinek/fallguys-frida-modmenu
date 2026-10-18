@@ -32,25 +32,26 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/frida-gum": "^19.8.0",
-    "@types/node": "^26.1.1",
-    "eslint": "^10.7.0",
+    "@types/frida-gum": "^19.12.0",
+    "@types/node": "^26.6.5",
+    "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
-    "globals": "^17.7.0",
+    "globals": "^17.13.0",
     "ifdef-loader": "^2.3.2",
     "jiti": "^2.7.0",
-    "prettier": "^3.9.5",
+    "prettier": "^3.9.10",
     "terser-webpack-plugin": "^5.6.1",
     "ts-loader": "^9.6.2",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.63.0",
-    "webpack": "^5.108.4",
-    "webpack-cli": "^7.2.1"
+    "typescript-eslint": "^8.71.2",
+    "webpack": "^5.112.0",
+    "webpack-cli": "^7.2.3"
   },
   "dependencies": {
     "buffer": "^6.0.3",
-    "frida-compile": "^19.0.5",
-    "frida-il2cpp-bridge": "^0.13.1",
+    "frida": "^17.23.0",
+    "frida-compile": "^19.1.0",
+    "frida-il2cpp-bridge": "^0.14.0",
     "frida-java-bridge": "^7.0.13",
     "frida-java-menu": "github:astra1dev/frida-java-menu"
   },
@@ -62,7 +63,7 @@
   },
   "allowScripts": {
     "github:astra1dev/frida-java-menu#aa6e44e3f7e88bba18042b0d08b30ebec42ebae2": true,
-    "frida@17.17.0": true,
-    "github:astra1dev/frida-java-menu#f260169ee1640b5a805d954b27ff475506991ac7": true
+    "github:astra1dev/frida-java-menu#f260169ee1640b5a805d954b27ff475506991ac7": true,
+    "frida@17.23.0": true
   }
 }
