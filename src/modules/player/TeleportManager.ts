@@ -3,7 +3,6 @@ import { BaseModule } from "../../core/BaseModule";
 import { Logger } from "../../logger/Logger";
 import { CharacterPhysicsModule } from "./CharacterPhysics";
 import { UnityUtils } from "../../utils/UnityUtils";
-import { toast } from "frida-java-menu";
 
 // TODO: describe issue here
 
@@ -35,35 +34,36 @@ export class TeleportManagerModule extends BaseModule {
      *
      * @returns `true` if allowed, `false` if on cooldown
      */
-    private checkCooldown(): boolean {
-        const currentTime = Date.now();
-        const diff = currentTime - this.lastTeleportTime;
-
-        if (diff < this.TELEPORT_COOLDOWN) {
-            const remaining = ((this.TELEPORT_COOLDOWN - diff) / 1000).toFixed(1);
-            toast(`Wait ${remaining}s`, 0);
-            return false;
-        }
-
-        this.lastTeleportTime = currentTime;
-        return true;
-    }
+    //     private checkCooldown(): boolean {
+    //         const currentTime = Date.now();
+    //         const diff = currentTime - this.lastTeleportTime;
+    //
+    //         if (diff < this.TELEPORT_COOLDOWN) {
+    //             const remaining = ((this.TELEPORT_COOLDOWN - diff) / 1000).toFixed(1);
+    //             toast(`Wait ${remaining}s`, 0);
+    //             return false;
+    //         }
+    //
+    //         this.lastTeleportTime = currentTime;
+    //         return true;
+    //     }
 
     /**
      * Teleports the player to the target object's position.
      *
      * @param playerInstance The Player Object
      * @param targetInstance The destination Object
+     * @param additionalY Vertical offset added to targetInstance position
      */
-    private teleportTo(playerInstance: Il2Cpp.Object, targetInstance: Il2Cpp.Object): void {
+    private teleportTo(playerInstance: Il2Cpp.Object, targetInstance: Il2Cpp.Object, additionalY: number = 0): void {
         try {
-            // prettier-ignore
-            const targetTransform = UnityUtils.getTransform(targetInstance);
-            const targetPos = targetTransform.method<Il2Cpp.Object>("get_position").invoke();
+            const targetPos = UnityUtils.getTransform(targetInstance).method<Il2Cpp.Object>("get_position").invoke(); // Vector3
+            targetPos.field<number>("y").value += additionalY;
 
-            // prettier-ignore
-            const playerTransform = UnityUtils.getTransform(playerInstance);
-            playerTransform.method<Il2Cpp.Object>("set_position").invoke(targetPos);
+            // I was using transform for teleportation
+            // We need to use rigid body instead
+            const playerRigidbody = playerInstance.method<Il2Cpp.Object>("get_RigidBody").invoke();
+            playerRigidbody.method<void>("set_position").invoke(targetPos);
         } catch (error: any) {
             Logger.warn(`[${this.name}::teleportTo] No character, ${error.name}`);
         }
@@ -74,7 +74,7 @@ export class TeleportManagerModule extends BaseModule {
     }
 
     public teleportToFinish(): void {
-        if (!this.checkCooldown()) return;
+        // if (!this.checkCooldown()) return;
 
         // TODO: fix, doesn't work
         if (!this.character) {
@@ -88,7 +88,7 @@ export class TeleportManagerModule extends BaseModule {
             const objects = UnityUtils.FindObjectsOfTypeAll(targetClass);
 
             if (objects.length > 0) {
-                this.teleportTo(this.character, objects.get(0));
+                this.teleportTo(this.character, objects.get(0), 5);
                 return;
             }
 
@@ -98,7 +98,7 @@ export class TeleportManagerModule extends BaseModule {
     }
 
     public teleportToScore(): void {
-        if (!this.checkCooldown()) return;
+        // if (!this.checkCooldown()) return;
 
         if (!this.character) {
             Logger.debug(`[${this.name}::teleportToScore] No character`);
@@ -113,7 +113,7 @@ export class TeleportManagerModule extends BaseModule {
             if (!target) target = this.findScoredButton();
 
             if (target) {
-                this.teleportTo(this.character, target);
+                this.teleportTo(this.character, target, 1);
             } else {
                 Logger.debug(`[${this.name}::teleportToScore] No object`);
                 //menu.toast
