@@ -7,12 +7,11 @@ export const ModPreferences = {
 } as const;
 
 /*
-!! TODO: 
+!! TODO:
 fix spam popups
 minimalistic fps counter: check ToggleFPSCounter() and FGDebug::GlobalDebug class
 eula popup (cool)
 refer changeResolutionScale()
-log file
 all cosmetics lobby (?)
 check old commits for pre-installed value on seekbars
 
@@ -28,7 +27,7 @@ DONE:
 [x] move menu in differents files
 [x] separate configs
 [x] change language
-[x] move popup manager to ui 
+[x] move popup manager to ui
 [x] update to 21.1.1
 [x] describe functions in javaUtils
 [x] fgdebug fix [ERROR]  il2cpp: cannot get element at index 0 as the array length is 0
@@ -41,18 +40,19 @@ DONE:
 [x] logging refactor
 [x] unity logging
 [x] move teleportmanager from utils
-[x] something with to global classes 
+[x] something with to global classes
 [x] rename velocity to gravity and dive strenght to dive force or wtf im was doing
 [x] wrapper over setActive
 [x] refactor localization (info and other)
 [x] wrapper for Il2cpp.perform main
 [x] refactor vars names
 [x] refactor menu and some other things using createPopup
-[x] refactor structure of project / script (all script in one file :cry:) 
+[x] refactor structure of project / script (all script in one file :cry:)
 
-not planned: 
-implement extensions.ts (.setActive, .getGameObject) 
+not planned:
+implement extensions.ts (.setActive, .getGameObject)
 on screen logging
 config file
 custom image on loading screen
+log file
 */

@@ -106,18 +106,6 @@ This mod relies on `frida-java-bridge`, which is **very unstable**. This results
 If you are unable to run this mod menu, we recommend checking out [**FGTools Mobile**](https://github.com/floyzi/FGToolsMobile) by [Floyzi](https://github.com/floyzi).
 
 
-## 🧑‍💻 Development & Building
-Want to build the APK yourself, debug the code, or contribute new features?
-
-**Please read our [CONTRIBUTING.md](CONTRIBUTING.md) guide.**
-
-It covers:
-*   Project Structure
-*   Building from source
-*   Debugging with Frida Gadget
-*   Code Style & Tools
-
-
 ## 🤝 Contribution
 Pull requests are welcome! **Please read our [CONTRIBUTING.md](CONTRIBUTING.md) guide.**
 
