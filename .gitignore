@@ -18,6 +18,7 @@ tools/
 /data/
 dump/
 app_process64/
+com.Mediatonic.FallGuys_client
 
 # Nix Flake
 .direnv/
