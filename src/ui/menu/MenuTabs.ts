@@ -200,6 +200,12 @@ export class MenuTabs {
                 MenuUtils.run(() => m.tipToeManager?.removeFakeTipToe())
             )
         );
+
+        add(
+            layout.toggle(I18n.t("menu.functions.show_perfect_match_tiles"), (state: boolean) => {
+                ModSettings.showPerfectMatchTiles = state;
+            })
+        )
     }
 
     private static buildTeleportsTab(layout: ObsidianLayout): void {
