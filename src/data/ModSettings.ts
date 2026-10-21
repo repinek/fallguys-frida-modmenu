@@ -17,6 +17,8 @@ export const ModSettings = {
     customDiveForce: false,
     diveForce: 16.5,
 
+    showPerfectMatchTiles: false,
+
     customFov: false,
     fov: 70,
     disableAnalytics: false,

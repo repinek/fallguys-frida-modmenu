@@ -17,6 +17,7 @@ import { TeleportManagerModule } from "../modules/player/TeleportManager";
 
 // Rounds
 import { DoorManagerModule } from "../modules/rounds/DoorManager";
+import { PerfectMatchManagerModule } from "../modules/rounds/PerfectMatchManager";
 import { TipToeManagerModule } from "../modules/rounds/TipToeManager";
 
 // Visuals
@@ -42,6 +43,7 @@ export class ModuleManager {
         new CharacterPhysicsModule(),
         new TeleportManagerModule(),
         new DoorManagerModule(),
+        new PerfectMatchManagerModule(),
         new TipToeManagerModule(),
         new FGDebugModule(),
         new GraphicsManagerModule(),

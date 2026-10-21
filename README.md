@@ -34,6 +34,7 @@ For updates announcements join our community in Discord:
 ### Rounds helper
 - **Door Dash / Lost Temple:** Hide Real Doors
 - **Tip Toe:** Hide Fake Platforms
+- **Perfect Match:** Always show tiles
 
 ### Teleports
 - **Teleport To Finish or Crown**
