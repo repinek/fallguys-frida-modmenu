@@ -104,7 +104,7 @@ This mod relies on `frida-java-bridge`, which is **very unstable**. This results
 **It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).**    
 
 ### 💡 Alternative Solution
-If you are unable to run this mod menu, we recommend checking out [**FGTools Mobile**](https://github.com/floyzi/FGToolsMobile) by [Floyzi](https://github.com/floyzi).
+If you are unable to run this mod menu, we recommend checking out [**FGTools Mobile**](https://gitlab.com/floyzi/FGToolsMobile) by [Floyzi](https://github.com/floyzi).
 
 
 ## 🤝 Contribution
