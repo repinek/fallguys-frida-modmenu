@@ -121,12 +121,12 @@ See the [LICENSE](LICENSE) file for details.
 
 
 ## 🙏 Special Thanks
-Obed Guys Team - Some features powered by **Obed Guys Team**.  
+[Obed Guys Corp.](https://github.com/Obed-Guys-Corp) - Some features powered by **Obed Guys Corp.**.  
 [Floyzi](https://github.com/floyzi) - For how the game works, help with some features, localization.  
 [commonuserlol](https://github.com/commonuserlol) - For help with code and [menu](https://github.com/commonuserlol/frida-java-menu).  
 [Dynasty-Dev](https://github.com/Dynasty-Dev) - For testing and contribution.  
 [igamegod](https://github.com/igamegod) - For help with some features.  
-[Astra1dev](https://github.com/astra1dev) - For help with [menu](https://github.com/astra1dev/frida-java-menu) and other things.
+[Astra1dev](https://github.com/astra1dev) - For help with [menu](https://github.com/astra1dev/frida-java-menu) and other things.  
 [Gene Brawl](https://github.com/RomashkaTea/genebrawl-public) - For the Webpack build configuration.  
 
 [Frida](https://frida.re/) - An amazing dynamic instrumentation toolkit.  
