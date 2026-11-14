@@ -123,7 +123,7 @@ It covers:
 
 - Settings up the delevopment environment
 - Building from source
-- Testing and debugging 
+- Testing and debugging
 - Heplful information and Reverse engineering tools
 
 ## 📜 License

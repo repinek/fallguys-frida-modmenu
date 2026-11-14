@@ -1,5 +1,4 @@
 import { AssemblyHelper } from "../../core/AssemblyHelper";
-import { BaseModule } from "../../core/BaseModule";
 import { I18n } from "../../i18n/I18n";
 import { Logger } from "../../logger/Logger";
 import { UnityUtils } from "../../utils/UnityUtils";
@@ -10,19 +9,19 @@ import { UnityUtils } from "../../utils/UnityUtils";
  * If it returns false or true, we disable the GameObject using SetActive
  */
 
-export class DoorManagerModule extends BaseModule {
-    public readonly name = "DoorManager";
-
+export class DoorManager {
     // Classes
-    private FakeDoorController!: Il2Cpp.Class;
-    private CrownMazeDoor!: Il2Cpp.Class;
+    private static FakeDoorController: Il2Cpp.Class;
+    private static CrownMazeDoor: Il2Cpp.Class;
 
-    public init(): void {
+    static init(): void {
         this.FakeDoorController = AssemblyHelper.TheMultiplayerGuys.class("Levels.DoorDash.FakeDoorController");
         this.CrownMazeDoor = AssemblyHelper.TheMultiplayerGuys.class("Levels.CrownMaze.CrownMazeDoor");
+
+        Logger.info("[DoorManager::init] Initialized");
     }
 
-    public removeRealDoors(): void {
+    static removeRealDoors(): void {
         if (this.processDoors(this.FakeDoorController, "get_IsFakeDoor", false)) {
             return;
         }
@@ -33,7 +32,7 @@ export class DoorManagerModule extends BaseModule {
         Logger.toast(I18n.t("rounds_toasts.no_doors"));
     }
 
-    private processDoors(doorClass: Il2Cpp.Class, methodName: string, methodShouldReturn: boolean): boolean {
+    private static processDoors(doorClass: Il2Cpp.Class, methodName: string, methodShouldReturn: boolean): boolean {
         const doors = UnityUtils.FindObjectsOfTypeAll(doorClass);
 
         if (doors.length === 0) {

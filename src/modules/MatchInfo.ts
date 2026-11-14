@@ -1,23 +1,21 @@
-import { AssemblyHelper } from "../../core/AssemblyHelper";
-import { BaseModule } from "../../core/BaseModule";
-import { Logger } from "../../logger/Logger";
-import { UnityUtils } from "../../utils/UnityUtils";
-import { I18n } from "../../i18n/I18n";
-import { JavaUtils } from "../../utils/JavaUtils";
+import { AssemblyHelper } from "../core/AssemblyHelper";
+import { Logger } from "../logger/Logger";
+import { UnityUtils } from "../utils/UnityUtils";
+import { I18n } from "../i18n/I18n";
+import { JavaUtils } from "../utils/JavaUtils";
 
-export class MatchInfoModule extends BaseModule {
-    public readonly name = "MatchInfo";
+export class MatchInfo {
+    private static ClientGameManager: Il2Cpp.Class;
+    private static GlobalGameStateClient: Il2Cpp.Class;
 
-    // Classes
-    private ClientGameManager!: Il2Cpp.Class;
-    private GlobalGameStateClient!: Il2Cpp.Class;
-
-    public init(): void {
+    static init(): void {
         this.ClientGameManager = AssemblyHelper.MTFGClient.class("FGClient.ClientGameManager");
         this.GlobalGameStateClient = AssemblyHelper.MTFGClient.class("FGClient.GlobalGameStateClient");
+
+        Logger.info("[MatchInfo::init] Initialized");
     }
 
-    public showGameDetails(): void {
+    static showGameDetails(): void {
         try {
             const gameStateInstance = this.getGameStateForMatch("showGameDetails");
             if (!gameStateInstance) return;
@@ -45,7 +43,7 @@ export class MatchInfoModule extends BaseModule {
         }
     }
 
-    public showServerDetails(): void {
+    static showServerDetails(): void {
         try {
             const gameStateInstance = this.getGameStateForMatch("showServerDetails");
             if (!gameStateInstance) return;
@@ -65,7 +63,7 @@ export class MatchInfoModule extends BaseModule {
         }
     }
 
-    private getGameStateForMatch(caller: string): Il2Cpp.Object | undefined {
+    private static getGameStateForMatch(caller: string): Il2Cpp.Object | undefined {
         const gameStateInstance = UnityUtils.getInstance(this.GlobalGameStateClient);
         if (!gameStateInstance) return undefined;
 

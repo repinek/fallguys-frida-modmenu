@@ -1,5 +1,4 @@
 import { AssemblyHelper } from "../../core/AssemblyHelper";
-import { BaseModule } from "../../core/BaseModule";
 import { I18n } from "../../i18n/I18n";
 import { UnityUtils } from "../../utils/UnityUtils";
 import { Logger } from "../../logger/Logger";
@@ -10,17 +9,17 @@ import { Logger } from "../../logger/Logger";
  * If it returns true, we disable the GameObject using SetActive
  */
 
-export class TipToeManagerModule extends BaseModule {
-    public readonly name = "TipToeManager";
-
+export class TipToeManager {
     // Classes
-    private TipToe_Platform!: Il2Cpp.Class;
+    private static TipToe_Platform: Il2Cpp.Class;
 
-    public init(): void {
+    static init(): void {
         this.TipToe_Platform = AssemblyHelper.TheMultiplayerGuys.class("Levels.TipToe.TipToe_Platform");
+
+        Logger.info("[TipToeManager::init] Initialized");
     }
 
-    public removeFakeTipToe(): void {
+    static removeFakeTipToe(): void {
         const platforms = UnityUtils.FindObjectsOfTypeAll(this.TipToe_Platform);
 
         if (platforms.length === 0) {

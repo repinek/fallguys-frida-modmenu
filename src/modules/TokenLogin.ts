@@ -1,15 +1,14 @@
-import { AssemblyHelper } from "../../core/AssemblyHelper";
-import { BaseModule } from "../../core/BaseModule";
-import { Constants } from "../../data/Constants";
-import { ModSettings } from "../../data/ModSettings";
-import { I18n } from "../../i18n/I18n";
-import { Logger } from "../../logger/Logger";
-import { LocaliseOption } from "../../ui/popup/data/ModalMessageBaseData";
-import { ModalType, OkButtonType } from "../../ui/popup/data/ModalMessageData";
-import { ModalMessageWithInputFieldData } from "../../ui/popup/data/ModalMessageWithInputFieldData";
-import { PopupManager } from "../../ui/popup/PopupManager";
-import { JavaUtils } from "../../utils/JavaUtils";
-import { UnityUtils } from "../../utils/UnityUtils";
+import { AssemblyHelper } from "../core/AssemblyHelper";
+import { Constants } from "../data/Constants";
+import { ModSettings } from "../data/ModSettings";
+import { I18n } from "../i18n/I18n";
+import { Logger } from "../logger/Logger";
+import { LocaliseOption } from "../ui/popup/data/ModalMessageBaseData";
+import { ModalType, OkButtonType } from "../ui/popup/data/ModalMessageData";
+import { ModalMessageWithInputFieldData } from "../ui/popup/data/ModalMessageWithInputFieldData";
+import { PopupManager } from "../ui/popup/PopupManager";
+import { JavaUtils } from "../utils/JavaUtils";
+import { UnityUtils } from "../utils/UnityUtils";
 
 // SHITCODE ALERT!
 
@@ -28,62 +27,52 @@ import { UnityUtils } from "../../utils/UnityUtils";
  * Thx floyzi
  */
 
-export class TokenLoginModule extends BaseModule {
-    public readonly name = "TokenLogin";
+export class TokenLogin {
+    private static args?: [Il2Cpp.Object, Il2Cpp.Object];
+    private static isPerformingLogin = false;
+    private static accessToken?: string;
 
-    // Classes
-    private CatapultGatewayConnection!: Il2Cpp.Class;
-    private LoginState!: Il2Cpp.Class;
+    static init(): void {
+        // Classes
+        const CatapultGatewayConnection = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Gateway.CatapultGatewayConnection");
+        const LoginState = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Gateway.States.LoginState");
 
-    // Methods
-    private PerformLoginFlow!: Il2Cpp.Method;
-    private BuildLoginRequest!: Il2Cpp.Method;
+        // Methods
+        //@ts-ignore
+        CatapultGatewayConnection.method("PerformLoginFlow", 1).implementation = this.performLoginFlowHook;
+        //@ts-ignore
+        LoginState.method<Il2Cpp.Object>("BuildLoginRequest", 1).implementation = this.buildLoginRequestHook;
 
-    private args?: [Il2Cpp.Object, Il2Cpp.Object];
-    private isPerformingLogin = false;
-    private accessToken?: string;
-
-    public init(): void {
-        this.CatapultGatewayConnection = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Gateway.CatapultGatewayConnection");
-        this.LoginState = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Gateway.States.LoginState");
-
-        this.PerformLoginFlow = this.CatapultGatewayConnection.method("PerformLoginFlow", 1);
-        this.BuildLoginRequest = this.LoginState.method<Il2Cpp.Object>("BuildLoginRequest", 1);
+        Logger.info("[TokenLogin::init] Initialized");
     }
 
-    public override initHooks(): void {
-        const module = this;
+    private static performLoginFlowHook(this: Il2Cpp.Object, ContentUpdateNotification: Il2Cpp.Object): void {
+        Logger.hook("PerformLoginFlow called");
 
-        //@ts-ignore
-        this.PerformLoginFlow.implementation = function (this: Il2Cpp.Object, ContentUpdateNotification: Il2Cpp.Object): void {
-            Logger.hook("PerformLoginFlow called");
+        if (TokenLogin.isPerformingLogin || !ModSettings.tokenLogin) {
+            TokenLogin.isPerformingLogin = false;
+            return this.method<void>("PerformLoginFlow", 1).invoke(ContentUpdateNotification);
+        }
 
-            if (module.isPerformingLogin || !ModSettings.tokenLogin) {
-                module.isPerformingLogin = false;
-                return this.method<void>("PerformLoginFlow", 1).invoke(ContentUpdateNotification);
-            }
+        // This is bad implemenation!
+        TokenLogin.args = [this, ContentUpdateNotification];
 
-            // This is bad implemenation!
-            module.args = [this, ContentUpdateNotification];
-
-            module.showTokenPopup();
-        };
-
-        //@ts-ignore
-        this.BuildLoginRequest.implementation = function (LoginCredential: Il2Cpp.Object): Il2Cpp.Object {
-            Logger.hook("BuildLoginRequest called");
-            const httpLoginRequest = this.method<Il2Cpp.Object>("BuildLoginRequest", 1).invoke(LoginCredential);
-
-            if (ModSettings.tokenLogin && module.accessToken) {
-                httpLoginRequest.method("set_Token", 1).invoke(Il2Cpp.string(module.accessToken));
-                Logger.debug(`[${module.name}::BuildLoginRequest] Using custom token to login`);
-            }
-
-            return httpLoginRequest;
-        };
+        TokenLogin.showTokenPopup();
     }
 
-    private showTokenPopup(): void {
+    private static buildLoginRequestHook(this: Il2Cpp.Object, LoginCredential: Il2Cpp.Object): Il2Cpp.Object {
+        Logger.hook("BuildLoginRequest called");
+        const httpLoginRequest = this.method<Il2Cpp.Object>("BuildLoginRequest", 1).invoke(LoginCredential);
+
+        if (ModSettings.tokenLogin && TokenLogin.accessToken) {
+            httpLoginRequest.method("set_Token", 1).invoke(Il2Cpp.string(TokenLogin.accessToken));
+            Logger.debug(`[${TokenLogin.name}::BuildLoginRequest] Using custom token to login`);
+        }
+
+        return httpLoginRequest;
+    }
+
+    private static showTokenPopup(): void {
         const data = ModalMessageWithInputFieldData.create();
         data.LocaliseOption = LocaliseOption.NotLocalised;
         data.Title = I18n.t("popups.token_login.title");
@@ -108,7 +97,7 @@ export class TokenLoginModule extends BaseModule {
         PopupManager.show(data, 1.5);
     }
 
-    private refreshToAccessToken(refreshToken: string): void {
+    private static refreshToAccessToken(refreshToken: string): void {
         const body = I18n.format(Constants.TOKEN_BODY, refreshToken);
         const headers = { "Content-Type": "application/x-www-form-urlencoded", Authorization: Constants.TOKEN_AUTHORIZATION };
 
@@ -135,7 +124,7 @@ export class TokenLoginModule extends BaseModule {
     }
 
     /** Calling PerformLoginFlow with isPerformingLogin = true to proceed login */
-    private resumeLogin(): void {
+    private static resumeLogin(): void {
         if (!this.args) return;
         this.isPerformingLogin = true;
         this.args[0].method("PerformLoginFlow", 1).invoke(this.args[1]);
@@ -143,7 +132,7 @@ export class TokenLoginModule extends BaseModule {
     }
 
     /** Checks on 3 parts and shows login toast if valid */
-    private validateToken(refreshToken: string): boolean {
+    private static validateToken(refreshToken: string): boolean {
         const parts = refreshToken.split(".");
         if (parts.length !== 3) {
             Logger.warn(`[${this.name}::validateToken] Invalid token format (parts: ${parts.length})`);
@@ -151,7 +140,7 @@ export class TokenLoginModule extends BaseModule {
             return false;
         }
 
-        const payload = TokenLoginModule.decodeBase64Url(parts[1]);
+        const payload = TokenLogin.decodeBase64Url(parts[1]);
         if (!payload) {
             Logger.warn(`[${this.name}::validateToken] Failed to decode payload`);
             Logger.toast(I18n.t("network_toasts.invalid_token"));
@@ -163,7 +152,7 @@ export class TokenLoginModule extends BaseModule {
     }
 
     // since it's jwt we can show profile name. JSON.parse returns any, so we accepting any here
-    private showLoginToast(payload: any): void {
+    private static showLoginToast(payload: any): void {
         Logger.toast(I18n.t("network_toasts.logined_in", payload.dn));
         return;
     }
@@ -173,7 +162,7 @@ export class TokenLoginModule extends BaseModule {
      *
      * @returns Result is json parsed
      */
-    public static decodeBase64Url(base64Url: string): any {
+    static decodeBase64Url(base64Url: string): any {
         try {
             let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
             while (base64.length % 4) base64 += "=";

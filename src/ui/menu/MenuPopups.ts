@@ -12,7 +12,7 @@ import { PopupManager } from "../popup/PopupManager";
 
 import { UnityUtils } from "../../utils/UnityUtils";
 import { UpdateUtils } from "../../utils/UpdateUtils";
-import { CatapultModule } from "../../modules/network/Catapult";
+import { Catapult } from "../../modules/Catapult";
 
 export class MenuPopups {
     static showDebugPopup(): void {
@@ -91,13 +91,13 @@ export class MenuPopups {
         data.ModalType = ModalType.MT_OK_CANCEL;
         data.OkButtonType = OkButtonType.Green;
 
-        const platforms = CatapultModule.getLocalisedPlatforms();
+        const platforms = Catapult.getLocalisedPlatforms();
         data.OptionStringIds = UnityUtils.createStringList(platforms);
 
         data.OnOptionSelectionModalClosed = Il2Cpp.delegate(UnityUtils.SystemActionBoolInt, (pressed: boolean, selectedIndex: number) => {
             if (pressed) {
-                const selectedPlatform = CatapultModule.PLATFORMS[selectedIndex];
-                CatapultModule.changePlatform(selectedPlatform);
+                const selectedPlatform = Catapult.PLATFORMS[selectedIndex];
+                Catapult.changePlatform(selectedPlatform);
             }
         });
 

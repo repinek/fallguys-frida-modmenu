@@ -1,18 +1,16 @@
-import { ModuleManager } from "../../core/ModuleManager";
+import { BuildInfo } from "../../modules/BuildInfo";
+import { MatchInfo } from "../../modules/MatchInfo";
+import { UwUify } from "../../modules/UwUify";
 
-import { BuildInfoModule } from "../../modules/game/BuildInfo";
-import { MatchInfoModule } from "../../modules/game/MatchInfo";
-import { UwUifyModule } from "../../modules/game/UwUify";
+import { CharacterPhysics } from "../../modules/player/CharacterPhysics";
+import { TeleportManager } from "../../modules/player/TeleportManager";
 
-import { CharacterPhysicsModule } from "../../modules/player/CharacterPhysics";
-import { TeleportManagerModule } from "../../modules/player/TeleportManager";
+import { DoorManager } from "../../modules/rounds/DoorManager";
+import { TipToeManager } from "../../modules/rounds/TipToeManager";
 
-import { DoorManagerModule } from "../../modules/rounds/DoorManager";
-import { TipToeManagerModule } from "../../modules/rounds/TipToeManager";
-
-import { FGDebugModule } from "../../modules/visuals/FGDebug";
-import { GraphicsManagerModule } from "../../modules/visuals/GraphicsManager";
-import { UICanvasModule } from "../../modules/visuals/UICanvas";
+import { FGDebug } from "../../modules/FGDebug";
+import { GraphicsManager } from "../../modules/GraphicsManager";
+import { UICanvas } from "../../modules/UICanvas";
 
 import { MenuBuilder } from "./MenuBuilder";
 
@@ -21,16 +19,16 @@ import { add, CENTER } from "frida-java-menu";
 
 export class MenuUtils {
     public static modules: {
-        buildInfo?: BuildInfoModule;
-        matchInfo?: MatchInfoModule;
-        uwuify?: UwUifyModule;
-        characterPhysics?: CharacterPhysicsModule;
-        teleportManager?: TeleportManagerModule;
-        doorManager?: DoorManagerModule;
-        tipToeManager?: TipToeManagerModule;
-        fgDebug?: FGDebugModule;
-        graphicsManager?: GraphicsManagerModule;
-        uiCanvas?: UICanvasModule;
+        buildInfo?: typeof BuildInfo;
+        matchInfo?: typeof MatchInfo;
+        uwuify?: typeof UwUify;
+        characterPhysics?: typeof CharacterPhysics;
+        teleportManager?: typeof TeleportManager;
+        doorManager?: typeof DoorManager;
+        tipToeManager?: typeof TipToeManager;
+        fgDebug?: typeof FGDebug;
+        graphicsManager?: typeof GraphicsManager;
+        uiCanvas?: typeof UICanvas;
     } = {};
 
     /** Creates a callback wrapper over UnityUtils.runInMain */
@@ -44,22 +42,22 @@ export class MenuUtils {
         const m = this.modules;
 
         // Game
-        m.buildInfo = ModuleManager.get(BuildInfoModule);
-        m.matchInfo = ModuleManager.get(MatchInfoModule);
-        m.uwuify = ModuleManager.get(UwUifyModule);
+        m.buildInfo = BuildInfo;
+        m.matchInfo = MatchInfo;
+        m.uwuify = UwUify;
 
         // Player
-        m.characterPhysics = ModuleManager.get(CharacterPhysicsModule);
-        m.teleportManager = ModuleManager.get(TeleportManagerModule);
+        m.characterPhysics = CharacterPhysics;
+        m.teleportManager = TeleportManager;
 
         // Rounds
-        m.doorManager = ModuleManager.get(DoorManagerModule);
-        m.tipToeManager = ModuleManager.get(TipToeManagerModule);
+        m.doorManager = DoorManager;
+        m.tipToeManager = TipToeManager;
 
         // Visuals
-        m.fgDebug = ModuleManager.get(FGDebugModule);
-        m.graphicsManager = ModuleManager.get(GraphicsManagerModule);
-        m.uiCanvas = ModuleManager.get(UICanvasModule);
+        m.fgDebug = FGDebug;
+        m.graphicsManager = GraphicsManager;
+        m.uiCanvas = UICanvas;
     }
 
     /** Adds center text in menu */

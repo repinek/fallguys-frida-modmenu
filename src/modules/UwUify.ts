@@ -1,7 +1,7 @@
-import { AssemblyHelper } from "../../core/AssemblyHelper";
-import { BaseModule } from "../../core/BaseModule";
-import { ModSettings } from "../../data/ModSettings";
-import { UnityUtils } from "../../utils/UnityUtils";
+import { AssemblyHelper } from "../core/AssemblyHelper";
+import { ModSettings } from "../data/ModSettings";
+import { UnityUtils } from "../utils/UnityUtils";
+import { Logger } from "../logger/Logger";
 
 /*
  * Hooks TMP_Text::set_text and return UwUified result
@@ -19,44 +19,38 @@ import { UnityUtils } from "../../utils/UnityUtils";
  * Special Thanks: https://github.com/floyzi/FGToolsMobile/blob/master/Src/FLZ_Common/Owoify.cs
  */
 
-export class UwUifyModule extends BaseModule {
-    public readonly name = "UwUify";
-
+export class UwUify {
     // Classes
-    private TMP_Text!: Il2Cpp.Class;
-
-    // Methods
-    private set_text!: Il2Cpp.Method;
+    private static TMP_Text: Il2Cpp.Class;
 
     // GameObjectInstanceID, string
-    private originalStrings: Record<number, string> = {};
+    private static originalStrings: Record<number, string> = {};
 
-    public init(): void {
+    static init(): void {
         this.TMP_Text = AssemblyHelper.TextMeshPro.class("TMPro.TMP_Text");
 
-        this.set_text = this.TMP_Text.method<void>("set_text");
-    }
-
-    public override initHooks(): void {
-        const module = this;
-
+        // Methods
         //@ts-ignore
-        this.set_text.implementation = function (this: Il2Cpp.Object, string: Il2Cpp.String): void {
-            if (string.isNull()) {
-                this.method<void>("set_text").invoke(string);
-                return;
-            }
+        this.TMP_Text.method<void>("set_text").implementation = this.setTextHook;
 
-            if (ModSettings.uwuifyMode) {
-                const content = string.content;
-                if (content && content.length > 0) string = Il2Cpp.string(module.createUwUifiedString(this, content));
-            }
-
-            this.method<void>("set_text").invoke(string);
-        };
+        Logger.info("[UwUify::init] Initialized");
     }
 
-    public toggleUwUify(state: boolean): void {
+    private static setTextHook(this: Il2Cpp.Object, string: Il2Cpp.String): void {
+        if (string.isNull()) {
+            this.method<void>("set_text").invoke(string);
+            return;
+        }
+
+        if (ModSettings.uwuifyMode) {
+            const content = string.content;
+            if (content && content.length > 0) string = Il2Cpp.string(UwUify.createUwUifiedString(this, content));
+        }
+
+        this.method<void>("set_text").invoke(string);
+    }
+
+    static toggleUwUify(state: boolean): void {
         if (state) {
             // it takes 2.2s with FindObjectOfTypeAll :broken_heart:
             const texts = UnityUtils.FindObjectsOfType(this.TMP_Text);
@@ -77,14 +71,14 @@ export class UwUifyModule extends BaseModule {
         }
     }
 
-    private createUwUifiedString(TMP_Text: Il2Cpp.Object, string: string): string {
+    private static createUwUifiedString(TMP_Text: Il2Cpp.Object, string: string): string {
         const objectID = UnityUtils.GetInstanceID(TMP_Text);
         this.originalStrings[objectID] = string;
 
         return this.uwuify(string);
     }
 
-    private uwuify(text: string): string {
+    private static uwuify(text: string): string {
         const prefixes = ["<3 ", "0w0 ", "H-hewwo?? ", "HIIII! ", "Haiiii! ", "Huohhhh. ", "OWO ", "OwO ", "UwU "];
 
         const suffixes = [

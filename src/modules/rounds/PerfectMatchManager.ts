@@ -1,33 +1,28 @@
 import { AssemblyHelper } from "../../core/AssemblyHelper";
-import { BaseModule } from "../../core/BaseModule";
 import { ModSettings } from "../../data/ModSettings";
+import { Logger } from "../../logger/Logger";
 
-export class PerfectMatchManagerModule extends BaseModule {
-    public readonly name = "PerfectMatchManager";
+export class PerfectMatchManager {
+    static init(): void {
+        // Classes
+        const MatchFallTile = AssemblyHelper.TheMultiplayerGuys.class("Levels.MatchFall.MatchFallTile");
 
-    // Classes
-    private MatchFallTile!: Il2Cpp.Class;
+        // Methods
+        //@ts-ignore
+        MatchFallTile.method<void>("Update").implementation = this.updateHook;
 
-    // Methods
-    private Update!: Il2Cpp.Method;
-
-    public init(): void {
-        this.MatchFallTile = AssemblyHelper.TheMultiplayerGuys.class("Levels.MatchFall.MatchFallTile");
-
-        this.Update = this.MatchFallTile.method<void>("Update");
+        Logger.info("[PerfectMatchManager::init] Initialized");
     }
 
-    public override initHooks(): void {
-        this.Update.implementation = function (): void {
-            if (ModSettings.showPerfectMatchTiles) {
-                const tileSurfaceOffObject = this.method<Il2Cpp.Object>("get__tileSurfaceOffObject").invoke();
-                const tileSurfaceOnObject = this.method<Il2Cpp.Object>("get__tileSurfaceOnObject").invoke();
+    private static updateHook(this: Il2Cpp.Object): void {
+        if (ModSettings.showPerfectMatchTiles) {
+            const tileSurfaceOffObject = this.method<Il2Cpp.Object>("get__tileSurfaceOffObject").invoke();
+            const tileSurfaceOnObject = this.method<Il2Cpp.Object>("get__tileSurfaceOnObject").invoke();
 
-                tileSurfaceOffObject.method<void>("SetActive").invoke(false);
-                tileSurfaceOnObject.method<void>("SetActive").invoke(true);
-            }
+            tileSurfaceOffObject.method<void>("SetActive").invoke(false);
+            tileSurfaceOnObject.method<void>("SetActive").invoke(true);
+        }
 
-            this.method<void>("Update").invoke();
-        };
+        this.method<void>("Update").invoke();
     }
 }

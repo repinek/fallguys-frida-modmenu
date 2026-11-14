@@ -1,25 +1,24 @@
 import { AssemblyHelper } from "../../core/AssemblyHelper";
-import { BaseModule } from "../../core/BaseModule";
 import { Logger } from "../../logger/Logger";
-import { CharacterPhysicsModule } from "./CharacterPhysics";
+import { CharacterPhysics } from "./CharacterPhysics";
 import { UnityUtils } from "../../utils/UnityUtils";
 
-export class TeleportManagerModule extends BaseModule {
-    public readonly name = "TeleportManager";
-
+export class TeleportManager {
     // Classes
-    private ObjectiveReachEndZone!: Il2Cpp.Class;
-    private GrabToQualify!: Il2Cpp.Class;
-    private SpawnableCollectable!: Il2Cpp.Class;
-    private ScoringBubble!: Il2Cpp.Class;
-    private ScoredButton!: Il2Cpp.Class;
+    private static ObjectiveReachEndZone: Il2Cpp.Class;
+    private static GrabToQualify: Il2Cpp.Class;
+    private static SpawnableCollectable: Il2Cpp.Class;
+    private static ScoringBubble: Il2Cpp.Class;
+    private static ScoredButton: Il2Cpp.Class;
 
-    public init(): void {
+    static init(): void {
         this.ObjectiveReachEndZone = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone"); // finish
         this.GrabToQualify = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crown
         this.SpawnableCollectable = AssemblyHelper.TheMultiplayerGuys.class("Levels.ScoreZone.SpawnableCollectable"); // bubble unity levels
         this.ScoringBubble = AssemblyHelper.TheMultiplayerGuys.class("Levels.Progression.COMMON_ScoringBubble"); // bubble creative levels
         this.ScoredButton = AssemblyHelper.TheMultiplayerGuys.class("ScoredButton"); // trigger button unity
+
+        Logger.info("[TeleportManager::init] Initialized");
     }
 
     /**
@@ -29,7 +28,7 @@ export class TeleportManagerModule extends BaseModule {
      * @param targetInstance The destination Object
      * @param additionalY Vertical offset added to targetInstance position
      */
-    private teleportTo(playerInstance: Il2Cpp.Object, targetInstance: Il2Cpp.Object, additionalY: number = 0): void {
+    private static teleportTo(playerInstance: Il2Cpp.Object, targetInstance: Il2Cpp.Object, additionalY: number = 0): void {
         try {
             const targetPos = UnityUtils.getTransform(targetInstance).method<Il2Cpp.Object>("get_position").invoke(); // Vector3
             targetPos.field<number>("y").value += additionalY;
@@ -43,11 +42,11 @@ export class TeleportManagerModule extends BaseModule {
         }
     }
 
-    private get character(): Il2Cpp.Object | undefined {
-        return CharacterPhysicsModule.Character;
+    private static get character(): Il2Cpp.Object | undefined {
+        return CharacterPhysics.Character;
     }
 
-    public teleportToFinish(): void {
+    static teleportToFinish(): void {
         // TODO: fix, doesn't work
         // UPD: since character is cached, we probably can re-check it here
         // I don't see a reason to do that currently, since it's not crashing or anything
@@ -71,7 +70,7 @@ export class TeleportManagerModule extends BaseModule {
         }
     }
 
-    public teleportToScore(): void {
+    static teleportToScore(): void {
         if (!this.character) {
             Logger.debug(`[${this.name}::teleportToScore] No character`);
             return;
@@ -94,7 +93,7 @@ export class TeleportManagerModule extends BaseModule {
         }
     }
 
-    private findUnityBubbles(): Il2Cpp.Object | undefined {
+    private static findUnityBubbles(): Il2Cpp.Object | undefined {
         const unityBubbles = UnityUtils.FindObjectsOfTypeAll(this.SpawnableCollectable);
         for (const bubble of unityBubbles) {
             if (bubble.method<boolean>("get_Spawned").invoke()) {
@@ -104,7 +103,7 @@ export class TeleportManagerModule extends BaseModule {
         return undefined;
     }
 
-    private findCreativeBubbles(): Il2Cpp.Object | undefined {
+    private static findCreativeBubbles(): Il2Cpp.Object | undefined {
         const creativeBubbles = UnityUtils.FindObjectsOfTypeAll(this.ScoringBubble);
         for (const bubble of creativeBubbles) {
             // if award is negative points: skip
@@ -117,7 +116,7 @@ export class TeleportManagerModule extends BaseModule {
         }
     }
 
-    private findScoredButton(): Il2Cpp.Object | undefined {
+    private static findScoredButton(): Il2Cpp.Object | undefined {
         const scoredButtons = UnityUtils.FindObjectsOfTypeAll(this.ScoredButton);
         for (const button of scoredButtons) {
             if (button.field<boolean>("_isAnActiveTarget").value) return button;
