@@ -20,15 +20,14 @@
   "license": "GPL-3.0",
   "main": "src/index.ts",
   "scripts": {
-    "build:release": "webpack --env release",
+    "build": "npm run build:release",
     "build:dev": "webpack --env dev",
-    "watch": "webpack --watch --env dev",
+    "build:release": "webpack --env release",
     "spawn": "frida -U gadget -l dist/agent.js",
-    "spawn:server": "frida -U \"Fall Guys\" -l dist/agent.js",
-    "spawn:release": "npm run build:release && frida -U gadget -l dist/agent.js",
-    "spawn:dev": "npm run build:dev && frida -U gadget -l dist/agent.js",
-    "lint": "eslint \"src/**\"",
-    "prettier": "prettier --write \"src/**\""
+    "spawn:dev": "npm run build:dev && npm run spawn",
+    "spawn:release": "npm run build:release && npm run spawn",
+    "prettier": "prettier --ignore-path .gitignore --ignore-path .prettierignore --write \"**/*.{ts,mts,json,md}\"",
+    "lint": "eslint . --fix"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -64,6 +63,6 @@
   "allowScripts": {
     "github:astra1dev/frida-java-menu#aa6e44e3f7e88bba18042b0d08b30ebec42ebae2": true,
     "github:astra1dev/frida-java-menu#f260169ee1640b5a805d954b27ff475506991ac7": true,
-    "frida@17.23.0": true
+    "frida@17.26.3": true
   }
 }
