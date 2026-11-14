@@ -4,13 +4,14 @@
 > **Use at your own risk.**
 
 # Fall Guys Mod Menu
+
 Android Fall Guys mod menu using [Frida](https://frida.re/) and [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge)
 
-For updates announcements join our community in Discord:
-[Make FG Great Again Discord Server](https://discord.gg/cNFJ73P6p3) 
-
+For updates and announcements join our community in Discord:
+[Make FG Great Again Discord Server](https://discord.gg/cNFJ73P6p3)
 
 ## 📸 Showcase
+
 <img src="media/video1.gif" width="500" alt="Teleport showcase" />
 
 <details>
@@ -20,9 +21,10 @@ For updates announcements join our community in Discord:
   <img src="media/screenshot3.jpg" alt="Platform Spoofing showcase" width="500"/>
 </details>
 
-
 ## ✨ Features
+
 ### Movement
+
 - **360 Dives**
 - **Air Jump**
 - **Freeze Player**
@@ -32,58 +34,64 @@ For updates announcements join our community in Discord:
 - **Change Jump and Dive Strength**
 
 ### Rounds helper
+
 - **Door Dash / Lost Temple:** Hide Real Doors
 - **Tip Toe:** Hide Fake Platforms
 - **Perfect Match:** Always show tiles
 
 ### Teleports
+
 - **Teleport To Finish or Crown**
-- **Teleport to Score Points** *(e.g., Bubbles)* **or Active Buttons**
+- **Teleport to Score Points** _(e.g., Bubbles)_ **or Active Buttons**
 
 ### Other
+
 - **View Names Shortcut Button**
 - **Change FOV**
 - **Toggle Display UI**
 - **Display FGDebug:**
-  - Shows FPS (min/max/avg/current), Time, Ping, Dropped Packets
-- **Disable FG Analytics** 
+    - Shows FPS (min/max/avg/current), Time, Ping, Dropped Packets
+- **Disable FG Analytics**
 - **Show Number of Queued Players** in matchmaking
 - **Change Game Resolution**
 - **Show Game Details**
-  - Shows RoundID, seed and Eliminated Players
+    - Shows RoundID, seed and Eliminated Players
 - **Show Server Details**
-  - Shows Server IP, Host and Ping
+    - Shows Server IP, Host and Ping
 - **UwUify Game**
 - **Spoof Platform**
 - **Show Build Info**
 
 ### Always Active
+
 - **Bypass Character Physics Checks**
 - **Remove FPS Limit**
 - **Anti-AFK**
-- **Bypass Permanent Ban** *(does not affect temporary bans)*
+- **Bypass Permanent Ban** _(does not affect temporary bans)_
 - **Automatically spoof to the latest game version**
 
 ### For developers
-- **Login Using Refresh Token** *(not included in release builds)*
-- **Spoof Login, Gateway and analytics server** *(requires script edit)*
+
+- **Login Using Refresh Token** _(not included in release builds)_
+- **Spoof Login, Gateway and analytics server** _(requires script edit)_
 - **Show Unity Logs**
 - **Wrapper for In-Game Popup Manager**
-  
 
 ## 📦 Installation
+
 Just download and install the .apk from [Releases](https://github.com/repinek/fallguys-frida-modmenu/releases/latest)  
 Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 
 > **Tip regarding OBB files:**  
 > If you don't want to wait for game resources to download again:
+>
 > 1. Copy the `.obb` file from `Android/obb/com.Mediatonic.FallGuys_client/`.
 > 2. Create a new folder: `Android/obb/com.Mediatonic.FallGuys_client.modmenu/`.
 > 3. Paste the file there and rename it by adding `.modmenu` before `.obb`.  
-> *Example:* `main.XXXX.com.mediatonic.FallGuys_client.modmenu.obb`
-
+>    _Example:_ `main.XXXX.com.mediatonic.FallGuys_client.modmenu.obb`
 
 ## 🛠️ Troubleshooting
+
 > This project is for **educational and research purposes only**. I won't be providing support.
 
 **Q:** How do I know if the menu is loaded?  
@@ -93,46 +101,48 @@ Not working? Look [🛠️ Troubleshooting](#%EF%B8%8F-troubleshooting)
 **A:** Ensure you granted the "Display over other apps" permission. The game should ask for it on the first launch. If not, grant it manually.
 
 **Q:** Are emulators supported?  
-**A:** No. Emulators are not supported because they cannot handle the `frida-java-bridge` required for the menu.  
+**A:** No. Emulators are not supported because they cannot handle the `frida-java-bridge` required for the menu.
 
 ### ⚠️ Stability Issues
-This mod relies on `frida-java-bridge`, which is **very unstable**. This results in random crashes and inconsistent behavior.
 
-*   **The Issue:** The game may crash immediately upon calling Java methods, even if Frida reports `Java.available = true`.
+This mod relies on `frida-java-bridge`, which can be **very unstable**. This results in random crashes and inconsistent behavior.
+The game may crash immediately upon calling Java methods, even if a lib reports `Java.available = true`.
 
-**HyperOS, ColorOS, OneUI, HarmonyOS**, and other **OEM ROMs** may not work properly or at all.   
-**It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).**    
+**HyperOS, ColorOS, OneUI, HarmonyOS**, and other **OEM ROMs** may not work properly or at all.  
+**It is recommended to use ROMs with minimal changes to ART (mainly AOSP forks).**
 
 ### 💡 Alternative Solution
+
 If you are unable to run this mod menu, we recommend checking out [**FGTools Mobile**](https://gitlab.com/floyzi/FGToolsMobile) by [Floyzi](https://github.com/floyzi).
 
-
 ## 🤝 Contribution
+
 Pull requests are welcome! **Please read our [CONTRIBUTING.md](CONTRIBUTING.md) guide.**
 
 It covers:
-*   Project Structure
-*   Building from source
-*   Debugging with Frida Gadget
-*   Code Style & Tools
+
+- Settings up the delevopment environment
+- Building from source
+- Testing and debugging 
+- Heplful information and Reverse engineering tools
 
 ## 📜 License
+
 This project is licensed under the **GNU General Public License v3.0**.  
 See the [LICENSE](LICENSE) file for details.
 
-
 ## 🙏 Special Thanks
+
 [Obed Guys Corp.](https://github.com/Obed-Guys-Corp) - Some features powered by **Obed Guys Corp.**.  
 [Floyzi](https://github.com/floyzi) - For how the game works, help with some features, localization.  
 [commonuserlol](https://github.com/commonuserlol) - For help with code and [menu](https://github.com/commonuserlol/frida-java-menu).  
 [Dynasty-Dev](https://github.com/Dynasty-Dev) - For testing and contribution.  
 [igamegod](https://github.com/igamegod) - For help with some features.  
 [Astra1dev](https://github.com/astra1dev) - For help with [menu](https://github.com/astra1dev/frida-java-menu) and other things.  
-[Gene Brawl](https://github.com/RomashkaTea/genebrawl-public) - For the Webpack build configuration.  
+[Gene Brawl](https://github.com/RomashkaTea/genebrawl-public) - For the Webpack build configuration.
 
 [Frida](https://frida.re/) - An amazing dynamic instrumentation toolkit.  
 [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge/) - The incredible frida module for IL2CPP.
-
 
 # Disclaimer
 
