@@ -48,6 +48,7 @@
   },
   "dependencies": {
     "buffer": "^6.0.3",
+    "eslint-plugin-simple-import-sort": "^14.0.0",
     "frida": "^17.23.0",
     "frida-compile": "^19.1.0",
     "frida-il2cpp-bridge": "^0.14.0",

@@ -1,29 +1,37 @@
+import { fileURLToPath } from "node:url";
+
+import { includeIgnoreFile } from "@eslint/config-helpers";
 import js from "@eslint/js";
+import { defineConfig } from "eslint/config";
+import eslintConfigPrettier from "eslint-config-prettier";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
 import globals from "globals";
 import tseslint from "typescript-eslint";
-import eslintConfigPrettier from "eslint-config-prettier";
 
-import { defineConfig, globalIgnores } from "eslint/config";
+// https://eslint.org/docs/latest/use/configure/ignore#include-gitignore-file
+const gitignorePath = fileURLToPath(new URL(".gitignore", import.meta.url));
 
 export default defineConfig([
     js.configs.recommended,
     ...tseslint.configs.recommended,
 
-    globalIgnores(["src/tests/"]),
-
+    includeIgnoreFile(gitignorePath),
     {
-        files: ["src/**/*.ts"],
+        files: ["src/**/*.ts", "*.mts"],
         languageOptions: {
             globals: {
-                ...globals.browser,
                 ...globals.node
             }
         },
+        plugins: {
+            "simple-import-sort": simpleImportSort
+        },
         rules: {
-            "@typescript-eslint/no-explicit-any": "off",
-            "@typescript-eslint/ban-ts-comment": "off", // Look https://github.com/vfsfitvnm/frida-il2cpp-bridge/wiki/Changelog#v090 that's why we should use @ts-ignore
-            "@typescript-eslint/no-this-alias": "off", // Needed to access the class instance inside hooks where this is rebound to the class Instance (refer Il2Cpp things)
-            "@typescript-eslint/no-unused-vars": "warn"
+            "@typescript-eslint/ban-ts-comment": "off", // https://github.com/vfsfitvnm/frida-il2cpp-bridge/wiki/Changelog#v090
+            "@typescript-eslint/no-this-alias": "off", // Needed to access the class instance inside Il2cpp hooks
+            "@typescript-eslint/no-unused-vars": "warn",
+            "simple-import-sort/imports": "warn",
+            "simple-import-sort/exports": "warn"
         }
     },
 
