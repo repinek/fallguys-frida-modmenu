@@ -1,5 +1,6 @@
-import { Logger } from "../logger/Logger";
 import Java from "frida-java-bridge";
+
+import { Logger } from "./Logger";
 
 export class JavaUtils {
     private static readonly tag = "JavaUtils";
@@ -40,7 +41,7 @@ export class JavaUtils {
                 const openIntent = intent.$new("android.intent.action.VIEW", uri);
                 openIntent.addFlags(0x10000000); // FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(openIntent);
-            } catch (error: any) {
+            } catch (error) {
                 Logger.errorThrow(error);
             }
         });
@@ -62,7 +63,7 @@ export class JavaUtils {
                 const clipData = ClipData.newPlainText(javaString.$new("label"), javaString.$new(text));
                 clipboardManager.setPrimaryClip(clipData);
                 Logger.debug(`[${this.tag}::copyToClipboard] Copied to clipboard: ${text}`);
-            } catch (error: any) {
+            } catch (error) {
                 Logger.errorThrow(error);
             }
         });
@@ -118,7 +119,7 @@ export class JavaUtils {
                 connection.disconnect();
                 Logger.debug(`[${this.tag}::httpGet] HTTP GET response: ${response}`);
                 onReceive(response);
-            } catch (error: any) {
+            } catch (error) {
                 Logger.errorThrow(error, "HTTP GET");
                 onReceive(undefined);
             }
@@ -206,7 +207,7 @@ export class JavaUtils {
                 connection.disconnect();
                 Logger.debug(`[${this.tag}::httpPost] HTTP POST response: ${response}`);
                 onReceive(response);
-            } catch (error: any) {
+            } catch (error) {
                 Logger.errorThrow(error, "HTTP POST");
                 onReceive(undefined);
             }
