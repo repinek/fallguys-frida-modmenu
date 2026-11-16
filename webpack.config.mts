@@ -19,7 +19,6 @@ export default function (env: WebpackEnv = {}): Configuration {
     const isRelease = targetEnv === "release";
 
     console.log(`Building script with ${targetEnv} version`);
-    if (isRelease) console.warn("Excluding all logs in Release version!");
 
     const ifdefOptions = {
         DEV: isDev,
@@ -49,6 +48,7 @@ export default function (env: WebpackEnv = {}): Configuration {
                     include: path.resolve(import.meta.dirname, "src"),
                     use: [{ loader: "ts-loader" }, { loader: "ifdef-loader", options: ifdefOptions }]
                 },
+                // Required by menu
                 {
                     test: /\.m?js$/,
                     resolve: {
@@ -67,8 +67,8 @@ export default function (env: WebpackEnv = {}): Configuration {
         },
         devtool: "inline-source-map",
         optimization: {
-            minimize: !isDev,
-            minimizer: !isDev
+            minimize: isRelease,
+            minimizer: isRelease
                 ? [
                       new TerserPlugin({
                           terserOptions: {
@@ -76,7 +76,6 @@ export default function (env: WebpackEnv = {}): Configuration {
                                   comments: false
                               },
                               compress: {
-                                  drop_console: isRelease,
                                   dead_code: true
                               }
                           },
@@ -85,7 +84,7 @@ export default function (env: WebpackEnv = {}): Configuration {
                   ]
                 : []
         },
-        plugins,
+        plugins: plugins,
         stats: "minimal",
         performance: {
             maxAssetSize: 5 * 1024 * 1024,
