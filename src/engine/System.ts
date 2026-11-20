@@ -3,6 +3,7 @@ export class System {
     private static _string: Il2Cpp.Class;
     private static _int32: Il2Cpp.Class;
 
+    private static _action1: Il2Cpp.Class;
     private static _actionBool: Il2Cpp.Class;
     private static _actionBoolInt: Il2Cpp.Class;
     private static _actionBoolString: Il2Cpp.Class;
@@ -19,6 +20,9 @@ export class System {
         return (this._int32 ??= Il2Cpp.corlib.class("System.Int32"));
     }
 
+    static get Action1(): Il2Cpp.Class {
+         return (this._action1 ??= Il2Cpp.corlib.class("System.Action`1"));
+    }
     static get ActionBool(): Il2Cpp.Class {
         return (this._actionBool ??= Il2Cpp.corlib.class("System.Action`1").inflate(this.Boolean));
     }

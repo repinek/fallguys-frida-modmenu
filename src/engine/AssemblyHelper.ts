@@ -3,6 +3,7 @@ import { Logger } from "../utils/Logger";
 export class AssemblyHelper {
     static MediatonicCatapultClientSdkRuntime: Il2Cpp.Image; // Catapult namespace & network related
     static TheMultiplayerGuys: Il2Cpp.Image; // FG::Common
+    static UnityWebRequestModule: Il2Cpp.Image; // UnityEngine
     static MTFGClient: Il2Cpp.Image; // FGClient
     static CoreModule: Il2Cpp.Image; // UnityEngine
     static TextMeshPro: Il2Cpp.Image; // TMPro
@@ -11,6 +12,7 @@ export class AssemblyHelper {
     static init() {
         this.MediatonicCatapultClientSdkRuntime = Il2Cpp.domain.assembly("Mediatonic.Catapult.ClientSdk.Runtime").image;
         this.TheMultiplayerGuys = Il2Cpp.domain.assembly("TheMultiplayerGuys.FGCommon").image;
+        this.UnityWebRequestModule = Il2Cpp.domain.assembly("UnityEngine.UnityWebRequestModule").image;
         this.MTFGClient = Il2Cpp.domain.assembly("MT.FGClient").image;
         this.CoreModule = Il2Cpp.domain.assembly("UnityEngine.CoreModule").image;
         this.TextMeshPro = Il2Cpp.domain.assembly("Unity.TextMeshPro").image;

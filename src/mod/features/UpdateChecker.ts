@@ -1,4 +1,6 @@
 import { System } from "../../engine/System";
+import { UnityUtils } from "../../engine/UnityUtils";
+import { UnityWebRequest } from "../../engine/wrappers/UnityWebRequest";
 import { LocaliseOption } from "../../fallguys/wrappers/ui/data/ModalMessageBaseData";
 import { ModalMessageData, ModalType, OkButtonType } from "../../fallguys/wrappers/ui/data/ModalMessageData";
 import { PopupManager } from "../../fallguys/wrappers/ui/PopupManager";
@@ -32,39 +34,26 @@ export class UpdateChecker {
         }
     }
 
-    static checkForUpdate(): void {
+    static async checkForUpdate(): Promise<void> {
         if (ModPreferences.ENV !== "release") {
             Logger.debug(`[UpdateChecker::checkForUpdate] Skipping mod menu version check in dev`);
             return;
         }
 
-        JavaUtils.httpGet(Constants.MOD_MENU_VERSION_URL, response => {
-            if (!response) {
-                Logger.warn(`[UpdateChecker::checkForUpdate] Actual mod menu version can't be fetched`);
-                return;
-            }
+        const updateVersion = await this.fetchJson(Constants.MOD_MENU_VERSION_URL);
+        if (updateVersion === undefined) return;
+        if (!this.isModMenuVersion(updateVersion)) {
+            Logger.warn(`[UpdateChecker::checkForUpdate] Invalid mod menu version response`);
+            return;
+        }
 
-            try {
-                const updateVersion = JSON.parse(response) as unknown;
-
-                if (!this.isModMenuVersion(updateVersion)) {
-                    Logger.warn(`[UpdateChecker::checkForUpdate] Invalid mod menu version response`);
-                    return;
-                }
-
-                this.modMenuUpdateVersion = updateVersion;
-            } catch {
-                Logger.warn(`[UpdateChecker::checkForUpdate] Invalid mod menu version response`);
-                return;
-            }
-
-            if (this.modMenuUpdateVersion.scriptVersion === ModPreferences.VERSION) {
-                Logger.info(`[UpdateChecker::checkForUpdate] Mod menu is up to date`);
-            } else {
-                Logger.warn(`[UpdateChecker::checkForUpdate] Mod menu version is outdated`);
-                this.showUpdatePopup();
-            }
-        });
+        this.modMenuUpdateVersion = updateVersion;
+        if (updateVersion.scriptVersion === ModPreferences.VERSION) {
+            Logger.info(`[UpdateChecker::checkForUpdate] Mod menu is up to date`);
+        } else {
+            Logger.warn(`[UpdateChecker::checkForUpdate] Mod menu version is outdated`);
+            this.showUpdatePopup();
+        }
     }
 
     private static showUpdatePopup(): void {
@@ -98,31 +87,38 @@ export class UpdateChecker {
         });
     }
 
-    // TODO: the same as httpGet
     // TODO: add link to apk too in changelog
-    static getChangelog(targetScriptVersion: string, onReceive: (entry: IChangelogEntry | undefined) => void): void {
-        JavaUtils.httpGet(Constants.MOD_MENU_CHANGELOG_URL, response => {
-            if (!response) {
-                onReceive(undefined);
-                return;
-            }
-
-            try {
-                const history = JSON.parse(response) as unknown;
-
-                if (!this.isChangelogHistory(history)) {
-                    Logger.warn(`[UpdateChecker::getChangelog] Invalid changelog response`);
-                    onReceive(undefined);
-                    return;
-                }
-
-                const entry = history.find(e => e.scriptVersion === targetScriptVersion);
-
-                if (entry) onReceive(entry);
-                else onReceive(undefined);
-            } catch {
+    static async getChangelog(targetScriptVersion: string, onReceive: (entry: IChangelogEntry | undefined) => void): Promise<void> {
+        const history = await this.fetchJson(Constants.MOD_MENU_CHANGELOG_URL);
+        let entry: IChangelogEntry | undefined;
+        if (history !== undefined) {
+            if (this.isChangelogHistory(history)) {
+                entry = history.find(item => item.scriptVersion === targetScriptVersion);
+            } else {
                 Logger.warn(`[UpdateChecker::getChangelog] Invalid changelog response`);
-                onReceive(undefined);
+            }
+        }
+        await UnityUtils.runInMain(() => {
+            try {
+                onReceive(entry);
+            } catch (error) {
+                Logger.error(`[UpdateChecker::getChangelog] ${error}`);
+            }
+        });
+    }
+
+    private static async fetchJson(url: string): Promise<unknown> {
+        return UnityUtils.runInMain(async () => {
+            try {
+                const request = await UnityWebRequest.sendGet(url);
+                try {
+                    return JSON.parse(request.text);
+                } finally {
+                    request.dispose();
+                }
+            } catch (error) {
+                Logger.warn(`[UpdateChecker::fetchJson] Failed to load ${url}: ${error}`);
+                return undefined;
             }
         });
     }

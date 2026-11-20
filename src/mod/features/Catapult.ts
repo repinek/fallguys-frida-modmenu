@@ -3,7 +3,7 @@ import { sharedPreferences } from "frida-java-menu";
 
 import { AssemblyHelper } from "../../engine/AssemblyHelper";
 import { UnityUtils } from "../../engine/UnityUtils";
-import { JavaUtils } from "../../utils/JavaUtils";
+import { UnityWebRequest } from "../../engine/wrappers/UnityWebRequest";
 import { Logger } from "../../utils/Logger";
 import { Constants } from "../data/Constants";
 import { I18n } from "../i18n/I18n";
@@ -48,7 +48,7 @@ export class Catapult {
         const CatapultServicesManager = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager");
         const WebSocketNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
 
-        this.fetchClientDetails();
+        void this.fetchClientDetails();
         this.readPlatform();
 
         //@ts-ignore
@@ -111,47 +111,40 @@ export class Catapult {
         return this.method<void>(".ctor", 3).invoke(serverAddress, port, isSecure);
     }
 
-    private static fetchClientDetails(): void {
+    private static async fetchClientDetails(): Promise<void> {
         if (!Constants.USE_SPOOF) {
             return;
         }
 
-        this.tryFetchSpoofData(0);
-    }
-
-    private static tryFetchSpoofData(index: number): void {
         const sources = [Constants.SPOOF_VERSION_URL, ...Constants.SPOOF_VERSION_MIRRORS];
+        for (const mirror of sources) {
+            Logger.debug(`[${this.name}::fetchClientDetails] Fetching spoof data from ${mirror}`);
 
-        if (index >= sources.length) {
-            Logger.warn(`[${this.name}::fetchClientDetails] All mirrors failed, spoof won't be working`);
-            Logger.toast(I18n.t("network_toasts.signature_fetch_fail"), 1);
-            return;
-        }
+            const clientDetails: unknown = await UnityUtils.runInMain(async () => {
+                try {
+                    const request = await UnityWebRequest.sendGet(mirror);
+                    try {
+                        return JSON.parse(request.text);
+                    } finally {
+                        request.dispose();
+                    }
+                } catch {
+                    Logger.warn(`[${this.name}::fetchClientDetails] Bad response from ${mirror}, trying next mirror`);
+                    return undefined;
+                }
+            });
 
-        const mirror = sources[index];
-        Logger.debug(`[${this.name}::fetchClientDetails] Fetching spoof data from ${mirror}`);
-
-        JavaUtils.httpGet(mirror, response => {
-            if (!response) {
-                this.tryFetchSpoofData(index + 1);
+            if (this.isClientDetails(clientDetails)) {
+                this.clientDetails = clientDetails;
                 return;
             }
-
-            try {
-                const clientDetails = JSON.parse(response!) as unknown;
-
-                if (!this.isClientDetails(clientDetails)) {
-                    Logger.warn(`[${this.name}::fetchClientDetails] Invalid response from ${mirror}, trying next mirror`);
-                    this.tryFetchSpoofData(index + 1);
-                    return;
-                }
-
-                this.clientDetails = clientDetails as IClientDetails;
-            } catch {
-                Logger.warn(`[${this.name}::fetchClientDetails] Bad response from ${mirror}, trying next mirror`);
-                this.tryFetchSpoofData(index + 1);
+            if (clientDetails !== undefined) {
+                Logger.warn(`[${this.name}::fetchClientDetails] Invalid response from ${mirror}, trying next mirror`);
             }
-        });
+        }
+
+        Logger.warn(`[${this.name}::fetchClientDetails] All mirrors failed, spoof won't be working`);
+        Logger.toast(I18n.t("network_toasts.signature_fetch_fail"), 1);
     }
 
     private static isClientDetails(value: unknown): value is IClientDetails {
