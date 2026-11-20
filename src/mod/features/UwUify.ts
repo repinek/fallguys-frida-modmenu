@@ -29,7 +29,6 @@ export class UwUify {
     static init(): void {
         this.TMP_Text = AssemblyHelper.TextMeshPro.class("TMPro.TMP_Text");
 
-        // Methods
         //@ts-ignore
         this.TMP_Text.method<void>("set_text").implementation = this.setTextHook;
 
@@ -42,6 +41,7 @@ export class UwUify {
             return;
         }
 
+        // UwUify string here
         if (ModSettings.uwuifyMode) {
             const content = string.content;
             if (content && content.length > 0) string = Il2Cpp.string(UwUify.createUwUifiedString(this, content));
@@ -53,27 +53,28 @@ export class UwUify {
     static toggleUwUify(state: boolean): void {
         if (state) {
             // it takes 2.2s with FindObjectOfTypeAll :broken_heart:
-            const texts = UEObject.findObjectsOfType(this.TMP_Text.type.object, false);
+            const uiTextObjects = UEObject.findObjectsOfType(this.TMP_Text.type.object, false);
 
-            for (const text of texts) {
-                const string = text.method<Il2Cpp.String>("get_text").invoke();
-                text.method<void>("set_text", 1).invoke(string);
+            for (const uiTextObject of uiTextObjects) {
+                const string = uiTextObject.method<Il2Cpp.String>("get_text").invoke();
+                uiTextObject.method<void>("set_text", 1).invoke(string);
             }
+        // Revert
         } else if (!state) {
-            for (const [objectID, originalText] of Object.entries(this.originalStrings)) {
-                const id = Number(objectID); // since entries return strings
-                const textObject = UEObject.findObjectFromInstanceID(id);
+            for (const [instanceId, originalText] of Object.entries(this.originalStrings)) {
+                const id = Number(instanceId); // since entries return strings
+                const uiTextObject = UEObject.findObjectFromInstanceID(id);
 
-                if (textObject) {
-                    textObject.method("set_text").invoke(Il2Cpp.string(originalText));
+                if (uiTextObject) {
+                    uiTextObject.method("set_text").invoke(Il2Cpp.string(originalText));
                 }
             }
         }
     }
 
     private static createUwUifiedString(TMP_Text: Il2Cpp.Object, string: string): string {
-        const objectID = UEObject.getInstanceID(TMP_Text);
-        this.originalStrings[objectID] = string;
+        const instanceId = UEObject.getInstanceID(TMP_Text);
+        this.originalStrings[instanceId] = string;
 
         return this.uwuify(string);
     }
