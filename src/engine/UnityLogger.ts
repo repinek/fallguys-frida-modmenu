@@ -12,9 +12,9 @@ export class UnityLogger {
         //@ts-ignore
         Debug.method<void>("Log", 1).implementation = this.logHook;
         //@ts-ignore
-        Debug.method("LogWarning", 1);
+        Debug.method("LogWarning", 1).implementation = this.warnHook;
         //@ts-ignore
-        Debug.method("LogError", 1);
+        Debug.method("LogError", 1).implementation = this.errorHook;
     }
 
     private static logHook(this: Il2Cpp.Object, object: Il2Cpp.Object): void {
