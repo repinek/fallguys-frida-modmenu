@@ -1,7 +1,11 @@
 import { Logger } from "../utils/Logger";
 
 export class UnityUtils {
-    /** Wrapper over klass::get_Instance */
+    /**
+     * Wrapper over klass::get_Instance
+     *
+     * @returns Instance, or undefined if the getter or instance is missing
+     */
     static getInstance(klass: Il2Cpp.Class): Il2Cpp.Object | undefined {
         const instanceMethod = klass.tryMethod<Il2Cpp.Object>("get_Instance");
         if (!instanceMethod) {
@@ -9,7 +13,8 @@ export class UnityUtils {
             return undefined;
         }
 
-        return instanceMethod.invoke();
+        const instance = instanceMethod.invoke();
+        return instance.isNull() ? undefined : instance;
     }
 
     /**
