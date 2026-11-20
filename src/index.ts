@@ -62,7 +62,7 @@ function initMod(): void {
     MenuBuilder.init();
 
     // Init updater
-    UpdateChecker.checkGameVersion();
+    UpdateChecker.checkVersionCompatibility();
     UpdateChecker.checkForUpdate();
 }
 

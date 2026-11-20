@@ -22,9 +22,10 @@ interface IChangelogEntry {
 }
 
 export class UpdateChecker {
-    private static modMenuUpdateVersion: IModMenuVersion;
+    private static latestVersionInfo: IModMenuVersion;
 
-    static checkGameVersion(): void {
+    /** Prints warn if gameVersion != ModPreferences game version */
+    static checkVersionCompatibility(): void {
         const gameVersion = Il2Cpp.application.version!;
 
         if (gameVersion !== ModPreferences.FOR_GAME_VERSION) {
@@ -36,34 +37,35 @@ export class UpdateChecker {
 
     static async checkForUpdate(): Promise<void> {
         if (ModPreferences.ENV !== "release") {
-            Logger.debug(`[UpdateChecker::checkForUpdate] Skipping mod menu version check in dev`);
+            Logger.debug(`[UpdateChecker::checkForUpdate] Skipping mod menu version check in non-release builds`);
             return;
         }
 
-        const updateVersion = await this.fetchJson(Constants.MOD_MENU_VERSION_URL);
+        const updateVersion = await UpdateChecker.fetchJson(Constants.MOD_MENU_VERSION_URL);
         if (updateVersion === undefined) return;
-        if (!this.isModMenuVersion(updateVersion)) {
+
+        if (!UpdateChecker.isValidModMenuVersionJson(updateVersion)) {
             Logger.warn(`[UpdateChecker::checkForUpdate] Invalid mod menu version response`);
             return;
         }
 
-        this.modMenuUpdateVersion = updateVersion;
+        UpdateChecker.latestVersionInfo = updateVersion;
         if (updateVersion.scriptVersion === ModPreferences.VERSION) {
             Logger.info(`[UpdateChecker::checkForUpdate] Mod menu is up to date`);
         } else {
             Logger.warn(`[UpdateChecker::checkForUpdate] Mod menu version is outdated`);
-            this.showUpdatePopup();
+            UpdateChecker.showUpdatePopup();
         }
     }
 
     private static showUpdatePopup(): void {
-        if (!this.modMenuUpdateVersion) {
+        if (!UpdateChecker.latestVersionInfo) {
             return;
         }
 
-        const scriptVersion = this.modMenuUpdateVersion.scriptVersion;
+        const scriptVersion = UpdateChecker.latestVersionInfo.scriptVersion;
 
-        this.getChangelog(scriptVersion, entry => {
+        UpdateChecker.fetchChangelog(scriptVersion, entry => {
             const data = ModalMessageData.create();
 
             const date = entry ? entry.date : I18n.t("update_utils.unknown_date");
@@ -88,11 +90,11 @@ export class UpdateChecker {
     }
 
     // TODO: add link to apk too in changelog
-    static async getChangelog(targetScriptVersion: string, onReceive: (entry: IChangelogEntry | undefined) => void): Promise<void> {
-        const history = await this.fetchJson(Constants.MOD_MENU_CHANGELOG_URL);
+    static async fetchChangelog(targetScriptVersion: string, onReceive: (entry: IChangelogEntry | undefined) => void): Promise<void> {
+        const history = await UpdateChecker.fetchJson(Constants.MOD_MENU_CHANGELOG_URL);
         let entry: IChangelogEntry | undefined;
         if (history !== undefined) {
-            if (this.isChangelogHistory(history)) {
+            if (UpdateChecker.isChangelogHistory(history)) {
                 entry = history.find(item => item.scriptVersion === targetScriptVersion);
             } else {
                 Logger.warn(`[UpdateChecker::getChangelog] Invalid changelog response`);
@@ -108,22 +110,20 @@ export class UpdateChecker {
     }
 
     private static async fetchJson(url: string): Promise<unknown> {
-        return UnityUtils.runInMain(async () => {
+        try {
+            const request = await UnityWebRequest.sendGet(url);
             try {
-                const request = await UnityWebRequest.sendGet(url);
-                try {
-                    return JSON.parse(request.text);
-                } finally {
-                    request.dispose();
-                }
-            } catch (error) {
-                Logger.warn(`[UpdateChecker::fetchJson] Failed to load ${url}: ${error}`);
-                return undefined;
+                return JSON.parse(request.text);
+            } finally {
+                request.dispose();
             }
-        });
+        } catch (error) {
+            Logger.warn(`[UpdateChecker::fetchJson] Failed to load ${url}: ${error}`);
+            return undefined;
+        }
     }
 
-    private static isModMenuVersion(value: unknown): value is IModMenuVersion {
+    private static isValidModMenuVersionJson(value: unknown): value is IModMenuVersion {
         if (!value || typeof value !== "object") return false;
 
         const version = value as Record<string, unknown>;
@@ -131,7 +131,7 @@ export class UpdateChecker {
     }
 
     private static isChangelogHistory(value: unknown): value is IChangelogEntry[] {
-        return Array.isArray(value) && value.every(entry => this.isChangelogEntry(entry));
+        return Array.isArray(value) && value.every(entry => UpdateChecker.isChangelogEntry(entry));
     }
 
     private static isChangelogEntry(value: unknown): value is IChangelogEntry {

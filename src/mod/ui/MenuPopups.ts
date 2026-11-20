@@ -137,7 +137,7 @@ export class MenuPopups {
     }
 
     static showChangelogPopup(): void {
-        UpdateChecker.getChangelog(ModPreferences.VERSION, entry => {
+        UpdateChecker.fetchChangelog(ModPreferences.VERSION, entry => {
             const data = ModalMessageData.create();
 
             const date = entry ? entry.date : I18n.t("update_utils.unknown_date");
