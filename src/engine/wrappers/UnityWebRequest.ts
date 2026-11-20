@@ -50,6 +50,7 @@ export class UnityWebRequest extends Il2Cpp.Object {
         return new UnityWebRequest(request);
     }
 
+    /** If response code != 200, request will be disposed automatically and error will throw */
     static async sendGet(uri: string): Promise<SendResult> {
         Logger.debug(`[UnityWebRequest::sendGet] ${uri}`);
         const request = UnityWebRequest.get(uri);
