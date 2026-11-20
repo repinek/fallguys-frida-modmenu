@@ -44,11 +44,10 @@ export class Catapult {
     private static targetPlatform: string = "android_ega";
 
     static init(): void {
-        // Classes
         const CatapultServicesManager = AssemblyHelper.MTFGClient.class("FGClient.CatapultServices.CatapultServicesManager");
         const WebSocketNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
 
-        void this.fetchClientDetails();
+        this.fetchClientDetails();
         this.readPlatform();
 
         //@ts-ignore
@@ -63,17 +62,20 @@ export class Catapult {
         Logger.hook("BuildCatapultConfig called");
         const catapultConfig = this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // <--- OnLeave
 
+        // Spoof clientDetails
         if (Constants.USE_SPOOF && Catapult.clientDetails) {
             catapultConfig.field<Il2Cpp.String>("ClientVersion").value = Il2Cpp.string(Catapult.clientDetails.clientVersion);
             catapultConfig.field<Il2Cpp.String>("ClientVersionSignature").value = Il2Cpp.string(Catapult.clientDetails.clientVersionSignature);
             Logger.debug(`[${Catapult.name}::BuildCatapultConfig] Applied version spoof to ${Catapult.clientDetails.clientVersion}`);
         }
 
-        if (Catapult.targetPlatform == "android_ega") {
+        // Spoof platform
+        if (Catapult.targetPlatform !== "android_ega") {
             catapultConfig.field<Il2Cpp.String>("Platform").value = Il2Cpp.string(Catapult.targetPlatform);
             Logger.debug(`[${Catapult.name}::BuildCatapultConfig] Modified platform to ${Catapult.targetPlatform}`);
         }
 
+        // Spoof login and gateway server
         if (Constants.USE_CUSTOM_SERVER) {
             const HttpNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.HttpNetworkHost");
             const WebSocketNetworkHost = AssemblyHelper.MediatonicCatapultClientSdkRuntime.class("Catapult.Network.Connections.Config.WebSocketNetworkHost");
@@ -98,6 +100,7 @@ export class Catapult {
     private static webSocketNetworkHostCtorHook(this: Il2Cpp.Object, serverAddress: Il2Cpp.String, port: number, isSecure: boolean): void {
         Logger.hook("WebSocketNetworkHost::.ctor called with args:", serverAddress, port, isSecure);
 
+        // Spoof analytics server
         if (Constants.USE_CUSTOM_SERVER) {
             if (serverAddress.content === "analytics-gateway.fallguys.oncatapult.com") {
                 serverAddress = Il2Cpp.string(Constants.CUSTOM_ANALYTICS_URL);
@@ -111,42 +114,43 @@ export class Catapult {
         return this.method<void>(".ctor", 3).invoke(serverAddress, port, isSecure);
     }
 
+    // Wow, this code so bad
     private static async fetchClientDetails(): Promise<void> {
-        if (!Constants.USE_SPOOF) {
-            return;
-        }
+        if (!Constants.USE_SPOOF) return;
 
         const sources = [Constants.SPOOF_VERSION_URL, ...Constants.SPOOF_VERSION_MIRRORS];
-        for (const mirror of sources) {
-            Logger.debug(`[${this.name}::fetchClientDetails] Fetching spoof data from ${mirror}`);
 
-            const clientDetails: unknown = await UnityUtils.runInMain(async () => {
+        for (const mirror of sources) {
+            Logger.debug(`[Catapult::fetchClientDetails] Fetching spoof data from ${mirror}`);
+
+            let clientDetails: unknown;
+
+            try {
+                const request = await UnityWebRequest.sendGet(mirror);
                 try {
-                    const request = await UnityWebRequest.sendGet(mirror);
-                    try {
-                        return JSON.parse(request.text);
-                    } finally {
-                        request.dispose();
-                    }
-                } catch {
-                    Logger.warn(`[${this.name}::fetchClientDetails] Bad response from ${mirror}, trying next mirror`);
-                    return undefined;
+                    clientDetails = JSON.parse(request.text);
+                } finally {
+                    request.dispose();
                 }
-            });
+            } catch {
+                Logger.warn(`[Catapult::fetchClientDetails] Bad response from ${mirror}, trying next mirror`);
+                continue;
+            }
 
             if (this.isClientDetails(clientDetails)) {
                 this.clientDetails = clientDetails;
                 return;
             }
             if (clientDetails !== undefined) {
-                Logger.warn(`[${this.name}::fetchClientDetails] Invalid response from ${mirror}, trying next mirror`);
+                Logger.warn(`[Catapult::fetchClientDetails] Invalid response from ${mirror}, trying next mirror`);
             }
         }
 
-        Logger.warn(`[${this.name}::fetchClientDetails] All mirrors failed, spoof won't be working`);
+        Logger.warn(`[Catapult::fetchClientDetails] All mirrors failed, spoof won't be working`);
         Logger.toast(I18n.t("network_toasts.signature_fetch_fail"), 1);
     }
 
+    /** Checks if this valid clientDetails */
     private static isClientDetails(value: unknown): value is IClientDetails {
         if (!value || typeof value !== "object") return false;
 
@@ -159,6 +163,7 @@ export class Catapult {
         );
     }
 
+    /** Reads and sets targetPlatform from sharedPreferences */
     private static readPlatform(): void {
         Java.perform(() => {
             if (sharedPreferences.contains("platform")) {
@@ -167,6 +172,7 @@ export class Catapult {
         });
     }
 
+    /** Puts platform string in sharedPreferences */
     static changePlatform(newPlatform: string): void {
         Java.perform(() => {
             Logger.debug(`put platform string into config: ${newPlatform}`);
