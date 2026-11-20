@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Java from "frida-java-bridge";
 import { sharedPreferences } from "frida-java-menu";
 
@@ -12,36 +13,34 @@ const TRANSLATIONS: Record<string, any> = {
 };
 
 export class I18n {
-    private static readonly tag = "I18n";
-
     static supportedLocales: string[] = Object.keys(TRANSLATIONS);
+
     private static currentLocale: string = "en";
 
     static init(): void {
         let targetLocale = "en";
 
         Java.perform(() => {
-            if (sharedPreferences.contains("locale")) {
-                const savedLocale = sharedPreferences.getString("locale");
-                if (this.isLocaleSupported(savedLocale)) {
-                    targetLocale = savedLocale;
-                    Logger.debug(`[${this.tag}::init] Loaded locale from config: ${targetLocale}`);
-                } else Logger.warn(`[${this.tag}::init] Locale ${savedLocale} from config is not supported`);
+            const isSaved = sharedPreferences.contains("locale");
+            const locale = isSaved ? sharedPreferences.getString("locale") : JavaUtils.getSystemLocale();
+
+            // Check if locale from config or system is supported, and assign it if supported
+            if (this.isLocaleSupported(locale)) {
+                targetLocale = locale;
+                if (isSaved) Logger.debug(`[I18n::init] Loaded locale from config: ${targetLocale}`);
             } else {
-                const systemLang = JavaUtils.getSystemLocale();
+                const source = isSaved ? "config" : "system";
+                Logger.warn(`[I18n::init] Locale ${locale} from ${source} is not supported`);
+            }
 
-                // prettier-ignore
-                if (this.isLocaleSupported(systemLang)) 
-                    targetLocale = systemLang;
-                else 
-                    Logger.warn(`[${this.tag}::init] Locale ${systemLang} from system is not supported`);
-
+            // Save locale if not saved yet
+            if (!isSaved) {
                 sharedPreferences.putString("locale", targetLocale);
-                Logger.info(`[${this.tag}::init] Saved ${targetLocale} locale to config`);
+                Logger.info(`[I18n::init] Saved ${targetLocale} locale to config`);
             }
 
             this.currentLocale = targetLocale;
-            Logger.info(`[${this.tag}::init] Initialized with ${targetLocale} locale`);
+            Logger.info(`[I18n::init] Initialized with ${targetLocale} locale`);
         });
     }
 
@@ -81,7 +80,7 @@ export class I18n {
 
     static changeLocale(newLocale: string): void {
         if (!this.isLocaleSupported(newLocale)) {
-            Logger.warn(`[${this.tag}::changeLocale] Trying to apply unsupported locale ${newLocale}`);
+            Logger.warn(`[I18n::changeLocale] Trying to apply unsupported locale ${newLocale}`);
             return;
         }
 
@@ -89,6 +88,6 @@ export class I18n {
             sharedPreferences.putString("locale", newLocale);
         });
 
-        Logger.info(`[${this.tag}::changeLocale] Locale changed to: ${newLocale}`);
+        Logger.info(`[I18n::changeLocale] Locale changed to: ${newLocale}`);
     }
 }
