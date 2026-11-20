@@ -1,7 +1,4 @@
 {
-    "hi": {
-        "hi": "hello from i18n wheelchair {0}"
-    },
     "languages": {
         "en": "English",
         "ru": "Russian"
@@ -57,9 +54,7 @@
             "game_details": "Show Game Details",
             "server_details": "Show and Copy Server Details",
             "uwuify": "UwUify Mode",
-            "select_platform": "Select Platform",
-            "token_login": "Token Login",
-            "token_login_warn": "Requires a valid Epic Games refresh token. Do not enable if you don't have one!"
+            "select_platform": "Select Platform"
         },
         "other": {
             "language": "Select Language",
@@ -106,16 +101,9 @@
             "title": "Select Platform",
             "message": "The spoofed platform will only be applied after restarting the game",
             "ok": "Apply Platform"
-        },
-        "token_login": {
-            "title": "Token Login",
-            "message": "Please enter your Epic Games refresh token below to authenticate",
-            "message_additional": "Close this window to continue normal way",
-            "placeholder": "Paste refresh token here..."
         }
     },
     "update_utils": {
-        "cant_retrieve": "Failed to retrieve changelog data",
         "not_found": "Changelog for this version not found",
         "unknown_date": "Unknown Date"
     },
@@ -126,9 +114,7 @@
     },
     "network_toasts": {
         "signature_fetch_fail": "Failed to fetch server signature. Spoofing disabled.",
-        "queued_players": "Queued Players: {0}",
-        "logined_in": "Logged in as {0}",
-        "invalid_token": "Invalid token format"
+        "queued_players": "Queued Players: {0}"
     },
     "rounds_toasts": {
         "no_tiptoe": "No tip toe platforms found",

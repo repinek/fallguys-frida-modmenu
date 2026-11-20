@@ -32,17 +32,6 @@ export class MenuTabs {
         debugtab.gravity = CENTER;
         add(debugtab);
 
-        // const debugtext = [
-        //     `Frida version: v${Frida.version}`,
-        //     `Frida Runtime: ${Script.runtime}`,
-        //     `Architecture: ${Process.arch}`,
-        //     `Platform: ${Process.platform}`,
-        //     `Android version: ${Java.androidVersion}`
-        // ];
-        // for (const text of debugtext) {
-        //     add(layout.textView(text));
-        // }
-
         add(
             layout.button(
                 "System.exit",
@@ -82,16 +71,6 @@ export class MenuTabs {
                 })
             )
         );
-
-        // yes i definitely need to other branch it but... sorry
-        // add(
-        //     layout.button(
-        //         "Create Logger",
-        //         this.run(() => InGameLogger.createLogger())
-        //     )
-        // );
-
-        add(layout.textView(I18n.t("hi.hi", "koluska")));
         /// #endif
     }
 
