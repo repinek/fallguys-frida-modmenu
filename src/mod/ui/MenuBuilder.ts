@@ -8,6 +8,7 @@ import { I18n } from "../i18n/I18n";
 import { MenuTabs } from "./MenuTabs";
 
 export class MenuBuilder {
+    /** We need this instance for MenuUtils::addCenterText */
     private static _layout: ObsidianLayout;
 
     static init(): void {

@@ -16,6 +16,7 @@ export class Network {
         Logger.info("[Network::init] Initialized");
     }
 
+    // Disable analytics patch
     private static sendEventBatchHook(this: Il2Cpp.Object): void {
         if (ModSettings.disableAnalytics) {
             return;
@@ -23,6 +24,7 @@ export class Network {
         return this.method<void>("SendEventBatch").invoke();
     }
 
+    // Show queued players in matchmaking patch
     private static processMessageReceivedHook(this: Il2Cpp.Object, jsonMessage: Il2Cpp.String): void {
         this.method<void>("ProcessMessageReceived", 1).invoke(jsonMessage);
         if (!ModSettings.showQueuedPlayers) return;

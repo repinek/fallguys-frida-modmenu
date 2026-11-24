@@ -53,8 +53,6 @@ export class FGDebug {
     private static setFGDebugScale(): void {
         if (!this.isScaled) {
             const localScale = Vector3.create(0.4, 0.4, 0.4);
-
-            // prettier-ignore
             const transform = Component.getTransform(this.GvrFPSInstance);
             Transform.setLocalScale(transform, localScale);
             this.isScaled = true;

@@ -8,7 +8,7 @@ import { Logger } from "../../utils/Logger";
 import { Constants } from "../data/Constants";
 import { ModPreferences } from "../data/ModPreferences";
 import { Catapult } from "../features/Catapult";
-import { I18n, LanguagePreferences } from "../i18n/I18n";
+import { I18n } from "../i18n/I18n";
 import { ChangelogEntry } from "../utils/UpdateChecker";
 
 /**
@@ -27,13 +27,14 @@ export class MenuPopups {
         data.ModalType = ModalType.MT_OK_CANCEL;
         data.OkButtonType = OkButtonType.Green;
 
-        const platforms = Catapult.getLocalisedPlatforms();
-        data.OptionStringIds = System.createStringList(platforms);
+        const platforms = Catapult.PLATFORMS;
+        const labels = platforms.map(platform => I18n.t(`platforms.${platform}`));
+        data.OptionStringIds = System.createStringList(labels);
 
         data.OnOptionSelectionModalClosed = Il2Cpp.delegate(System.ActionBoolInt, (pressed: boolean, selectedIndex: number) => {
             if (pressed) {
-                const selectedPlatform = Catapult.PLATFORMS[selectedIndex];
-                Catapult.changePlatform(selectedPlatform);
+                const selectedPlatform = platforms[selectedIndex];
+                Catapult.platformPreference.save(selectedPlatform);
             }
         });
 
@@ -56,7 +57,7 @@ export class MenuPopups {
         data.OnOptionSelectionModalClosed = Il2Cpp.delegate(System.ActionBoolInt, (pressed: boolean, selectedIndex: number) => {
             if (pressed) {
                 const selectedLocale = I18n.supportedLanguages[selectedIndex];
-                LanguagePreferences.save(selectedLocale);
+                I18n.languagePreference.save(selectedLocale);
                 Logger.toast(I18n.t("menu.toasts.on_locale_changed", languageNames[selectedIndex]), 0);
             }
         });

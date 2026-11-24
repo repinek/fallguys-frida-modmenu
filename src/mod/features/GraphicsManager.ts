@@ -77,6 +77,7 @@ export class GraphicsManager {
      *
      * Reads state from PlayerInfoHUDBase::get_ShowNames
      */
+    // TODO: maybe I need to actually change state of it?
     static toggleNames(): void {
         const shouldShowPlayerNames = this.get_ShowNames.invoke() as boolean;
         this.SetShowPlayerNamesByDefault.invoke(!shouldShowPlayerNames);

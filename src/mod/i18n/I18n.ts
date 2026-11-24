@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Java from "frida-java-bridge";
-import { sharedPreferences } from "frida-java-menu";
-
 import { AndroidUtils } from "../../android/AndroidUtils";
+import { StringPrereference } from "../../android/Preference";
 import { Logger } from "../../utils/Logger";
 import en from "./localization/en.json";
 import ru from "./localization/ru.json";
@@ -17,8 +15,10 @@ export class I18n {
 
     private static currentLanguage: string = "en";
 
+    static readonly languagePreference: StringPrereference = new StringPrereference("language");
+
     static init(): void {
-        const preferredLanguage = LanguagePreferences.read() || AndroidUtils.getSystemLanguage();
+        const preferredLanguage = this.languagePreference.read() || AndroidUtils.getSystemLanguage();
 
         const supported = this.isLanguageSupported(preferredLanguage);
         this.currentLanguage = supported ? preferredLanguage : "en";
@@ -61,30 +61,6 @@ export class I18n {
     static getLocalisedLanguages(): string[] {
         return this.supportedLanguages.map(locale => {
             return this.t(`languages.${locale}`);
-        });
-    }
-}
-
-/** Class for managing Language config */
-export class LanguagePreferences {
-    private static key = "language";
-
-    /** @returns undefined if no language present in sharedPreferences */
-    static read(): string | undefined {
-        let language: string | undefined = undefined;
-
-        Java.performNow(() => {
-            if (sharedPreferences.contains(LanguagePreferences.key)) {
-                language = sharedPreferences.getString(LanguagePreferences.key);
-            }
-        });
-
-        return language;
-    }
-
-    static save(newLanguage: string): void {
-        Java.performNow(() => {
-            sharedPreferences.putString(LanguagePreferences.key, newLanguage);
         });
     }
 }

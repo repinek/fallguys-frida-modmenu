@@ -1,6 +1,7 @@
 import { add, CENTER, ObsidianLayout, toast } from "frida-java-menu";
 
 import { AndroidUtils } from "../../android/AndroidUtils";
+import { UnityUtils } from "../../engine/UnityUtils";
 import { Constants } from "../data/Constants";
 import { ModPreferences } from "../data/ModPreferences";
 import { ModSettings } from "../data/ModSettings";
@@ -17,8 +18,6 @@ import { I18n } from "../i18n/I18n";
 import { UpdateChecker } from "../utils/UpdateChecker";
 import { MenuPopups } from "./MenuPopups";
 import { MenuUtils } from "./MenuUtils";
-import { ManifestPlugin } from "webpack";
-import { UnityUtils } from "../../engine/UnityUtils";
 
 export class MenuTabs {
     static buildAll(layout: ObsidianLayout) {
@@ -257,7 +256,7 @@ export class MenuTabs {
 
         add(
             layout.button(I18n.t("menu.functions.server_details"), () => {
-                MatchInfo.showServerDetails();
+                MatchInfo.showAndCopyServerDetails();
             })
         );
 

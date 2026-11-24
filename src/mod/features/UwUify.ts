@@ -20,7 +20,6 @@ import { ModSettings } from "../data/ModSettings";
  */
 
 export class UwUify {
-    // Classes
     private static TMP_Text: Il2Cpp.Class;
 
     // GameObjectInstanceID, string
