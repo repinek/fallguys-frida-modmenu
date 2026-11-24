@@ -7,7 +7,7 @@ export enum LocaliseOption {
 
 /** Wrapper over FGClient::UI::ModalMessageBaseData */
 export abstract class ModalMessageBaseData {
-    public instance: Il2Cpp.Object;
+    instance: Il2Cpp.Object;
 
     constructor(instance: Il2Cpp.Object) {
         this.instance = instance;

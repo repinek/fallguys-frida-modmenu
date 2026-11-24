@@ -2,7 +2,7 @@
 import Java from "frida-java-bridge";
 import { sharedPreferences } from "frida-java-menu";
 
-import { JavaUtils } from "../../utils/JavaUtils";
+import { AndroidUtils } from "../../android/AndroidUtils";
 import { Logger } from "../../utils/Logger";
 import en from "./localization/en.json";
 import ru from "./localization/ru.json";
@@ -13,39 +13,25 @@ const TRANSLATIONS: Record<string, any> = {
 };
 
 export class I18n {
-    static supportedLocales: string[] = Object.keys(TRANSLATIONS);
+    static supportedLanguages: string[] = Object.keys(TRANSLATIONS);
 
-    private static currentLocale: string = "en";
+    private static currentLanguage: string = "en";
 
     static init(): void {
-        let targetLocale = "en";
+        const preferredLanguage = LanguagePreferences.read() || AndroidUtils.getSystemLanguage();
 
-        Java.perform(() => {
-            const isSaved = sharedPreferences.contains("locale");
-            const locale = isSaved ? sharedPreferences.getString("locale") : JavaUtils.getSystemLocale();
+        const supported = this.isLanguageSupported(preferredLanguage);
+        this.currentLanguage = supported ? preferredLanguage : "en";
 
-            // Check if locale from config or system is supported, and assign it if supported
-            if (this.isLocaleSupported(locale)) {
-                targetLocale = locale;
-                if (isSaved) Logger.debug(`[I18n::init] Loaded locale from config: ${targetLocale}`);
-            } else {
-                const source = isSaved ? "config" : "system";
-                Logger.warn(`[I18n::init] Locale ${locale} from ${source} is not supported`);
-            }
+        if (!supported) {
+            Logger.warn(`[I18n::init] Unsupported language ${preferredLanguage}, using en`);
+        }
 
-            // Save locale if not saved yet
-            if (!isSaved) {
-                sharedPreferences.putString("locale", targetLocale);
-                Logger.info(`[I18n::init] Saved ${targetLocale} locale to config`);
-            }
-
-            this.currentLocale = targetLocale;
-            Logger.info(`[I18n::init] Initialized with ${targetLocale} locale`);
-        });
+        Logger.info(`[I18n::init] Initialized with ${this.currentLanguage} language`);
     }
 
-    private static isLocaleSupported(locale: string): boolean {
-        return this.supportedLocales.includes(locale);
+    private static isLanguageSupported(language: string): boolean {
+        return this.supportedLanguages.includes(language);
     }
 
     private static resolveKey(obj: any, path: string): string | undefined {
@@ -55,7 +41,7 @@ export class I18n {
     }
 
     /** Replaces {0}, {1} placeholders with provided arguments */
-    public static format(text: string, ...args: (string | number)[]): string {
+    static format(text: string, ...args: (string | number)[]): string {
         if (args.length === 0) return text;
 
         return text.replace(/{(\d+)}/g, (match, number) => {
@@ -65,7 +51,7 @@ export class I18n {
     }
 
     static t(key: string, ...args: (string | number)[]): string {
-        const value = this.resolveKey(TRANSLATIONS[this.currentLocale], key);
+        const value = this.resolveKey(TRANSLATIONS[this.currentLanguage], key);
 
         if (!value) return `MISSING: ${key}`;
 
@@ -73,21 +59,32 @@ export class I18n {
     }
 
     static getLocalisedLanguages(): string[] {
-        return this.supportedLocales.map(locale => {
+        return this.supportedLanguages.map(locale => {
             return this.t(`languages.${locale}`);
         });
     }
+}
 
-    static changeLocale(newLocale: string): void {
-        if (!this.isLocaleSupported(newLocale)) {
-            Logger.warn(`[I18n::changeLocale] Trying to apply unsupported locale ${newLocale}`);
-            return;
-        }
+/** Class for managing Language config */
+export class LanguagePreferences {
+    private static key = "language";
 
-        Java.perform(() => {
-            sharedPreferences.putString("locale", newLocale);
+    /** @returns undefined if no language present in sharedPreferences */
+    static read(): string | undefined {
+        let language: string | undefined = undefined;
+
+        Java.performNow(() => {
+            if (sharedPreferences.contains(LanguagePreferences.key)) {
+                language = sharedPreferences.getString(LanguagePreferences.key);
+            }
         });
 
-        Logger.info(`[I18n::changeLocale] Locale changed to: ${newLocale}`);
+        return language;
+    }
+
+    static save(newLanguage: string): void {
+        Java.performNow(() => {
+            sharedPreferences.putString(LanguagePreferences.key, newLanguage);
+        });
     }
 }

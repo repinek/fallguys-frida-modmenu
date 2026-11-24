@@ -63,6 +63,6 @@ export class UnityWebRequest extends Il2Cpp.Object {
             throw new Error(`Response code is not 200\nError: ${error}\nContent: ${content}`);
         }
 
-        return result
+        return result;
     }
 }

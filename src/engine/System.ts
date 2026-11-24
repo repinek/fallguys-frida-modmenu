@@ -1,3 +1,4 @@
+/** Short-hand to some System Types */
 export class System {
     private static _boolean: Il2Cpp.Class;
     private static _string: Il2Cpp.Class;
@@ -21,7 +22,7 @@ export class System {
     }
 
     static get Action1(): Il2Cpp.Class {
-         return (this._action1 ??= Il2Cpp.corlib.class("System.Action`1"));
+        return (this._action1 ??= Il2Cpp.corlib.class("System.Action`1"));
     }
     static get ActionBool(): Il2Cpp.Class {
         return (this._actionBool ??= Il2Cpp.corlib.class("System.Action`1").inflate(this.Boolean));

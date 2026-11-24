@@ -20,11 +20,22 @@ import { DoorManager } from "./mod/features/rounds/DoorManager";
 import { PerfectMatchManager } from "./mod/features/rounds/PerfectMatchManager";
 import { TipToeManager } from "./mod/features/rounds/TipToeManager";
 import { UICanvas } from "./mod/features/UICanvas";
-import { UpdateChecker } from "./mod/features/UpdateChecker";
 import { UwUify } from "./mod/features/UwUify";
 import { I18n } from "./mod/i18n/I18n";
 import { MenuBuilder } from "./mod/ui/MenuBuilder";
+import { UpdateChecker } from "./mod/utils/UpdateChecker";
 import { Logger } from "./utils/Logger";
+
+function logBanner(): void {
+    const { VERSION, ENV, FOR_GAME_VERSION } = ModPreferences;
+    const gameVersion = Il2Cpp.application.version!;
+
+    Logger.infoGreen(`Fall Guys Frida Mod Menu ${VERSION} (${ENV}), Game Version: ${gameVersion}`);
+
+    if (gameVersion !== ModPreferences.FOR_GAME_VERSION) {
+        Logger.warn(`[UpdateChecker::checkGameVersion] Game version ${gameVersion} is not supported. Expected ${FOR_GAME_VERSION}. Things may break`);
+    }
+}
 
 function initEngine(): void {
     AssemblyHelper.init();
@@ -32,8 +43,14 @@ function initEngine(): void {
     UnityLogger.init(Constants.UNITY_LOGGING);
 }
 
+function initGame(): void {
+    PopupManager.init();
+    LocalisedStringsHook.init();
+}
+
 function initMod(): void {
     I18n.init();
+    UpdateChecker.fetchLatestVersion();
 
     // Init features
     // Player
@@ -58,16 +75,7 @@ function initMod(): void {
     UwUify.init();
 
     // Init UI
-    PopupManager.init();
     MenuBuilder.init();
-
-    // Init updater
-    UpdateChecker.checkVersionCompatibility();
-    UpdateChecker.checkForUpdate();
-}
-
-function initGame(): void {
-    LocalisedStringsHook.init();
 }
 
 function init(): void {
@@ -75,11 +83,11 @@ function init(): void {
 
     Il2Cpp.perform(() => {
         Logger.debug("IL2CPP Loaded");
-        Logger.infoGreen(`Fall Guys Frida Mod Menu ${ModPreferences.VERSION} (${ModPreferences.ENV}), Game Version: ${Il2Cpp.application.version!}`);
+        logBanner();
 
         initEngine();
-        initMod();
         initGame();
+        initMod();
     }).catch(error => Logger.error(`Failed to initialize script: ${error}`));
 }
 

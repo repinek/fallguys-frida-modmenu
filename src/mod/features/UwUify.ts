@@ -59,7 +59,7 @@ export class UwUify {
                 const string = uiTextObject.method<Il2Cpp.String>("get_text").invoke();
                 uiTextObject.method<void>("set_text", 1).invoke(string);
             }
-        // Revert
+            // Revert
         } else if (!state) {
             for (const [instanceId, originalText] of Object.entries(this.originalStrings)) {
                 const id = Number(instanceId); // since entries return strings

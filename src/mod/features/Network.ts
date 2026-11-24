@@ -34,7 +34,7 @@ export class Network {
 
             // payload example: {"payload":{"queuedPlayers":6,"state":"Queued"},"name":"StatusUpdate"}
             const payload = JSON.parse(content)?.payload;
-            if (payload?.state === "Queued" ) {
+            if (payload?.state === "Queued") {
                 Logger.toast(I18n.t("network_toasts.queued_players", payload.queuedPlayers.toString()));
             }
         } catch (error) {

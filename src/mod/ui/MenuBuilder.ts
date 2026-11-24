@@ -1,4 +1,3 @@
-import Java from "frida-java-bridge";
 import { Composer, ObsidianLayout, waitForInit } from "frida-java-menu";
 
 import { Logger } from "../../utils/Logger";
@@ -9,33 +8,29 @@ import { I18n } from "../i18n/I18n";
 import { MenuTabs } from "./MenuTabs";
 
 export class MenuBuilder {
-    private static readonly tag = "MenuBuilder";
-
-    static layout: ObsidianLayout;
+    private static _layout: ObsidianLayout;
 
     static init(): void {
-        if (Java.available) {
-            Java.perform(() => {
-                waitForInit(MenuBuilder.build);
-            });
-
-            Logger.info(`[${this.tag}::init] Initialized`);
-        } else {
-            Logger.warn(`[${this.tag}::init] Java is unavailable, menu won't be initialized`);
-        }
+        waitForInit(() => MenuBuilder.build());
+        Logger.info(`[MenuBuilder::init] Initialized`);
     }
 
     private static build(): void {
-        MenuBuilder.layout = new ObsidianLayout(getObsidianConfig());
+        const layout = new ObsidianLayout(getObsidianConfig());
+        this._layout = layout;
 
         const title = I18n.t("menu.info.title");
         const desc = I18n.t("menu.info.desc", ModPreferences.VERSION, ModPreferences.ENV);
 
-        const composer = new Composer(title, desc, MenuBuilder.layout);
+        const composer = new Composer(title, desc, layout);
         composer.icon(Constants.MOD_MENU_ICON_URL, "Web");
 
-        MenuTabs.buildAll(MenuBuilder.layout);
+        MenuTabs.buildAll(layout);
 
         composer.show();
+    }
+
+    static get layout(): ObsidianLayout {
+        return this._layout;
     }
 }

@@ -1,7 +1,8 @@
 import { add, CENTER, ObsidianLayout, toast } from "frida-java-menu";
 
-import { JavaUtils } from "../../utils/JavaUtils";
+import { AndroidUtils } from "../../android/AndroidUtils";
 import { Constants } from "../data/Constants";
+import { ModPreferences } from "../data/ModPreferences";
 import { ModSettings } from "../data/ModSettings";
 import { FGDebug } from "../features/FGDebug";
 import { GraphicsManager } from "../features/GraphicsManager";
@@ -13,8 +14,11 @@ import { TipToeManager } from "../features/rounds/TipToeManager";
 import { UICanvas } from "../features/UICanvas";
 import { UwUify } from "../features/UwUify";
 import { I18n } from "../i18n/I18n";
+import { UpdateChecker } from "../utils/UpdateChecker";
 import { MenuPopups } from "./MenuPopups";
 import { MenuUtils } from "./MenuUtils";
+import { ManifestPlugin } from "webpack";
+import { UnityUtils } from "../../engine/UnityUtils";
 
 export class MenuTabs {
     static buildAll(layout: ObsidianLayout) {
@@ -40,35 +44,8 @@ export class MenuTabs {
                 },
                 () => {
                     // Long Callback
-                    JavaUtils.exitFromApp();
+                    AndroidUtils.exitFromApp();
                 }
-            )
-        );
-
-        add(
-            layout.button(
-                "Create Test Popup",
-                MenuUtils.run(() => {
-                    MenuPopups.showDebugPopup();
-                })
-            )
-        );
-
-        add(
-            layout.button(
-                "Create test Selection Option Popup",
-                MenuUtils.run(() => {
-                    MenuPopups.showDebugOptionsPopup();
-                })
-            )
-        );
-
-        add(
-            layout.button(
-                "Create Test Input Field Popup",
-                MenuUtils.run(() => {
-                    MenuPopups.showDebugInputPopup();
-                })
             )
         );
         /// #endif
@@ -314,9 +291,9 @@ export class MenuTabs {
             )
         );
 
-        add(layout.button(I18n.t("menu.other.github_url"), () => JavaUtils.openURL(Constants.GITHUB_URL)));
-        add(layout.button(I18n.t("menu.other.discord_url"), () => JavaUtils.openURL(Constants.DISCORD_URL)));
-        add(layout.button(I18n.t("menu.other.fgtools_mobile_url"), () => JavaUtils.openURL(Constants.FGTOOLS_MOBILE_URL)));
+        add(layout.button(I18n.t("menu.other.github_url"), () => AndroidUtils.openURL(Constants.GITHUB_URL)));
+        add(layout.button(I18n.t("menu.other.discord_url"), () => AndroidUtils.openURL(Constants.DISCORD_URL)));
+        add(layout.button(I18n.t("menu.other.fgtools_mobile_url"), () => AndroidUtils.openURL(Constants.FGTOOLS_MOBILE_URL)));
 
         add(
             layout.button(
@@ -328,7 +305,9 @@ export class MenuTabs {
         add(
             layout.button(
                 I18n.t("menu.other.changelog"),
-                MenuUtils.run(() => MenuPopups.showChangelogPopup())
+                MenuUtils.run(() =>
+                    UpdateChecker.getChangelog(ModPreferences.VERSION).then(entry => UnityUtils.runInMain(() => MenuPopups.showChangelogPopup(entry)))
+                )
             )
         );
     }

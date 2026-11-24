@@ -32,5 +32,5 @@ export const Constants = {
     IS_GATEWAY_SECURE: true,
     CUSTOM_ANALYTICS_URL: "analytics-gateway.fallguys.oncatapult.com",
     CUSTOM_ANALYTICS_PORT: 443,
-    IS_ANALYTICS_SECURE: true,
+    IS_ANALYTICS_SECURE: true
 } as const;

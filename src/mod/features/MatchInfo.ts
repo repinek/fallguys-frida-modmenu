@@ -1,6 +1,6 @@
+import { AndroidUtils } from "../../android/AndroidUtils";
 import { AssemblyHelper } from "../../engine/AssemblyHelper";
 import { UnityUtils } from "../../engine/UnityUtils";
-import { JavaUtils } from "../../utils/JavaUtils";
 import { Logger } from "../../utils/Logger";
 import { I18n } from "../i18n/I18n";
 
@@ -57,7 +57,7 @@ export class MatchInfo {
 
             const infoString = I18n.t("game_toasts.server_info", hostIPAddr, hostPortNo, rtt);
             Logger.toast(infoString, 1);
-            JavaUtils.copyToClipboard(`${hostIPAddr}:${hostPortNo}`);
+            AndroidUtils.copyToClipboard(`${hostIPAddr}:${hostPortNo}`);
         } catch (error) {
             Logger.errorThrow(error);
         }

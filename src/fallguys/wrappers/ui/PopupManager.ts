@@ -32,7 +32,7 @@ export class PopupManager {
     private static waitingForScaling = false;
     private static scale: number;
 
-    public static init(): void {
+    static init(): void {
         this.PopupManager = AssemblyHelper.MTFGClient.class("FGClient.UI.PopupManager");
 
         this.ModalMessagePopupViewModel = AssemblyHelper.MTFGClient.class("FGClient.UI.ModalMessagePopupViewModel");
