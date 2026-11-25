@@ -1,9 +1,9 @@
 import { AndroidUtils } from "../../android/AndroidUtils";
 import { System } from "../../engine/System";
-import { LocaliseOption } from "../../fallguys/wrappers/ui/data/ModalMessageBaseData";
-import { ModalMessageData, ModalType, OkButtonType } from "../../fallguys/wrappers/ui/data/ModalMessageData";
-import { ModalMessageWithOptionSelectionData } from "../../fallguys/wrappers/ui/data/ModalMessageWithOptionSelectionData";
-import { PopupManager } from "../../fallguys/wrappers/ui/PopupManager";
+import { LocaliseOption } from "../../fallguys/wrappers/FGClient/UI/data/ModalMessageBaseData";
+import { ModalMessageData, ModalType, OkButtonType } from "../../fallguys/wrappers/FGClient/UI/data/ModalMessageData";
+import { ModalMessageWithOptionSelectionData } from "../../fallguys/wrappers/FGClient/UI/data/ModalMessageWithOptionSelectionData";
+import { PopupManager } from "../../fallguys/wrappers/FGClient/UI/PopupManager";
 import { Logger } from "../../utils/Logger";
 import { Constants } from "../data/Constants";
 import { ModPreferences } from "../data/ModPreferences";
@@ -71,6 +71,16 @@ export class MenuPopups {
         data.Title = I18n.t("popups.credits.title");
         data.Message = I18n.t("popups.credits.message");
 
+        data.ModalType = ModalType.MT_OK;
+        data.OkButtonType = OkButtonType.Green;
+
+        PopupManager.show(data);
+    }
+
+    static showBannedPopup(): void {
+        const data = ModalMessageData.create();
+        data.Title = I18n.t("popups.ban_bypass.title");
+        data.Message = I18n.t("popups.ban_bypass.message");
         data.ModalType = ModalType.MT_OK;
         data.OkButtonType = OkButtonType.Green;
 

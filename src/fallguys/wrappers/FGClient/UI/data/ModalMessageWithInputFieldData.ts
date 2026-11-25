@@ -1,5 +1,5 @@
-import { AssemblyHelper } from "../../../../engine/AssemblyHelper";
-import { UnityUtils } from "../../../../engine/UnityUtils";
+import { AssemblyHelper } from "../../../../../engine/AssemblyHelper";
+import { UnityUtils } from "../../../../../engine/UnityUtils";
 import { ModalMessageData } from "./ModalMessageData";
 
 /*

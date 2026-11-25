@@ -1,8 +1,6 @@
 import { AssemblyHelper } from "../../engine/AssemblyHelper";
-import { ModalMessageData, ModalType, OkButtonType } from "../../fallguys/wrappers/ui/data/ModalMessageData";
-import { PopupManager } from "../../fallguys/wrappers/ui/PopupManager";
 import { Logger } from "../../utils/Logger";
-import { I18n } from "../i18n/I18n";
+import { MenuPopups } from "../ui/MenuPopups";
 
 /*
  * Temporary bans can't be bypassed, but permament can be lol
@@ -38,17 +36,7 @@ export class BanBypass {
 
     private static popupHook(): void {
         Logger.hook("ShowAntiCheatPopup called");
-        BanBypass.showBannedPopup();
+        MenuPopups.showBannedPopup();
         return;
-    }
-
-    private static showBannedPopup(): void {
-        const data = ModalMessageData.create();
-        data.Title = I18n.t("popups.ban_bypass.title");
-        data.Message = I18n.t("popups.ban_bypass.message");
-        data.ModalType = ModalType.MT_OK;
-        data.OkButtonType = OkButtonType.Green;
-
-        PopupManager.show(data);
     }
 }

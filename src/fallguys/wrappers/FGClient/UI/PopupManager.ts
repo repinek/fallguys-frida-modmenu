@@ -1,7 +1,7 @@
-import { AssemblyHelper } from "../../../engine/AssemblyHelper";
-import { UnityUtils } from "../../../engine/UnityUtils";
-import { Vector3 } from "../../../engine/wrappers/Vector3";
-import { Logger } from "../../../utils/Logger";
+import { AssemblyHelper } from "../../../../engine/AssemblyHelper";
+import { UnityUtils } from "../../../../engine/UnityUtils";
+import { Vector3 } from "../../../../engine/wrappers/Vector3";
+import { Logger } from "../../../../utils/Logger";
 import { ModalMessageData } from "./data/ModalMessageData";
 import { ModalMessageWithInputFieldData } from "./data/ModalMessageWithInputFieldData";
 import { ModalMessageWithOptionSelectionData } from "./data/ModalMessageWithOptionSelectionData";

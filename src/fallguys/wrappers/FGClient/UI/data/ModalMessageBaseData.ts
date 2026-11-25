@@ -1,4 +1,4 @@
-import { AssemblyHelper } from "../../../../engine/AssemblyHelper";
+import { AssemblyHelper } from "../../../../../engine/AssemblyHelper";
 
 export enum LocaliseOption {
     Localised = 0,
