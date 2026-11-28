@@ -12,6 +12,6 @@ export class FallGuysCharacterController extends Il2Cpp.Object {
     }
 
     get rigidBody(): Rigidbody {
-        return new Rigidbody (this.method<Il2Cpp.Object>("get_RigidBody").invoke())
+        return new Rigidbody(this.method<Il2Cpp.Object>("get_RigidBody").invoke());
     }
 }

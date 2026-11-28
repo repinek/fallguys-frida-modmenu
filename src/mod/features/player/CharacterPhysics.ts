@@ -26,7 +26,6 @@ export class CharacterPhysics {
         const MotorFunctionJump = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
         const MPGNetMotorTasks = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks");
 
-        // Methods
         //@ts-ignore
         CharacterDataMonitor.method<boolean>("CheckCharacterControllerData", 1).implementation = this.checkCharacterControllerDataHook;
         //@ts-ignore
@@ -51,7 +50,6 @@ export class CharacterPhysics {
         return true;
     }
 
-
     private static changeSpeed(data: CharacterControllerData): void {
         const speed = ModSettings.customSpeed ? ModSettings.normalMaxSpeed : GameDefaults.normalMaxSpeed;
 
@@ -74,18 +72,18 @@ export class CharacterPhysics {
             }
         }
 
-        data.maxGravityVelocity = gravity
+        data.maxGravityVelocity = gravity;
     }
 
     private static changeDive(data: CharacterControllerData): void {
         const diveSensitivity = ModSettings.enable360Dives ? 69420 : GameDefaults.divePlayerSensitivity;
-        data.divePlayerSensitivity = diveSensitivity
+        data.divePlayerSensitivity = diveSensitivity;
 
         if (ModSettings.customDiveForce) {
             data.diveForce = ModSettings.diveForce;
             data.airDiveForce = ModSettings.diveForce / GameDefaults.diveMultiplier;
         } else {
-            data.diveForce = GameDefaults.diveForce
+            data.diveForce = GameDefaults.diveForce;
             data.airDiveForce = GameDefaults.airDiveForce;
         }
     }
