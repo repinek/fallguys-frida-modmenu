@@ -1,5 +1,9 @@
 import { AssemblyHelper } from "../../../engine/AssemblyHelper";
 import { GameDefaults } from "../../../fallguys/GameDefaults";
+import { FallGuysCharacterController } from "../../../fallguys/wrappers/FallGuysCharacterController";
+import { MotorFunctionJump } from "../../../fallguys/wrappers/FG.Common/Character/MotorFunctionJump";
+import { CharacterControllerData } from "../../../fallguys/wrappers/FG.Common/CharacterControllerData";
+import { GlobalGameStateClient } from "../../../fallguys/wrappers/FGClient/GlobalGameStateClient";
 import { Logger } from "../../../utils/Logger";
 import { ModSettings } from "../../data/ModSettings";
 
@@ -17,17 +21,12 @@ import { ModSettings } from "../../data/ModSettings";
  */
 
 export class CharacterPhysics {
-    // Classes and Instances
-    private static character?: Il2Cpp.Object; // FallGuysCharacterController
-    static _character?: Il2Cpp.Object;
-
     static init(): void {
         const CharacterDataMonitor = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.Character.CharacterDataMonitor");
         const MotorFunctionJump = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.Character.MotorFunctionJump");
         const MPGNetMotorTasks = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.MPGNetMotorTasks");
 
         // Methods
-        // Boolean CheckCharacterControllerData(FallGuysCharacterController character*)
         //@ts-ignore
         CharacterDataMonitor.method<boolean>("CheckCharacterControllerData", 1).implementation = this.checkCharacterControllerDataHook;
         //@ts-ignore
@@ -38,12 +37,11 @@ export class CharacterPhysics {
         Logger.info("[CharacterPhysics::init] Initialized");
     }
 
-    private static checkCharacterControllerDataHook(character: Il2Cpp.Object): boolean {
-        CharacterPhysics.character = character; // Instance of class FallGuysCharacterController
-        CharacterPhysics._character = character;
+    private static checkCharacterControllerDataHook(rawCharacter: Il2Cpp.Object): boolean {
+        const character = new FallGuysCharacterController(rawCharacter);
 
-        const data = character.method<Il2Cpp.Object>("get_Data").invoke(); // Instance of class CharacterControllerData
-        const jumpMotor = character.method<Il2Cpp.Object>("get_JumpMotorFunction").invoke(); // Instance of class MotorFunctionJump
+        const data = character.data;
+        const jumpMotor = character.jumpMotorFunction;
 
         CharacterPhysics.changeSpeed(data);
         CharacterPhysics.changeGravity(data);
@@ -51,6 +49,62 @@ export class CharacterPhysics {
         CharacterPhysics.changeJump(jumpMotor);
 
         return true;
+    }
+
+
+    private static changeSpeed(data: CharacterControllerData): void {
+        const speed = ModSettings.customSpeed ? ModSettings.normalMaxSpeed : GameDefaults.normalMaxSpeed;
+
+        data.normalMaxSpeed = speed;
+        data.carryMaxSpeed = speed;
+        data.grabbingMaxSpeed = speed;
+    }
+
+    private static changeGravity(data: CharacterControllerData): void {
+        let gravity: number = GameDefaults.maxGravityVelocity;
+
+        // kinda messy, idk how better
+        if (ModSettings.customGravity) {
+            if (ModSettings.noGravity) {
+                gravity = 0;
+            } else if (ModSettings.negativeGravity) {
+                gravity = -ModSettings.maxGravityVelocity;
+            } else {
+                gravity = ModSettings.maxGravityVelocity;
+            }
+        }
+
+        data.maxGravityVelocity = gravity
+    }
+
+    private static changeDive(data: CharacterControllerData): void {
+        const diveSensitivity = ModSettings.enable360Dives ? 69420 : GameDefaults.divePlayerSensitivity;
+        data.divePlayerSensitivity = diveSensitivity
+
+        if (ModSettings.customDiveForce) {
+            data.diveForce = ModSettings.diveForce;
+            data.airDiveForce = ModSettings.diveForce / GameDefaults.diveMultiplier;
+        } else {
+            data.diveForce = GameDefaults.diveForce
+            data.airDiveForce = GameDefaults.airDiveForce;
+        }
+    }
+
+    private static changeJump(jumpMotor: MotorFunctionJump): void {
+        const targetJump = ModSettings.customJumpForce ? ModSettings.jumpForce : GameDefaults.jumpForce;
+        jumpMotor.jumpForce.y = targetJump;
+    }
+
+    static freezePlayer(state: boolean): void {
+        if (GlobalGameStateClient.instance?.gameStateView.isGamePlaying && this.localCharacter) {
+            this.localCharacter.rigidBody.isKinematic = state;
+        } else {
+            // not in game say it
+        }
+    }
+
+    static get localCharacter(): FallGuysCharacterController | undefined {
+        return GlobalGameStateClient.instance?.playerManager.localCharacter;
     }
 
     private static canJumpHook(this: Il2Cpp.Object): boolean {
@@ -65,63 +119,5 @@ export class CharacterPhysics {
             return;
         }
         return this.method<void>("SendMessage", 1).invoke(bypassNetworkLOD);
-    }
-
-    private static changeSpeed(data: Il2Cpp.Object): void {
-        const speed = ModSettings.customSpeed ? ModSettings.normalMaxSpeed : GameDefaults.normalMaxSpeed;
-
-        data.field("normalMaxSpeed").value = speed;
-        data.field("carryMaxSpeed").value = speed;
-        data.field("grabbingMaxSpeed").value = speed;
-    }
-
-    private static changeGravity(data: Il2Cpp.Object): void {
-        let gravity: number = GameDefaults.maxGravityVelocity;
-
-        if (ModSettings.customGravity) {
-            if (ModSettings.noGravity) {
-                gravity = 0;
-            } else if (ModSettings.negativeGravity) {
-                gravity = -ModSettings.maxGravityVelocity;
-            } else {
-                gravity = ModSettings.maxGravityVelocity;
-            }
-        }
-
-        data.field("maxGravityVelocity").value = gravity;
-    }
-
-    private static changeDive(data: Il2Cpp.Object): void {
-        const diveSensitivity = ModSettings.enable360Dives ? 69420 : GameDefaults.divePlayerSensitivity;
-
-        data.field("divePlayerSensitivity").value = diveSensitivity;
-
-        if (ModSettings.customDiveForce) {
-            data.field("diveForce").value = ModSettings.diveForce;
-            data.field("airDiveForce").value = ModSettings.diveForce / GameDefaults.diveMultiplier;
-        } else {
-            data.field("diveForce").value = GameDefaults.diveForce;
-            data.field("airDiveForce").value = GameDefaults.airDiveForce;
-        }
-    }
-
-    private static changeJump(jumpMotor: Il2Cpp.Object): void {
-        const targetJump = ModSettings.customJumpForce ? ModSettings.jumpForce : GameDefaults.jumpForce;
-
-        const jumpForce = jumpMotor.field<Il2Cpp.ValueType>("_jumpForce").value;
-        jumpForce.field("y").value = targetJump;
-    }
-
-    static freezePlayer(state: boolean): void {
-        try {
-            const characterRigidBody = this.character!.method<Il2Cpp.Object>("get_RigidBody").invoke();
-            characterRigidBody.method<void>("set_isKinematic").invoke(state);
-        } catch (error) {
-            Logger.warn(`[${this.name}::freezePlayer] No character Instance found: ${error}`);
-        }
-    }
-
-    static get Character(): Il2Cpp.Object | undefined {
-        return this._character;
     }
 }

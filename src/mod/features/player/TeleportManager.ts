@@ -46,7 +46,7 @@ export class TeleportManager {
     }
 
     private static get character(): Il2Cpp.Object | undefined {
-        return CharacterPhysics.Character;
+        return CharacterPhysics.localCharacter;
     }
 
     static teleportToFinish(): void {

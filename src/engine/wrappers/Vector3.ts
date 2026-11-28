@@ -16,4 +16,8 @@ export class Vector3 extends Il2Cpp.ValueType {
         const value = instance.unbox();
         return new Vector3(value.handle, value.type);
     }
+
+    set y(value: number) {
+        this.field("y").value = value;
+    }
 }
