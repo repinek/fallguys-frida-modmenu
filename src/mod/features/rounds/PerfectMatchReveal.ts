@@ -3,7 +3,7 @@ import { GameObject } from "../../../engine/wrappers/GameObject";
 import { Logger } from "../../../utils/Logger";
 import { ModSettings } from "../../data/ModSettings";
 
-export class PerfectMatchManager {
+export class PerfectMatchReveal {
     static init(): void {
         const MatchFallTile = AssemblyHelper.TheMultiplayerGuys.class("Levels.MatchFall.MatchFallTile");
         //@ts-ignore

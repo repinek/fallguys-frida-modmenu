@@ -9,7 +9,6 @@ export class GameObject extends Il2Cpp.Object {
         return (this._class ??= AssemblyHelper.CoreModule.class("UnityEngine.GameObject"));
     }
 
-
     /** Wrapper over UnityEngine::GameObject::SetActive */
     setActive(active: boolean): void {
         this.method<void>("SetActive").invoke(active);

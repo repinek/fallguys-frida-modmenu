@@ -7,7 +7,7 @@ import { PopupManager } from "../../fallguys/wrappers/FGClient/UI/PopupManager";
 import { Logger } from "../../utils/Logger";
 import { Constants } from "../data/Constants";
 import { ModPreferences } from "../data/ModPreferences";
-import { Catapult } from "../features/Catapult";
+import { CatapultSpoof } from "../features/network/Catapult";
 import { I18n } from "../i18n/I18n";
 import { ChangelogEntry } from "../utils/UpdateChecker";
 
@@ -27,14 +27,14 @@ export class MenuPopups {
         data.ModalType = ModalType.MT_OK_CANCEL;
         data.OkButtonType = OkButtonType.Green;
 
-        const platforms = Catapult.PLATFORMS;
+        const platforms = CatapultSpoof.PLATFORMS;
         const labels = platforms.map(platform => I18n.t(`platforms.${platform}`));
         data.OptionStringIds = System.createStringList(labels);
 
         data.OnOptionSelectionModalClosed = Il2Cpp.delegate(System.ActionBoolInt, (pressed: boolean, selectedIndex: number) => {
             if (pressed) {
                 const selectedPlatform = platforms[selectedIndex];
-                Catapult.platformPreference.save(selectedPlatform);
+                CatapultSpoof.platformPreference.save(selectedPlatform);
             }
         });
 

@@ -8,16 +8,17 @@ import { Constants } from "./mod/data/Constants";
 import { ModPreferences } from "./mod/data/ModPreferences";
 import { BanBypass } from "./mod/features/BanBypass";
 import { BuildInfo } from "./mod/features/BuildInfo";
-import { Catapult } from "./mod/features/Catapult";
 import { FGDebug } from "./mod/features/FGDebug";
 import { GraphicsManager } from "./mod/features/GraphicsManager";
-import { Network } from "./mod/features/Network";
+import { AnalyticsDisabler } from "./mod/features/network/AnalyticsDisabler";
+import { CatapultSpoof } from "./mod/features/network/Catapult";
+import { MatchmakingInfo } from "./mod/features/network/MatchmakingInfo";
 import { AntiAFK } from "./mod/features/player/AntiAFK";
 import { CharacterPhysics } from "./mod/features/player/CharacterPhysics";
 import { TeleportManager } from "./mod/features/player/TeleportManager";
-import { DoorManager } from "./mod/features/rounds/DoorManager";
-import { PerfectMatchManager } from "./mod/features/rounds/PerfectMatchManager";
-import { TipToeManager } from "./mod/features/rounds/TipToeManager";
+import { DoorReveal } from "./mod/features/rounds/DoorReveal";
+import { PerfectMatchReveal } from "./mod/features/rounds/PerfectMatchReveal";
+import { TipToeReveal } from "./mod/features/rounds/TipToeReveal";
 import { UICanvas } from "./mod/features/UICanvas";
 import { UwUify } from "./mod/features/UwUify";
 import { I18n } from "./mod/i18n/I18n";
@@ -52,23 +53,26 @@ function initMod(): void {
     UpdateChecker.fetchLatestVersion();
 
     // Init features
+    // Network
+    AnalyticsDisabler.init();
+    CatapultSpoof.init();
+    MatchmakingInfo.init();
+
     // Player
     AntiAFK.init();
     CharacterPhysics.init();
     TeleportManager.init();
 
     // Rounds
-    DoorManager.init();
-    PerfectMatchManager.init();
-    TipToeManager.init();
+    DoorReveal.init();
+    PerfectMatchReveal.init();
+    TipToeReveal.init();
 
     // Other
     BanBypass.init();
     BuildInfo.init();
-    Catapult.init();
     FGDebug.init();
     GraphicsManager.init();
-    Network.init();
     UICanvas.init();
     UwUify.init();
 

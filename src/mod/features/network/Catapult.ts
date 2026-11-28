@@ -1,10 +1,10 @@
-import { StringPrereference } from "../../android/Preference";
-import { AssemblyHelper } from "../../engine/AssemblyHelper";
-import { UnityUtils } from "../../engine/UnityUtils";
-import { UnityWebRequest } from "../../engine/wrappers/UnityWebRequest";
-import { Logger } from "../../utils/Logger";
-import { Constants } from "../data/Constants";
-import { I18n } from "../i18n/I18n";
+import { StringPrereference } from "../../../android/Preference";
+import { AssemblyHelper } from "../../../engine/AssemblyHelper";
+import { UnityUtils } from "../../../engine/UnityUtils";
+import { UnityWebRequest } from "../../../engine/wrappers/UnityWebRequest";
+import { Logger } from "../../../utils/Logger";
+import { Constants } from "../../data/Constants";
+import { I18n } from "../../i18n/I18n";
 
 /*
  * 1. Login and Version Spoofing:
@@ -34,7 +34,7 @@ interface ClientDetails {
     clientVersionSignature: string;
 }
 
-export class Catapult {
+export class CatapultSpoof {
     // any pc platform for some reason on mobile version required EAC_MESSAGE, which we can't handle -> gets disconnected
     static readonly PLATFORMS: string[] = ["android_ega", "ios_ega", "ps5", "xb1", "switch", "ports3_2"];
 
@@ -65,16 +65,16 @@ export class Catapult {
         const catapultConfig = this.method<Il2Cpp.Object>("BuildCatapultConfig").invoke(); // <--- OnLeave
 
         // Spoof clientDetails
-        if (Constants.USE_SPOOF && Catapult.clientDetails) {
-            catapultConfig.field<Il2Cpp.String>("ClientVersion").value = Il2Cpp.string(Catapult.clientDetails.clientVersion);
-            catapultConfig.field<Il2Cpp.String>("ClientVersionSignature").value = Il2Cpp.string(Catapult.clientDetails.clientVersionSignature);
-            Logger.debug(`[Catapult::BuildCatapultConfig] Applied version spoof to ${Catapult.clientDetails.clientVersion}`);
+        if (Constants.USE_SPOOF && CatapultSpoof.clientDetails) {
+            catapultConfig.field<Il2Cpp.String>("ClientVersion").value = Il2Cpp.string(CatapultSpoof.clientDetails.clientVersion);
+            catapultConfig.field<Il2Cpp.String>("ClientVersionSignature").value = Il2Cpp.string(CatapultSpoof.clientDetails.clientVersionSignature);
+            Logger.debug(`[Catapult::BuildCatapultConfig] Applied version spoof to ${CatapultSpoof.clientDetails.clientVersion}`);
         }
 
         // Spoof platform
-        if (Catapult.targetPlatform !== "android_ega") {
-            catapultConfig.field<Il2Cpp.String>("Platform").value = Il2Cpp.string(Catapult.targetPlatform);
-            Logger.debug(`[Catapult::BuildCatapultConfig] Modified platform to ${Catapult.targetPlatform}`);
+        if (CatapultSpoof.targetPlatform !== "android_ega") {
+            catapultConfig.field<Il2Cpp.String>("Platform").value = Il2Cpp.string(CatapultSpoof.targetPlatform);
+            Logger.debug(`[Catapult::BuildCatapultConfig] Modified platform to ${CatapultSpoof.targetPlatform}`);
         }
 
         // Spoof login and gateway server

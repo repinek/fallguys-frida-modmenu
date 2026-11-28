@@ -7,11 +7,11 @@ import { ModPreferences } from "../data/ModPreferences";
 import { ModSettings } from "../data/ModSettings";
 import { FGDebug } from "../features/FGDebug";
 import { GraphicsManager } from "../features/GraphicsManager";
-import { MatchInfo } from "../features/MatchInfo";
+import { MatchInfo } from "../features/network/MatchInfo";
 import { CharacterPhysics } from "../features/player/CharacterPhysics";
 import { TeleportManager } from "../features/player/TeleportManager";
-import { DoorManager } from "../features/rounds/DoorManager";
-import { TipToeManager } from "../features/rounds/TipToeManager";
+import { DoorReveal } from "../features/rounds/DoorReveal";
+import { TipToeReveal } from "../features/rounds/TipToeReveal";
 import { UICanvas } from "../features/UICanvas";
 import { UwUify } from "../features/UwUify";
 import { I18n } from "../i18n/I18n";
@@ -150,14 +150,14 @@ export class MenuTabs {
         add(
             layout.button(
                 I18n.t("menu.functions.hide_doors"),
-                MenuUtils.run(() => DoorManager.removeRealDoors())
+                MenuUtils.run(() => DoorReveal.removeRealDoors())
             )
         );
 
         add(
             layout.button(
                 I18n.t("menu.functions.hide_tiptoe"),
-                MenuUtils.run(() => TipToeManager.removeFakeTipToe())
+                MenuUtils.run(() => TipToeReveal.removeFakeTipToe())
             )
         );
 

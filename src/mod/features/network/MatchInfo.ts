@@ -1,10 +1,10 @@
-import { AndroidUtils } from "../../android/AndroidUtils";
-import { FG_NetworkManager } from "../../fallguys/wrappers/FG.Common/FG_NetworkManager";
-import { ClientGameManager } from "../../fallguys/wrappers/FGClient/ClientGameManager";
-import { ClientGameStateView } from "../../fallguys/wrappers/FGClient/ClientGameStateView";
-import { GlobalGameStateClient } from "../../fallguys/wrappers/FGClient/GlobalGameStateClient";
-import { Logger } from "../../utils/Logger";
-import { I18n } from "../i18n/I18n";
+import { AndroidUtils } from "../../../android/AndroidUtils";
+import { FG_NetworkManager } from "../../../fallguys/wrappers/FG.Common/FG_NetworkManager";
+import { ClientGameManager } from "../../../fallguys/wrappers/FGClient/ClientGameManager";
+import { ClientGameStateView } from "../../../fallguys/wrappers/FGClient/ClientGameStateView";
+import { GlobalGameStateClient } from "../../../fallguys/wrappers/FGClient/GlobalGameStateClient";
+import { Logger } from "../../../utils/Logger";
+import { I18n } from "../../i18n/I18n";
 
 export class MatchInfo {
     static showGameDetails(): void {

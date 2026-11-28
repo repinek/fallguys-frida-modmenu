@@ -10,7 +10,7 @@ import { I18n } from "../../i18n/I18n";
  * If it returns false or true, we disable the GameObject using SetActive
  */
 
-export class DoorManager {
+export class DoorReveal {
     private static FakeDoorController: Il2Cpp.Class;
     private static CrownMazeDoor: Il2Cpp.Class;
 

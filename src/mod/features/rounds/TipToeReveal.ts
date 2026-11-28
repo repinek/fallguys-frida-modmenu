@@ -10,7 +10,7 @@ import { I18n } from "../../i18n/I18n";
  * If it returns true, we disable the GameObject using SetActive
  */
 
-export class TipToeManager {
+export class TipToeReveal {
     private static TipToe_Platform: Il2Cpp.Class;
 
     static init(): void {

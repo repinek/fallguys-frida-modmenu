@@ -1,8 +1,6 @@
 import { AssemblyHelper } from "../../engine/AssemblyHelper";
 import { Component } from "../../engine/wrappers/Component";
-import { GameObject } from "../../engine/wrappers/GameObject";
 import { Resources } from "../../engine/wrappers/Resources";
-import { Transform } from "../../engine/wrappers/Transform";
 import { Vector3 } from "../../engine/wrappers/Vector3";
 import { Logger } from "../../utils/Logger";
 
@@ -45,7 +43,7 @@ export class FGDebug {
 
         if (this.isAwaked) {
             this.setFGDebugScale();
-            this.GvrFPSInstance.gameObject.setActive(value)
+            this.GvrFPSInstance.gameObject.setActive(value);
         }
     }
 
