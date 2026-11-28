@@ -1,4 +1,4 @@
-/** Short-hand to some System Types */
+/** Shorthand to some System Types */
 export class System {
     private static _boolean: Il2Cpp.Class;
     private static _string: Il2Cpp.Class;
