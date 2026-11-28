@@ -6,6 +6,7 @@ import { CharacterControllerData } from "../../../fallguys/wrappers/FG.Common/Ch
 import { GlobalGameStateClient } from "../../../fallguys/wrappers/FGClient/GlobalGameStateClient";
 import { Logger } from "../../../utils/Logger";
 import { ModSettings } from "../../data/ModSettings";
+import { InGameUtils } from "../../utils/InGameUtils";
 
 /*
  * Original CharacterDataMonitor::CheckCharacterControllerData logic is
@@ -94,15 +95,11 @@ export class CharacterPhysics {
     }
 
     static freezePlayer(state: boolean): void {
-        if (GlobalGameStateClient.instance?.gameStateView.isGamePlaying && this.localCharacter) {
-            this.localCharacter.rigidBody.isKinematic = state;
+        if (GlobalGameStateClient.instance?.gameStateView.isGamePlaying && InGameUtils.localCharacter) {
+            InGameUtils.localCharacter.rigidBody.isKinematic = state;
         } else {
             // not in game say it
         }
-    }
-
-    static get localCharacter(): FallGuysCharacterController | undefined {
-        return GlobalGameStateClient.instance?.playerManager.localCharacter;
     }
 
     private static canJumpHook(this: Il2Cpp.Object): boolean {

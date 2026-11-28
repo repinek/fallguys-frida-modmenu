@@ -17,7 +17,11 @@ export class Vector3 extends Il2Cpp.ValueType {
         return new Vector3(value.handle, value.type);
     }
 
+    get y(): number {
+        return this.field<number>("y").value;
+    }
+
     set y(value: number) {
-        this.field("y").value = value;
+        this.field<number>("y").value = value;
     }
 }

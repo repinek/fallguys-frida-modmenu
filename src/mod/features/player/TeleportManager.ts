@@ -1,60 +1,35 @@
 import { AssemblyHelper } from "../../../engine/AssemblyHelper";
 import { Component } from "../../../engine/wrappers/Component";
 import { Resources } from "../../../engine/wrappers/Resources";
+import { FallGuysCharacterController } from "../../../fallguys/wrappers/FallGuysCharacterController";
+import { COMMON_ScoringBubble } from "../../../fallguys/wrappers/Levels/Progression/COMMON_ScoringBubble";
+import { SpawnableCollectable } from "../../../fallguys/wrappers/Levels/ScoreZone/SpawnableCollectable";
+import { ScoredButton } from "../../../fallguys/wrappers/ScoredButton";
 import { Logger } from "../../../utils/Logger";
-import { CharacterPhysics } from "./CharacterPhysics";
+import { InGameUtils } from "../../utils/InGameUtils";
 
 export class TeleportManager {
-    // Classes
-    private static ObjectiveReachEndZone: Il2Cpp.Class;
-    private static GrabToQualify: Il2Cpp.Class;
-    private static SpawnableCollectable: Il2Cpp.Class;
-    private static ScoringBubble: Il2Cpp.Class;
-    private static ScoredButton: Il2Cpp.Class;
+    private static ObjectiveReachEndZone: Il2Cpp.Class; // finish
+    private static GrabToQualify: Il2Cpp.Class; // crown
 
     static init(): void {
-        this.ObjectiveReachEndZone = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone"); // finish
-        this.GrabToQualify = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify"); // crown
-        this.SpawnableCollectable = AssemblyHelper.TheMultiplayerGuys.class("Levels.ScoreZone.SpawnableCollectable"); // bubble unity levels
-        this.ScoringBubble = AssemblyHelper.TheMultiplayerGuys.class("Levels.Progression.COMMON_ScoringBubble"); // bubble creative levels
-        this.ScoredButton = AssemblyHelper.TheMultiplayerGuys.class("ScoredButton"); // trigger button unity
+        this.ObjectiveReachEndZone = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_ObjectiveReachEndZone");
+        this.GrabToQualify = AssemblyHelper.TheMultiplayerGuys.class("FG.Common.COMMON_GrabToQualify");
 
         Logger.info("[TeleportManager::init] Initialized");
     }
 
-    /**
-     * Teleports the player to the target object's position.
-     *
-     * @param playerInstance The Player Object
-     * @param targetInstance The destination Object
-     * @param additionalY Vertical offset added to targetInstance position
-     */
-    private static teleportTo(playerInstance: Il2Cpp.Object, targetInstance: Il2Cpp.Object, additionalY: number = 0): void {
-        try {
-            // TODO
-            const temp = new Component(targetInstance);
-            const targetPos = temp.transform.method<Il2Cpp.Object>("get_position").invoke(); // Vector3
-            targetPos.field<number>("y").value += additionalY;
+    /** Teleports the player to the target object's position. */
+    private static teleportTo(playerInstance: FallGuysCharacterController, targetInstance: Component, additionalY: number = 0): void {
+        const targetPos = targetInstance.transform.position;
+        targetPos.y += additionalY;
 
-            // I was using transform for teleportation
-            // We need to use rigid body instead
-            const playerRigidbody = playerInstance.method<Il2Cpp.Object>("get_RigidBody").invoke();
-            playerRigidbody.method<void>("set_position").invoke(targetPos);
-        } catch (error) {
-            Logger.warn(`[${this.name}::teleportTo] No character, ${error}`);
-        }
-    }
-
-    private static get character(): Il2Cpp.Object | undefined {
-        return CharacterPhysics.localCharacter;
+        playerInstance.rigidBody.position = targetPos;
     }
 
     static teleportToFinish(): void {
-        // TODO: fix, doesn't work
-        // UPD: since character is cached, we probably can re-check it here
-        // I don't see a reason to do that currently, since it's not crashing or anything
-        if (!this.character) {
-            Logger.debug(`[${this.name}::teleportToFinish] No character`);
+        if (!InGameUtils.isPlayingAndCharacterExist()) {
+            // todo no character
             return;
         }
 
@@ -64,65 +39,60 @@ export class TeleportManager {
             const objects = Resources.findObjectsOfTypeAll(targetClass.type.object);
 
             if (objects.length > 0) {
-                this.teleportTo(this.character, objects.get(0), 5);
+                this.teleportTo(InGameUtils.localCharacter!, new Component(objects.get(0)), 5);
                 return;
             }
 
-            Logger.debug(`[${this.name}::teleportToFinish] No object`);
+            Logger.debug(`[TeleportManager::teleportToFinish] No object`);
             //Menu.toast(en.messages.no_finish, 0);
         }
     }
 
     static teleportToScore(): void {
-        if (!this.character) {
-            Logger.debug(`[${this.name}::teleportToScore] No character`);
+        if (!InGameUtils.isPlayingAndCharacterExist()) {
+            // todo no character
             return;
         }
 
-        try {
-            let target = this.findUnityBubbles();
+        const target = this.findUnityBubble() ?? this.findCreativeBubble() ?? this.findScoredButton();
 
-            if (!target) target = this.findCreativeBubbles();
-
-            if (!target) target = this.findScoredButton();
-
-            if (target) {
-                this.teleportTo(this.character, target, 1);
-            } else {
-                Logger.debug(`[${this.name}::teleportToScore] No object`);
-            }
-        } catch (error) {
-            Logger.errorThrow(error);
+        if (target) {
+            this.teleportTo(InGameUtils.localCharacter!, target, 1);
+        } else {
+            Logger.debug(`[TeleportManager::teleportToScore] No object`);
         }
     }
 
-    private static findUnityBubbles(): Il2Cpp.Object | undefined {
-        const unityBubbles = Resources.findObjectsOfTypeAll(this.SpawnableCollectable.type.object);
-        for (const bubble of unityBubbles) {
-            if (bubble.method<boolean>("get_Spawned").invoke()) {
-                return bubble;
-            }
-        }
-        return undefined;
-    }
+    private static findUnityBubble(): SpawnableCollectable | undefined {
+        const unityBubbles = Resources.findObjectsOfTypeAll(SpawnableCollectable.class.type.object);
 
-    private static findCreativeBubbles(): Il2Cpp.Object | undefined {
-        const creativeBubbles = Resources.findObjectsOfTypeAll(this.ScoringBubble.type.object);
-        for (const bubble of creativeBubbles) {
-            // if award is negative points: skip
-            if (bubble.field<number>("_pointsAwarded").value <= 0) continue;
-
-            const bubbleHandle = bubble.field<Il2Cpp.Object>("_bubbleHandle").value; // LevelEditorBubbleHandler class
-            if (bubbleHandle.field<boolean>("_spawned").value) {
+        for (const rawBubble of unityBubbles) {
+            const bubble = new SpawnableCollectable(rawBubble);
+            if (bubble.spawned) {
                 return bubble;
             }
         }
     }
 
-    private static findScoredButton(): Il2Cpp.Object | undefined {
-        const scoredButtons = Resources.findObjectsOfTypeAll(this.ScoredButton.type.object);
-        for (const button of scoredButtons) {
-            if (button.field<boolean>("_isAnActiveTarget").value) return button;
+    private static findCreativeBubble(): COMMON_ScoringBubble | undefined {
+        const creativeBubbles = Resources.findObjectsOfTypeAll(COMMON_ScoringBubble.class.type.object);
+
+        for (const rawBubble of creativeBubbles) {
+            const bubble = new COMMON_ScoringBubble(rawBubble);
+            if (bubble.pointsAwarded <= 0) continue;
+
+            if (bubble.bubbleHandle.spawned) {
+                return bubble;
+            }
+        }
+    }
+
+    private static findScoredButton(): ScoredButton | undefined {
+        const scoredButtons = Resources.findObjectsOfTypeAll(ScoredButton.class.type.object);
+
+        for (const rawButton of scoredButtons) {
+            const button = new ScoredButton(rawButton);
+            if (button.isAnActiveTarget) return button;
         }
     }
 }

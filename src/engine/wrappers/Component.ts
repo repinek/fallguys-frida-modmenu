@@ -31,6 +31,11 @@ export class Transform extends Component {
         return (this._class ??= AssemblyHelper.CoreModule.class("UnityEngine.Transform"));
     }
 
+    get position(): Vector3 {
+        const value = this.method<Il2Cpp.ValueType>("get_position").invoke()
+        return new Vector3(value.handle, value.type);
+    }
+
     /**
      * Wrapper over UnityEngine::Transform::set_localScale
      *
