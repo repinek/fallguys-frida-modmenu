@@ -29,18 +29,14 @@ export class Network {
         this.method<void>("ProcessMessageReceived", 1).invoke(jsonMessage);
         if (!ModSettings.showQueuedPlayers) return;
 
-        try {
-            const content = jsonMessage.content;
-            if (!content) return;
-            Logger.debug(`[${Network.name}] Received matchmaking message: ${content}`);
+        const content = jsonMessage.content;
+        if (!content) return;
+        Logger.debug(`[Network::processMessageReceivedHook] Received matchmaking message: ${content}`);
 
-            // payload example: {"payload":{"queuedPlayers":6,"state":"Queued"},"name":"StatusUpdate"}
-            const payload = JSON.parse(content)?.payload;
-            if (payload?.state === "Queued") {
-                Logger.toast(I18n.t("network_toasts.queued_players", payload.queuedPlayers.toString()));
-            }
-        } catch (error) {
-            Logger.warn(`[${Network.name}] Could not display queue message`, error);
+        // payload example: {"payload":{"queuedPlayers":6,"state":"Queued"},"name":"StatusUpdate"}
+        const payload = JSON.parse(content)?.payload;
+        if (payload?.state === "Queued") {
+            Logger.toast(I18n.t("network_toasts.queued_players", payload.queuedPlayers.toString()));
         }
     }
 }

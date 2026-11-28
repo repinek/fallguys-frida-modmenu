@@ -1,5 +1,5 @@
 import { AssemblyHelper } from "../../../engine/AssemblyHelper";
-import { GameObject } from "../../../engine/wrappers/GameObject";
+import { Component } from "../../../engine/wrappers/Component";
 import { Resources } from "../../../engine/wrappers/Resources";
 import { Logger } from "../../../utils/Logger";
 import { I18n } from "../../i18n/I18n";
@@ -11,7 +11,6 @@ import { I18n } from "../../i18n/I18n";
  */
 
 export class TipToeManager {
-    // Classes
     private static TipToe_Platform: Il2Cpp.Class;
 
     static init(): void {
@@ -24,18 +23,16 @@ export class TipToeManager {
         const platforms = Resources.findObjectsOfTypeAll(this.TipToe_Platform.type.object);
 
         if (platforms.length === 0) {
-            Logger.debug(`[${this.name}::removeFakeTipToe] No TipToe`);
+            Logger.debug(`[TipToeManager::removeFakeTipToe] No TipToe`);
             Logger.toast(I18n.t("rounds_toasts.no_tiptoe"), 0);
             return;
         }
 
-        for (const tiptoe of platforms) {
+        for (const rawTiptoe of platforms) {
+            const tiptoe = new Component(rawTiptoe);
             const isFake = tiptoe.method<boolean>("get_IsFakePlatform").invoke();
 
-            if (isFake) {
-                const tiptoeObject = tiptoe.method<Il2Cpp.Object>("get_gameObject").invoke();
-                GameObject.setActive(tiptoeObject, false);
-            }
+            if (isFake) tiptoe.gameObject.setActive(false);
         }
     }
 }

@@ -31,7 +31,9 @@ export class TeleportManager {
      */
     private static teleportTo(playerInstance: Il2Cpp.Object, targetInstance: Il2Cpp.Object, additionalY: number = 0): void {
         try {
-            const targetPos = Component.getTransform(targetInstance).method<Il2Cpp.Object>("get_position").invoke(); // Vector3
+            // TODO
+            const temp = new Component(targetInstance);
+            const targetPos = temp.transform.method<Il2Cpp.Object>("get_position").invoke(); // Vector3
             targetPos.field<number>("y").value += additionalY;
 
             // I was using transform for teleportation

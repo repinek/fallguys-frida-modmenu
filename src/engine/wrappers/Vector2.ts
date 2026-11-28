@@ -1,7 +1,7 @@
 import { AssemblyHelper } from "../AssemblyHelper";
 
 /** `UnityEngine.Vector2` */
-export class Vector2 {
+export class Vector2 extends Il2Cpp.ValueType {
     protected static _class: Il2Cpp.Class | null = null;
 
     /** `UnityEngine.Vector2` */

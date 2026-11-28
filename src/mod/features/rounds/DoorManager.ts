@@ -1,6 +1,5 @@
 import { AssemblyHelper } from "../../../engine/AssemblyHelper";
 import { Component } from "../../../engine/wrappers/Component";
-import { GameObject } from "../../../engine/wrappers/GameObject";
 import { Resources } from "../../../engine/wrappers/Resources";
 import { Logger } from "../../../utils/Logger";
 import { I18n } from "../../i18n/I18n";
@@ -12,7 +11,6 @@ import { I18n } from "../../i18n/I18n";
  */
 
 export class DoorManager {
-    // Classes
     private static FakeDoorController: Il2Cpp.Class;
     private static CrownMazeDoor: Il2Cpp.Class;
 
@@ -24,6 +22,7 @@ export class DoorManager {
     }
 
     static removeRealDoors(): void {
+        // Only one of them can be present on scene
         if (this.processDoors(this.FakeDoorController, "get_IsFakeDoor", false)) {
             return;
         }
@@ -38,18 +37,17 @@ export class DoorManager {
         const doors = Resources.findObjectsOfTypeAll(doorClass.type.object);
 
         if (doors.length === 0) {
-            Logger.debug(`[${this.name}::removeFakeDoors] No doors of ${doorClass.name}`);
+            Logger.debug(`[DoorManager::removeFakeDoors] No doors of ${doorClass.name}`);
             return false;
         }
 
-        for (const door of doors) {
+        for (const rawDoor of doors) {
+            const door = new Component(rawDoor);
             const methodRetuned = door.method<boolean>(methodName).invoke();
 
-            if (methodRetuned === methodShouldReturn) {
-                const doorObject = Component.getGameObject(door);
-                GameObject.setActive(doorObject, false);
-            }
+            if (methodRetuned === methodShouldReturn) door.gameObject.setActive(false);
         }
+
         return true;
     }
 }

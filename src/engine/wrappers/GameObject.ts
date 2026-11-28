@@ -1,7 +1,7 @@
 import { AssemblyHelper } from "../AssemblyHelper";
 
 /** `UnityEngine.GameObject` */
-export class GameObject {
+export class GameObject extends Il2Cpp.Object {
     protected static _class: Il2Cpp.Class | null = null;
 
     /** `UnityEngine.GameObject` */
@@ -9,8 +9,9 @@ export class GameObject {
         return (this._class ??= AssemblyHelper.CoreModule.class("UnityEngine.GameObject"));
     }
 
+
     /** Wrapper over UnityEngine::GameObject::SetActive */
-    static setActive(gameObject: Il2Cpp.Object, active: boolean): void {
-        gameObject.method<void>("SetActive").invoke(active);
+    setActive(active: boolean): void {
+        this.method<void>("SetActive").invoke(active);
     }
 }

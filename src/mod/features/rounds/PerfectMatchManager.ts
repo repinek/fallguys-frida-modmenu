@@ -1,13 +1,11 @@
 import { AssemblyHelper } from "../../../engine/AssemblyHelper";
+import { GameObject } from "../../../engine/wrappers/GameObject";
 import { Logger } from "../../../utils/Logger";
 import { ModSettings } from "../../data/ModSettings";
 
 export class PerfectMatchManager {
     static init(): void {
-        // Classes
         const MatchFallTile = AssemblyHelper.TheMultiplayerGuys.class("Levels.MatchFall.MatchFallTile");
-
-        // Methods
         //@ts-ignore
         MatchFallTile.method<void>("Update").implementation = this.updateHook;
 
@@ -16,11 +14,10 @@ export class PerfectMatchManager {
 
     private static updateHook(this: Il2Cpp.Object): void {
         if (ModSettings.showPerfectMatchTiles) {
-            const tileSurfaceOffObject = this.method<Il2Cpp.Object>("get__tileSurfaceOffObject").invoke();
-            const tileSurfaceOnObject = this.method<Il2Cpp.Object>("get__tileSurfaceOnObject").invoke();
-
-            tileSurfaceOffObject.method<void>("SetActive").invoke(false);
-            tileSurfaceOnObject.method<void>("SetActive").invoke(true);
+            const tileSurfaceOffObject = new GameObject(this.method<Il2Cpp.Object>("get__tileSurfaceOffObject").invoke());
+            const tileSurfaceOnObject = new GameObject(this.method<Il2Cpp.Object>("get__tileSurfaceOnObject").invoke());
+            tileSurfaceOffObject.setActive(false);
+            tileSurfaceOnObject.setActive(true);
         }
 
         this.method<void>("Update").invoke();
